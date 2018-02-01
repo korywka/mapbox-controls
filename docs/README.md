@@ -6,4 +6,4 @@
 
 `npm i mapbox-gl-controls`
 
-[Examples](https://bravecow.github.io/mapbox-gl-controls/index.html)
+[Examples](https://bravecow.github.io/mapbox-gl-controls/)

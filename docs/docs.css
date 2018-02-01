@@ -1,0 +1,37 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px;
+}
+
+.wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+h2 {
+
+}
+
+.map {
+    margin: 32px auto;
+    height: 400px;
+}
+
+.radio {
+    display: inline-block;
+    margin: 10px;
+}
+
+.radio input {
+    margin-right: 10px;
+    vertical-align: top;
+}
+
+ul {
+    margin-bottom: 24px;
+    padding-left: 18px;
+}
+
+li {
+    margin-bottom: 10px;
+}

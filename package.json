@@ -1,0 +1,29 @@
+{
+  "name": "mapbox-gl-controls",
+  "version": "0.0.1",
+  "main": "./lib/index.js",
+  "scripts": {
+    "lib": "babel src --out-dir lib",
+    "prepublishOnly": "npm version patch",
+    "docs": "webpack --config ./docs/webpack.config.js -p",
+    "docs:watch": "webpack --config ./docs/webpack.config.js --watch"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.0",
+    "css-loader": "^0.28.9",
+    "eslint": "^4.7.2",
+    "eslint-config-airbnb-base": "^12.0.1",
+    "eslint-plugin-import": "^2.7.0",
+    "extract-text-webpack-plugin": "^3.0.2",
+    "mapbox-gl": "^0.44.0",
+    "normalize.css": "^7.0.0",
+    "prismjs": "^1.10.0",
+    "webpack": "^3.10.0"
+  },
+  "peerDependencies": {
+    "mapbox-gl": "^0.43.0"
+  }
+}

@@ -1,6 +1,6 @@
 {
   "name": "mapbox-gl-controls",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "./lib/index.js",
   "scripts": {
     "lib": "babel src --out-dir lib",

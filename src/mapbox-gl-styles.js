@@ -9,7 +9,7 @@ const stylesDefault = [
 ];
 
 export default class {
-  constructor(styles = []) {
+  constructor(styles) {
     this.styles = styles || stylesDefault;
   }
 

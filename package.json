@@ -4,6 +4,7 @@
   "main": "./lib/index.js",
   "scripts": {
     "lib": "babel src --out-dir lib",
+    "lib:watch": "babel src --out-dir lib --watch",
     "prepublishOnly": "npm version patch",
     "docs": "webpack --config ./docs/webpack.config.js -p",
     "docs:watch": "webpack --config ./docs/webpack.config.js --watch"

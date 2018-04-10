@@ -47,7 +47,7 @@ export default class {
         div.style.background = 'none';
         div.style.fontWeight = '400';
       });
-      const styleUrls = this.styles.map(style => style.url);
+      const styleUrls = this.styles.map(style => style.url.split('?')[0]); // remove GET params: ?optimize=true
       const currentStyleIndex = styleUrls.indexOf(this.map.getStyle().sprite.replace('sprites', 'styles'));
       if (currentStyleIndex !== -1) {
         const currentNode = this.nodes[currentStyleIndex];

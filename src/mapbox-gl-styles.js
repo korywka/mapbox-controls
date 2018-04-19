@@ -27,7 +27,7 @@ export default class {
     this.styles.forEach((style) => {
       const node = document.createElement('div');
       node.textContent = style.name;
-      node.style.padding = '4px 8px';
+      node.style.padding = '5px 8px';
       node.style.cursor = 'pointer';
       node.style.float = 'left';
       node.style.background = '#f9f9f9';

@@ -20,8 +20,8 @@ export default class {
     this.zoomIn.style.background = `url('data:image/svg+xml,${addSVG}') center no-repeat`;
     this.zoomOut.style.background = `url('data:image/svg+xml,${removeSVG}') center no-repeat`;
     [this.zoomIn, this.zoomOut].forEach((node) => {
-      node.style.width = '28px';
-      node.style.height = '28px';
+      node.style.width = '30px';
+      node.style.height = '30px';
       node.style.cursor = 'pointer';
       this.container.appendChild(node);
     });

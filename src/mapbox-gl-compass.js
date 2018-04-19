@@ -19,8 +19,8 @@ export default class {
     this.container.classList.add('mapbox-ctrl-compass');
     this.compassButton.style.position = 'relative';
     this.compassButton.style.background = `url('data:image/svg+xml,${compassSVG}') center no-repeat`;
-    this.compassButton.style.width = '28px';
-    this.compassButton.style.height = '28px';
+    this.compassButton.style.width = '30px';
+    this.compassButton.style.height = '30px';
     this.compassButton.style.cursor = 'pointer';
     this.container.appendChild(this.compassButton);
   }

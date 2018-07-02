@@ -3,6 +3,10 @@ body {
     font-size: 15px;
 }
 
+a {
+    color: #2196F3;
+}
+
 .wrapper {
     max-width: 800px;
     margin: 0 auto;

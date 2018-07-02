@@ -1,4 +1,5 @@
-const compassSVG = '<svg width="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><path d="M0 0h24v24H0z"/><path fill="#212121" d="M12 3l4 8H8z"/><path fill="#9E9E9E" d="M12 21l-4-8h8z"/></g></svg>';
+import theme from './theme';
+import { CompassIcon } from './icons';
 
 export default class {
   constructor(options = {}) {
@@ -10,18 +11,18 @@ export default class {
     this.container = document.createElement('div');
     this.compassButton = document.createElement('div');
     this.container.classList.add('mapboxgl-ctrl');
-    this.container.style.background = '#fff';
-    this.container.style.boxShadow = '0 1px 4px rgba(0, 0, 0, .3)';
-    this.container.style.borderRadius = '2px';
+    this.container.style.background = theme.colorDefault;
+    this.container.style.boxShadow = theme.boxShadow;
+    this.container.style.borderRadius = theme.borderRadius;
     this.container.style.overflow = 'hidden';
     this.container.style.opacity = '0';
-    this.container.style.transition = '.2s opacity ease-in-out';
+    this.container.style.transition = theme.transition;
     this.container.classList.add('mapbox-ctrl-compass');
     this.compassButton.style.position = 'relative';
-    this.compassButton.style.background = `url('data:image/svg+xml,${compassSVG}') center no-repeat`;
-    this.compassButton.style.width = '30px';
-    this.compassButton.style.height = '30px';
+    this.compassButton.style.width = theme.width;
+    this.compassButton.style.height = theme.height;
     this.compassButton.style.cursor = 'pointer';
+    this.compassButton.innerHTML = CompassIcon;
     this.container.appendChild(this.compassButton);
   }
 

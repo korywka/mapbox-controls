@@ -1,6 +1,6 @@
 import mapboxgl from 'mapbox-gl';
 import Prism from 'prismjs';
-import { RulerControl } from '../../lib';
+import { StylesControl, RulerControl } from '../../lib';
 
 export default () => {
   const map = new mapboxgl.Map({
@@ -13,6 +13,7 @@ export default () => {
 
   map.on('load', () => {
     map.addControl(new RulerControl(), 'top-right');
+    map.addControl(new StylesControl(), 'top-left');
   });
 
   code.textContent =

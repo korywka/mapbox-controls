@@ -50,6 +50,7 @@ class Ruler {
     this.coordinates = [];
     this.labels = [];
     this.mapClickListener = this.mapClickListener.bind(this);
+    this.styleLoadListener = this.styleLoadListener.bind(this);
   }
 
   insertControls() {
@@ -68,10 +69,17 @@ class Ruler {
     this.container.appendChild(this.rulerButton);
   }
 
-  measuringOn() {
-    this.map.getCanvas().style.cursor = 'crosshair';
-    this.container.style.background = theme.colorSelected;
-    this.rulerButton.querySelector('svg').setAttribute('fill', theme.colorHighlight);
+  draw() {
+    this.map.addSource(SOURCE_LINE, {
+      type: 'geojson',
+      data: geoLineString(this.coordinates),
+    });
+
+    this.map.addSource(SOURCE_SYMBOL, {
+      type: 'geojson',
+      data: geoPoint(this.coordinates, this.labels),
+    });
+
     this.map.addLayer({
       id: LAYER_LINE,
       type: 'line',
@@ -81,6 +89,7 @@ class Ruler {
         'line-width': 2,
       },
     });
+
     this.map.addLayer({
       id: LAYER_SYMBOL,
       type: 'symbol',
@@ -100,19 +109,32 @@ class Ruler {
     });
   }
 
-  measuringOff() {
-    this.map.getCanvas().style.cursor = '';
-    this.container.style.background = theme.colorDefault;
-    this.rulerButton.querySelector('svg').removeAttribute('fill');
-    // clear map and data
-    this.map.removeLayer(LAYER_LINE);
-    this.map.removeLayer(LAYER_SYMBOL);
-    this.markers.forEach(m => m.remove());
+  measuringOn() {
+    this.isMeasuring = true;
     this.markers = [];
     this.coordinates = [];
     this.labels = [];
-    this.map.getSource(SOURCE_LINE).setData(geoLineString());
-    this.map.getSource(SOURCE_SYMBOL).setData(geoPoint());
+    this.map.getCanvas().style.cursor = 'crosshair';
+    this.container.style.background = theme.colorSelected;
+    this.rulerButton.querySelector('svg').setAttribute('fill', theme.colorHighlight);
+    this.draw();
+    this.map.on('click', this.mapClickListener);
+    this.map.on('style.load', this.styleLoadListener);
+  }
+
+  measuringOff() {
+    this.isMeasuring = false;
+    this.map.getCanvas().style.cursor = '';
+    this.container.style.background = theme.colorDefault;
+    this.rulerButton.querySelector('svg').removeAttribute('fill');
+    // remove layers, sources and event listeners
+    this.map.removeLayer(LAYER_LINE);
+    this.map.removeLayer(LAYER_SYMBOL);
+    this.map.removeSource(SOURCE_LINE);
+    this.map.removeSource(SOURCE_SYMBOL);
+    this.markers.forEach(m => m.remove());
+    this.map.off('click', this.mapClickListener);
+    this.map.off('style.load', this.styleLoadListener);
   }
 
   mapClickListener(event) {
@@ -144,27 +166,19 @@ class Ruler {
     });
   }
 
+  styleLoadListener() {
+    this.draw();
+  }
+
   onAdd(map) {
     this.map = map;
     this.insertControls();
     this.rulerButton.addEventListener('click', () => {
       if (this.isMeasuring) {
-        this.isMeasuring = false;
         this.measuringOff();
-        this.map.off('click', this.mapClickListener);
       } else {
-        this.isMeasuring = true;
         this.measuringOn();
-        this.map.on('click', this.mapClickListener);
       }
-    });
-    this.map.addSource(SOURCE_LINE, {
-      type: 'geojson',
-      data: geoLineString(),
-    });
-    this.map.addSource(SOURCE_SYMBOL, {
-      type: 'geojson',
-      data: geoPoint(),
     });
     return this.container;
   }

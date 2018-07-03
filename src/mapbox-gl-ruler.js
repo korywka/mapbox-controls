@@ -101,7 +101,7 @@ class Ruler {
   }
 
   measuringOff() {
-    this.map.getCanvas().style.removeProperty('cursor');
+    this.map.getCanvas().style.cursor = '';
     this.container.style.background = theme.colorDefault;
     this.rulerButton.querySelector('svg').removeAttribute('fill');
     // clear map and data

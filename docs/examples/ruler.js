@@ -1,6 +1,6 @@
 import mapboxgl from 'mapbox-gl';
 import Prism from 'prismjs';
-import RulerControl from '../../lib/mapbox-gl-ruler';
+import { RulerControl } from '../../lib';
 
 export default () => {
   const map = new mapboxgl.Map({

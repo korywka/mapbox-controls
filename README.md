@@ -1,5 +1,6 @@
 # Mapbox Controls
 * Localization
+* Ruler
 * Styles
 * Zoom
 * Compass

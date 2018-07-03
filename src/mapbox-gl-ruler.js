@@ -69,7 +69,7 @@ class Ruler {
   }
 
   measuringOn() {
-    this.map.getContainer().querySelector('canvas').style.cursor = 'crosshair';
+    this.map.getCanvas().style.cursor = 'crosshair';
     this.container.style.background = theme.colorSelected;
     this.rulerButton.querySelector('svg').setAttribute('fill', theme.colorHighlight);
     this.map.addLayer({
@@ -101,7 +101,7 @@ class Ruler {
   }
 
   measuringOff() {
-    this.map.getContainer().querySelector('canvas').style.removeProperty('cursor');
+    this.map.getCanvas().style.removeProperty('cursor');
     this.container.style.background = theme.colorDefault;
     this.rulerButton.querySelector('svg').removeAttribute('fill');
     // clear map and data
@@ -117,10 +117,11 @@ class Ruler {
 
   mapClickListener(event) {
     const markerNode = document.createElement('div');
-    markerNode.style.width = '8px';
-    markerNode.style.height = '8px';
+    markerNode.style.width = '12px';
+    markerNode.style.height = '12px';
     markerNode.style.borderRadius = '50%';
     markerNode.style.background = '#fff';
+    markerNode.style.boxSizing = 'border-box';
     markerNode.style.border = '2px solid #263238';
     const marker = new mapboxgl.Marker({
       element: markerNode,

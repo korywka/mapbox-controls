@@ -4,7 +4,7 @@ const optionsDefault = {
   fallbackLanguage: 'local',
 };
 
-export default class {
+class Localization {
   constructor(options = {}) {
     this.options = Object.assign(optionsDefault, options);
     this.isLanguageField = /^{name/;
@@ -84,3 +84,5 @@ export default class {
     this.map.setStyle(this.getLocalizedStyle(language));
   }
 }
+
+export default Localization;

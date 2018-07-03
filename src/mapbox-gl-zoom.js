@@ -1,11 +1,7 @@
 import theme from './theme';
 import { PlusIcon, MinusIcon } from './icons';
 
-export default class {
-  constructor(options = {}) {
-    this.options = options;
-  }
-
+class Zoom {
   insertControls() {
     this.container = document.createElement('div');
     this.container.classList.add('mapboxgl-ctrl');
@@ -45,3 +41,5 @@ export default class {
     this.map = undefined;
   }
 }
+
+export default Zoom;

@@ -1,31 +1,30 @@
 import mapboxgl from 'mapbox-gl';
+import Prism from 'prismjs';
 import { StylesControl } from '../../lib/index';
-import Prism from "prismjs";
 
 export default () => {
   const map = new mapboxgl.Map({
-    container: 'styles-map',
+    container: 'map-styles',
     style: 'mapbox://styles/mapbox/streets-v9',
     zoom: 10,
     center: [30.5234, 50.4501],
     scrollZoom: false,
   });
-  const code = document.querySelector('#styles-code');
-  const codeComment = document.querySelector('#styles-comment-code');
+  const code = document.querySelector('#code-styles');
 
   map.addControl(new StylesControl([{
     name: 'Streets',
-    url: 'mapbox://styles/mapbox/streets-v9'
+    url: 'mapbox://styles/mapbox/streets-v9',
   }, {
     name: 'Satellite',
-    url: 'mapbox://styles/mapbox/satellite-v9'
+    url: 'mapbox://styles/mapbox/satellite-v9',
   }, {
     name: 'Dark',
-    url: 'mapbox://styles/mapbox/dark-v9'
+    url: 'mapbox://styles/mapbox/dark-v9',
   }]), 'top-left');
 
   code.textContent =
-`import { StylesControl } from 'mapbox-gl-controls;
+    `import { StylesControl } from 'mapbox-gl-controls;
 
 map.addControl(new StylesControl([{
   name: 'Streets',
@@ -36,12 +35,10 @@ map.addControl(new StylesControl([{
 }, {
   name: 'Dark',
   url: 'mapbox://styles/mapbox/dark-v9'
-}]), 'top-left');`;
+}]), 'top-left');
 
-  codeComment.textContent =
-`// Use style.load event to redraw layers when style has changed:
-map.on('style.load', () => { addLayers(); });`;
+// Use style.load event to redraw layers when style has changed:
+map.on('style.load', () => { /* redraw layers */ });`;
 
   Prism.highlightElement(code);
-  Prism.highlightElement(codeComment);
 };

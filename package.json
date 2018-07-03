@@ -5,7 +5,8 @@
   "scripts": {
     "prepublishOnly": "npm version patch",
     "build": "babel src --out-dir lib & webpack --config ./docs/webpack.config.js -p",
-    "watch": "webpack --config ./docs/webpack.config.js --watch & babel src --out-dir lib --watch"
+    "watch": "webpack --config ./docs/webpack.config.js --watch & babel src --out-dir lib --watch",
+    "lint": "eslint ."
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -17,12 +18,15 @@
     "eslint-config-airbnb-base": "^12.0.1",
     "eslint-plugin-import": "^2.7.0",
     "extract-text-webpack-plugin": "^3.0.2",
-    "mapbox-gl": "^0.44.0",
+    "mapbox-gl": "^0.46.0",
     "normalize.css": "^7.0.0",
     "prismjs": "^1.10.0",
     "webpack": "^3.10.0"
   },
   "peerDependencies": {
-    "mapbox-gl": "^0.43.0"
+    "mapbox-gl": "^0.46.0"
+  },
+  "dependencies": {
+    "@turf/distance": "^6.0.1"
   }
 }

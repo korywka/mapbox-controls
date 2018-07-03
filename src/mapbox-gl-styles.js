@@ -10,7 +10,7 @@ const stylesDefault = [
   },
 ];
 
-export default class {
+class Styles {
   constructor(styles) {
     this.styles = styles || stylesDefault;
   }
@@ -63,3 +63,5 @@ export default class {
     this.map = undefined;
   }
 }
+
+export default Styles;

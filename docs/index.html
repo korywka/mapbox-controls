@@ -10,13 +10,14 @@
 <div class="wrapper">
     <h1>Mapbox controls</h1>
     <ul>
-        <li><a href="#localization">Localization</a></li>
-        <li><a href="#styles">Styles</a></li>
-        <li><a href="#zoom-and-compass">Zoom</a></li>
-        <li><a href="#zoom-and-compass">Compass</a></li>
+        <li><a href="#p-localization">Localization</a></li>
+        <li><a href="#p-ruler">Ruler</a></li>
+        <li><a href="#p-styles">Styles</a></li>
+        <li><a href="#p-zoom-compass">Zoom</a></li>
+        <li><a href="#p-zoom-compass">Compass</a></li>
     </ul>
     <pre><code class="language-js">npm i mapbox-gl-controls</code></pre>
-    <h2 id="localization">Localization control</h2>
+    <h2 id="p-localization">Localization control</h2>
     <label class="radio">
         <input type="radio" name="language" value="browser" checked>Browser detect (fallback to Local)
     </label>
@@ -47,18 +48,20 @@
     <label class="radio">
         <input type="radio" name="language" value="pt">Portuguese
     </label>
-    <pre><code class="language-js" id="localization-code"></code></pre>
-    <div id="localization-map" class="map"></div>
-    <pre><code class="language-js" id="localization-comment-code"></code></pre>
+    <pre><code class="language-js" id="code-localization"></code></pre>
+    <div id="map-localization" class="map"></div>
     <br>
-    <h2 id="styles">Styles control</h2>
-    <pre><code class="language-js" id="styles-code"></code></pre>
-    <div id="styles-map" class="map"></div>
-    <pre><code class="language-js" id="styles-comment-code"></code></pre>
+    <h2 id="p-ruler">Ruler control</h2>
+    <pre><code class="language-js" id="code-ruler"></code></pre>
+    <div id="map-ruler" class="map"></div>
     <br>
-    <h2 id="zoom-and-compass">Zoom and compass controls</h2>
-    <pre><code class="language-js" id="zoom-compass-code"></code></pre>
-    <div id="zoom-compass-map" class="map"></div>
+    <h2 id="p-styles">Styles control</h2>
+    <pre><code class="language-js" id="code-styles"></code></pre>
+    <div id="map-styles" class="map"></div>
+    <br>
+    <h2 id="p-zoom-compass">Zoom and compass controls</h2>
+    <pre><code class="language-js" id="code-zoom-compass"></code></pre>
+    <div id="map-zoom-compass" class="map"></div>
 </div>
 <script src="build/bundle.js"></script>
 

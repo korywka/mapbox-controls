@@ -1,9 +1,8 @@
 import theme from './theme';
 import { CompassIcon } from './icons';
 
-export default class {
-  constructor(options = {}) {
-    this.options = options;
+class Compass {
+  constructor() {
     this.toggle = this.toggle.bind(this);
   }
 
@@ -48,3 +47,5 @@ export default class {
     this.compassButton.style.transform = `rotate(${angle}deg)`;
   }
 }
+
+export default Compass;

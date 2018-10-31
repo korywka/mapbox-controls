@@ -1,0 +1,72 @@
+.mapboxgl-ctrl-group button {
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* styles */
+.mapboxgl-ctrl-styles {
+    display: flex;
+}
+
+.mapboxgl-ctrl-styles button {
+    width: auto;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+}
+
+.mapboxgl-ctrl-styles button + button {
+    border: none;
+}
+
+.mapboxgl-ctrl-styles button.-active {
+    font-weight: bold;
+    background: #f5f5f5;
+}
+
+/* ruler */
+.mapboxgl-ctrl-ruler button {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="12" viewBox="0 0 22 12" fill="#505050"><path fill-rule="evenodd" fill="none" d="M-1-6h24v24H-1z"/><path fill-rule="nonzero" d="M20 0H2C.9 0 0 .9 0 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V2c0-1.1-.9-2-2-2zm0 10H2V2h2v4h2V2h2v4h2V2h2v4h2V2h2v4h2V2h2v8z"/></svg>');
+}
+
+.mapboxgl-ctrl-ruler button.-active {
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="12" viewBox="0 0 22 12" fill="#ff9800"><path fill-rule="evenodd" fill="none" d="M-1-6h24v24H-1z"/><path fill-rule="nonzero" d="M20 0H2C.9 0 0 .9 0 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V2c0-1.1-.9-2-2-2zm0 10H2V2h2v4h2V2h2v4h2V2h2v4h2V2h2v4h2V2h2v8z"/></svg>') #f5f5f5 no-repeat center;
+}
+
+/* zoom */
+.mapboxgl-ctrl-zoom button:first-child {
+    border-radius: 2px 2px 0 0;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="#232323" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+}
+
+.mapboxgl-ctrl-zoom button:last-child {
+    border-radius: 0 0 2px 2px;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="#232323" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M19 13H5v-2h14v2z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+}
+
+/* bearing */
+.mapboxgl-ctrl-bearing {
+    position: relative;
+    opacity: 0;
+    visibility: hidden;
+    transition: .1s all ease-in-out;
+    cursor: pointer;
+}
+
+.mapboxgl-ctrl-bearing.-active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.mapboxgl-ctrl-bearing span {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    left: 50%;
+    top: 50%;
+    margin-left: -12px;
+    margin-top: -12px;
+    background: url('data:image/svg+xml;utf8,<svg width="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><path d="M0 0h24v24H0z"/><path fill="#212121" d="M12 3l4 8H8z"/><path fill="#9E9E9E" d="M12 21l-4-8h8z"/></g></svg>') no-repeat center;
+}

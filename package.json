@@ -5,7 +5,7 @@
   "scripts": {
     "prepublishOnly": "npm version patch",
     "build": "babel src --out-dir lib & webpack --config ./docs/webpack.config.js -p",
-    "watch": "webpack --config ./docs/webpack.config.js --watch & babel src --out-dir lib --watch",
+    "watch": "babel src --out-dir lib --watch & webpack --config ./docs/webpack.config.js --watch",
     "lint": "eslint ."
   },
   "devDependencies": {

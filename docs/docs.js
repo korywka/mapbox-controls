@@ -2,6 +2,7 @@ import 'normalize.css';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import 'prismjs/themes/prism.css';
+import '../src/mapbox-gl-controls.css';
 import './docs.css';
 import exampleLocalization from './examples/localization';
 import exampleStyles from './examples/styles';

@@ -11,15 +11,17 @@ export default () => {
   });
   const code = document.querySelector('#code-ruler');
 
-  map.on('load', () => {
-    map.addControl(new RulerControl(), 'top-right');
-    map.addControl(new StylesControl(), 'top-left');
-  });
+  map.addControl(new RulerControl(), 'top-right');
+  map.addControl(new StylesControl(), 'bottom-left');
+  map.on('ruler.on', () => console.log('ruler: on'));
+  map.on('ruler.off', () => console.log('ruler: off'));
 
   code.textContent =
-    `import { RulerControl } from 'mapbox-gl-controls;
+`import { RulerControl } from 'mapbox-gl-controls;
 
-map.addControl(new RulerControl(), 'top-right');`;
+map.addControl(new RulerControl(), 'top-right');
+map.on('ruler.on', () => console.log('ruler: on'));
+map.on('ruler.off', () => console.log('ruler: off'));`;
 
   Prism.highlightElement(code);
 };

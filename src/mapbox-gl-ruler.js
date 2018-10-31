@@ -1,7 +1,5 @@
 import mapboxgl from 'mapbox-gl';
 import distance from '@turf/distance';
-import theme from './theme';
-import { RulerIcon } from './icons';
 
 const LAYER_LINE = 'controls-layer-line';
 const LAYER_SYMBOL = 'controls-layer-symbol';
@@ -55,18 +53,11 @@ class Ruler {
 
   insertControls() {
     this.container = document.createElement('div');
-    this.rulerButton = document.createElement('div');
     this.container.classList.add('mapboxgl-ctrl');
-    this.container.style.background = theme.colorDefault;
-    this.container.style.boxShadow = theme.boxShadow;
-    this.container.style.borderRadius = theme.borderRadius;
-    this.container.classList.add('mapbox-ctrl-ruler');
-    this.rulerButton.style.position = 'relative';
-    this.rulerButton.style.width = theme.width;
-    this.rulerButton.style.height = theme.height;
-    this.rulerButton.style.cursor = 'pointer';
-    this.rulerButton.innerHTML = RulerIcon;
-    this.container.appendChild(this.rulerButton);
+    this.container.classList.add('mapboxgl-ctrl-group');
+    this.container.classList.add('mapboxgl-ctrl-ruler');
+    this.button = document.createElement('button');
+    this.container.appendChild(this.button);
   }
 
   draw() {
@@ -115,18 +106,17 @@ class Ruler {
     this.coordinates = [];
     this.labels = [];
     this.map.getCanvas().style.cursor = 'crosshair';
-    this.container.style.background = theme.colorSelected;
-    this.rulerButton.querySelector('svg').setAttribute('fill', theme.colorHighlight);
+    this.button.classList.add('-active');
     this.draw();
     this.map.on('click', this.mapClickListener);
     this.map.on('style.load', this.styleLoadListener);
+    this.map.fire('ruler.on');
   }
 
   measuringOff() {
     this.isMeasuring = false;
     this.map.getCanvas().style.cursor = '';
-    this.container.style.background = theme.colorDefault;
-    this.rulerButton.querySelector('svg').removeAttribute('fill');
+    this.button.classList.remove('-active');
     // remove layers, sources and event listeners
     this.map.removeLayer(LAYER_LINE);
     this.map.removeLayer(LAYER_SYMBOL);
@@ -135,6 +125,7 @@ class Ruler {
     this.markers.forEach(m => m.remove());
     this.map.off('click', this.mapClickListener);
     this.map.off('style.load', this.styleLoadListener);
+    this.map.fire('ruler.off');
   }
 
   mapClickListener(event) {
@@ -173,7 +164,7 @@ class Ruler {
   onAdd(map) {
     this.map = map;
     this.insertControls();
-    this.rulerButton.addEventListener('click', () => {
+    this.button.addEventListener('click', () => {
       if (this.isMeasuring) {
         this.measuringOff();
       } else {

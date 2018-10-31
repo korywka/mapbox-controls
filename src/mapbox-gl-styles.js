@@ -1,5 +1,3 @@
-import theme from './theme';
-
 const stylesDefault = [
   {
     name: 'Streets',
@@ -18,20 +16,14 @@ class Styles {
   insertControls() {
     this.container = document.createElement('div');
     this.container.classList.add('mapboxgl-ctrl');
-    this.container.style.background = theme.colorDefault;
-    this.container.style.boxShadow = theme.boxShadow;
-    this.container.style.fontSize = theme.fontSize;
-    this.container.style.borderRadius = theme.borderRadius;
-    this.container.style.overflow = 'hidden';
-    this.container.classList.add('mapbox-ctrl-styles');
+    this.container.classList.add('mapboxgl-ctrl-group');
+    this.container.classList.add('mapboxgl-ctrl-styles');
     this.nodes = [];
     this.styles.forEach((style) => {
-      const node = document.createElement('div');
+      const node = document.createElement('button');
       node.textContent = style.name;
-      node.style.padding = '5px 8px';
-      node.style.cursor = 'pointer';
-      node.style.float = 'left';
       node.addEventListener('click', () => {
+        if (node.classList.contains('-active')) return;
         this.map.setStyle(style.url);
       });
       this.nodes.push(node);
@@ -43,16 +35,12 @@ class Styles {
     this.map = map;
     this.insertControls();
     this.map.on('styledata', () => {
-      [].forEach.call(this.container.querySelectorAll('div'), (div) => {
-        div.style.background = 'none';
-        div.style.fontWeight = theme.fontWeight;
-      });
+      [].forEach.call(this.container.querySelectorAll('button'), div => div.classList.remove('-active'));
       const styleUrls = this.styles.map(style => style.url.split('?')[0]); // remove GET params: ?optimize=true
       const currentStyleIndex = styleUrls.indexOf(this.map.getStyle().sprite.replace('sprites', 'styles'));
       if (currentStyleIndex !== -1) {
         const currentNode = this.nodes[currentStyleIndex];
-        currentNode.style.background = theme.colorSelected;
-        currentNode.style.fontWeight = theme.fontWeightSelected;
+        currentNode.classList.add('-active');
       }
     });
     return this.container;

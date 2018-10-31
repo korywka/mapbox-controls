@@ -1,6 +1,6 @@
 {
   "name": "mapbox-gl-controls",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "main": "./lib/index.js",
   "scripts": {
     "prepublishOnly": "npm version patch",

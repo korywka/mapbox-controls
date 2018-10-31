@@ -1,3 +1,7 @@
+.mapboxgl-ctrl-group {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .3);
+}
+
 .mapboxgl-ctrl-group button {
     background-repeat: no-repeat;
     background-position: center;
@@ -42,6 +46,7 @@
 }
 
 .mapboxgl-ctrl-zoom button:last-child {
+    border: none;
     border-radius: 0 0 2px 2px;
     background-image: url('data:image/svg+xml;utf8,<svg fill="#232323" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M19 13H5v-2h14v2z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
 }

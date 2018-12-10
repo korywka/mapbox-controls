@@ -1,5 +1,6 @@
 import mapboxgl from 'mapbox-gl';
 import distance from '@turf/distance';
+import { convertLength } from '@turf/helpers'
 
 const LAYER_LINE = 'controls-layer-line';
 const LAYER_SYMBOL = 'controls-layer-symbol';
@@ -29,26 +30,41 @@ const geoPoint = (coordinates = [], labels = []) => ({
   })),
 });
 
-const coordinatesToLabels = (coordinates) => {
+const coordinatesToLabels = (coordinates, units) => {
   let sum = 0;
+  let metric = 0;
+  let meters, kilometers = 0;
+  const isImperial = !!(units === 'imperial')
+  
   return coordinates.map((c, i) => {
     if (i === 0) return 0;
     sum += distance(coordinates[i - 1], coordinates[i]);
     if (sum < 1) {
-      return `${(sum * 1000).toFixed()} m`;
+      meters = (sum*1000).toFixed()
+      if(isImperial){
+        return `${(convertLength(meters, 'meters', 'feet')).toFixed(2)} ft`
+      }
+      metric = `${meters} m`;
+      return metric
     }
-    return `${sum.toFixed(2)} km`;
+    kilometers = sum.toFixed(2)
+    if(isImperial){
+      return `${(convertLength(kilometers, 'kilometers', 'miles')).toFixed(2)} mi`
+    }
+    metric = `${kilometers} km`;
+    return metric
   });
 };
 
 class Ruler {
-  constructor() {
+  constructor(units = 'metric') {
     this.isMeasuring = false;
     this.markers = [];
     this.coordinates = [];
     this.labels = [];
     this.mapClickListener = this.mapClickListener.bind(this);
     this.styleLoadListener = this.styleLoadListener.bind(this);
+    this.units = units;
   }
 
   insertControls() {
@@ -76,7 +92,7 @@ class Ruler {
       type: 'line',
       source: SOURCE_LINE,
       paint: {
-        'line-color': '#263238',
+        'line-color': '#f49b42',
         'line-width': 2,
       },
     });
@@ -87,15 +103,16 @@ class Ruler {
       source: SOURCE_SYMBOL,
       layout: {
         'text-field': '{text}',
-        'text-font': ['Roboto Medium'],
+        'text-font': ['Roboto Bold'],
         'text-anchor': 'top',
-        'text-size': 12,
+        'text-size': 18,
         'text-offset': [0, 0.8],
       },
       paint: {
-        'text-color': '#263238',
-        'text-halo-color': '#fff',
-        'text-halo-width': 1,
+        'text-color': '#f49b42',
+        'text-halo-color': '#000',
+        'text-halo-width': 5,
+        'text-halo-blur': 20,
       },
     });
   }
@@ -133,9 +150,9 @@ class Ruler {
     markerNode.style.width = '12px';
     markerNode.style.height = '12px';
     markerNode.style.borderRadius = '50%';
-    markerNode.style.background = '#fff';
+    markerNode.style.background = '#f49b42';
     markerNode.style.boxSizing = 'border-box';
-    markerNode.style.border = '2px solid #263238';
+    markerNode.style.border = '2px solid #000000';
     const marker = new mapboxgl.Marker({
       element: markerNode,
       draggable: true,
@@ -143,7 +160,7 @@ class Ruler {
       .setLngLat(event.lngLat)
       .addTo(this.map);
     this.coordinates.push([event.lngLat.lng, event.lngLat.lat]);
-    this.labels = coordinatesToLabels(this.coordinates);
+    this.labels = coordinatesToLabels(this.coordinates, this.units);
     this.map.getSource(SOURCE_LINE).setData(geoLineString(this.coordinates));
     this.map.getSource(SOURCE_SYMBOL).setData(geoPoint(this.coordinates, this.labels));
     this.markers.push(marker);
@@ -151,10 +168,16 @@ class Ruler {
       const index = this.markers.indexOf(marker);
       const lngLat = marker.getLngLat();
       this.coordinates[index] = [lngLat.lng, lngLat.lat];
-      this.labels = coordinatesToLabels(this.coordinates);
+      this.labels = coordinatesToLabels(this.coordinates, this.units);
       this.map.getSource(SOURCE_LINE).setData(geoLineString(this.coordinates));
       this.map.getSource(SOURCE_SYMBOL).setData(geoPoint(this.coordinates, this.labels));
     });
+  }
+
+  setUnit(units){
+    this.units = units; 
+    this.labels = coordinatesToLabels(this.coordinates, this.units);
+    this.map.getSource(SOURCE_SYMBOL).setData(geoPoint(this.coordinates, this.labels));
   }
 
   styleLoadListener() {

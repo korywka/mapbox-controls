@@ -92,7 +92,7 @@ class Ruler {
       type: 'line',
       source: SOURCE_LINE,
       paint: {
-        'line-color': '#f49b42',
+        'line-color': '#263238',
         'line-width': 2,
       },
     });
@@ -103,16 +103,15 @@ class Ruler {
       source: SOURCE_SYMBOL,
       layout: {
         'text-field': '{text}',
-        'text-font': ['Roboto Bold'],
+        'text-font': ['Roboto Medium'],
         'text-anchor': 'top',
-        'text-size': 18,
+        'text-size': 12,
         'text-offset': [0, 0.8],
       },
       paint: {
-        'text-color': '#f49b42',
-        'text-halo-color': '#000',
-        'text-halo-width': 5,
-        'text-halo-blur': 20,
+        'text-color': '#263238',
+        'text-halo-color': '#fff',
+        'text-halo-width': 1,
       },
     });
   }
@@ -150,9 +149,9 @@ class Ruler {
     markerNode.style.width = '12px';
     markerNode.style.height = '12px';
     markerNode.style.borderRadius = '50%';
-    markerNode.style.background = '#f49b42';
+    markerNode.style.background = '#fff';
     markerNode.style.boxSizing = 'border-box';
-    markerNode.style.border = '2px solid #000000';
+    markerNode.style.border = '2px solid #263238';
     const marker = new mapboxgl.Marker({
       element: markerNode,
       draggable: true,

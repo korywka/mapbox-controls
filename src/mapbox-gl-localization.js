@@ -1,5 +1,5 @@
 const optionsDefault = {
-  supportedLanguages: ['en', 'es', 'fr', 'de', 'ru', 'zh', 'ar', 'pt', 'local'],
+  supportedLanguages: ['en', 'es', 'fr', 'de', 'ru', 'zh', 'ar', 'pt', 'mul'],
   language: false,
   fallbackLanguage: 'local',
 };
@@ -20,7 +20,7 @@ class Localization {
     if (this.options.supportedLanguages.indexOf(language) === -1) {
       language = this.options.fallbackLanguage;
     }
-    const localizedField = language === 'local' ? '{name}' : `{name_${language}}`;
+    const localizedField = language === 'mul' ? '{name}' : `{name_${language}}`;
     style.layers = style.layers.map(layer => this.localizeLayer(layer, localizedField));
     return style;
   }

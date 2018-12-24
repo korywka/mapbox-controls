@@ -24,7 +24,7 @@
     "webpack": "^3.10.0"
   },
   "peerDependencies": {
-    "mapbox-gl": "^0.46.0"
+    "mapbox-gl": "^0.52.0"
   },
   "dependencies": {
     "@turf/distance": "^6.0.1"

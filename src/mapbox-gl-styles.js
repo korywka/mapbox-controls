@@ -37,8 +37,8 @@ class Styles {
     this.map.on('styledata', () => {
       [].forEach.call(this.container.querySelectorAll('button'), div => div.classList.remove('-active'));
       const styleUrls = this.styles.map(style => {
-        if (typeof style === 'object') {
-            return style;
+        if (typeof style.url === 'object') {
+            return style.url;
         } else {
             var styleUrlSplit = style.url.split('?');
             if (styleUrlSplit.length > 0) {

@@ -38,10 +38,15 @@ class Styles {
       [].forEach.call(this.container.querySelectorAll('button'), div => div.classList.remove('-active'));
       const styleUrls = this.styles.map(style => {
       const styleUrlSplit = style.url.split('?');
-          if (styleUrlSplit.length > 0) {
-              return styleUrlSplit[0];
+          if (typeof style === 'object') {
+            return style;
           } else {
+            var styleUrlSplit = style.url.split('?');
+            if (styleUrlSplit.length > 0) {
+              return styleUrlSplit[0];
+            } else {
               return style.url;
+            }
           }
       }); // remove GET params: ?optimize=true
       const currentStyleIndex = styleUrls.indexOf(this.map.getStyle().sprite.replace('sprites', 'styles'));

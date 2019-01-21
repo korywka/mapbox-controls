@@ -1,6 +1,6 @@
 import mapboxgl from 'mapbox-gl';
 import Prism from 'prismjs';
-import { LocalizationControl } from '../../lib/index';
+import { LocalizationControl } from '../../dist/index';
 
 export default () => {
   const map = new mapboxgl.Map({

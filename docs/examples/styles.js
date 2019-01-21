@@ -1,6 +1,6 @@
 import mapboxgl from 'mapbox-gl';
 import Prism from 'prismjs';
-import { StylesControl } from '../../lib/index';
+import { StylesControl } from '../../dist/index';
 
 export default () => {
   const map = new mapboxgl.Map({

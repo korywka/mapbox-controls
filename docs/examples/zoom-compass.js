@@ -1,6 +1,6 @@
 import mapboxgl from 'mapbox-gl';
 import Prism from 'prismjs';
-import { ZoomControl, CompassControl } from '../../lib/index';
+import { ZoomControl, CompassControl } from '../../dist/index';
 
 export default () => {
   const map = new mapboxgl.Map({

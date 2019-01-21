@@ -1,13 +1,14 @@
 {
   "name": "mapbox-gl-controls",
-  "version": "0.0.17",
+  "version": "1.0.0",
   "scripts": {
     "lint": "eslint src",
+    "watch": "rollup --config --watch",
     "build": "rollup --config"
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",
-    "@babel/preset-env": "^7.2.3",
+    "@babel/preset-env": "^7.3.0",
     "eslint": "^5.12.1",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.14.0",

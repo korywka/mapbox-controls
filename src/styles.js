@@ -36,7 +36,14 @@ class Styles {
     this.insertControls();
     this.map.on('styledata', () => {
       [].forEach.call(this.container.querySelectorAll('button'), div => div.classList.remove('-active'));
-      const styleUrls = this.styles.map(style => style.url.split('?')[0]); // remove GET params: ?optimize=true
+      // remove GET params: ?optimize=true
+      const styleUrls = this.styles.map(style => {
+        if (typeof style.url === 'string') {
+          const styleUrlSplit = style.url.split('?');
+          return styleUrlSplit.length > 0 ? styleUrlSplit[0] : style.url;
+        }
+        return style.url;
+      });
       const currentStyleIndex = styleUrls.indexOf(this.map.getStyle().sprite.replace('sprites', 'styles'));
       if (currentStyleIndex !== -1) {
         const currentNode = this.nodes[currentStyleIndex];

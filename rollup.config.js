@@ -13,7 +13,7 @@ export default [
     input: 'src/ruler.js',
     external: ['mapbox-gl', '@turf/distance'],
     output: {
-      name: 'MapRuler',
+      name: 'RulerControl',
       file: 'lib/ruler.js',
       format: 'umd',
       globals: {
@@ -24,18 +24,19 @@ export default [
     plugins,
   },
   {
-    input: 'src/compass.js',
+    input: 'src/compass',
     output: {
-      name: 'MapCompass',
+      name: 'CompassControl',
       file: 'lib/compass.js',
       format: 'umd',
+      indent: false,
     },
     plugins,
   },
   {
     input: 'src/styles.js',
     output: {
-      name: 'MapStyles',
+      name: 'StylesControl',
       file: 'lib/styles.js',
       format: 'umd',
     },
@@ -44,7 +45,7 @@ export default [
   {
     input: 'src/zoom.js',
     output: {
-      name: 'MapZoom',
+      name: 'ZoomControl',
       file: 'lib/zoom.js',
       format: 'umd',
     },

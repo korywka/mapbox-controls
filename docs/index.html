@@ -9,29 +9,23 @@
 <body>
 <div class="wrapper">
     <h1>Mapbox controls</h1>
-    <ul>
-        <li><a href="#p-ruler">Ruler</a></li>
-        <li><a href="#p-styles">Styles</a></li>
-        <li><a href="#p-zoom-compass">Zoom</a></li>
-        <li><a href="#p-zoom-compass">Compass</a></li>
-    </ul>
     <h2 id="p-ruler">Ruler control</h2>
     <code>
         map.on('ruler.on', () => console.log('ruler: on'));
         <br>
         map.on('ruler.off', () => console.log('ruler: off'));
     </code>
-    <iframe src="https://stackblitz.com/edit/mapbox-controls-ruler?embed=1&file=index.js&view=preview"></iframe>
+    <iframe src="https://stackblitz.com/edit/mapbox-controls-ruler?embed=1&view=preview"></iframe>
     <h2 id="p-styles">Styles control</h2>
     <code>
         // When the style is updated, the layers should be redrawn:
         <br>
         map.on('style.load', () => { /* redraw layers */ });
     </code>
-    <iframe src="https://stackblitz.com/edit/mapbox-controls-styles?embed=1&file=index.js&view=preview"></iframe>
+    <iframe src="https://stackblitz.com/edit/mapbox-controls-styles?embed=1&view=preview"></iframe>
     <h2 id="p-zoom-compass">Zoom and compass controls</h2>
     <code>Zoom control visible after map rotate</code>
-    <iframe src="https://stackblitz.com/edit/mapbox-controls-zoom-compass?embed=1&file=index.js&view=preview"></iframe>
+    <iframe src="https://stackblitz.com/edit/mapbox-controls-zoom-compass?embed=1&view=preview"></iframe>
 </div>
 
 <a href="https://github.com/bravecow/mapbox-gl-controls" class="github-corner" aria-label="View source on Github">

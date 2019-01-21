@@ -1,6 +1,6 @@
 {
   "name": "mapbox-gl-controls",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "scripts": {
     "lint": "eslint src",
     "build": "rollup --config"

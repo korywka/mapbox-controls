@@ -12,7 +12,7 @@ Include styles:
 <link href="theme.css" rel="stylesheet">
 ```
 
-###Examples
+### Examples
 
 * **[Ruler](https://bravecow.github.io/mapbox-gl-controls/#p-ruler)**
 * **[Styles](https://bravecow.github.io/mapbox-gl-controls/#p-styles)**

@@ -2,6 +2,7 @@
   "name": "mapbox-gl-controls",
   "version": "1.0.0",
   "license": "MIT",
+  "homepage": "https://bravecow.github.io/mapbox-gl-controls/",
   "scripts": {
     "lint": "eslint src",
     "watch": "rollup --config --watch",
@@ -23,5 +24,9 @@
   },
   "dependencies": {
     "@turf/distance": "6.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bravecow/mapbox-gl-controls.git"
   }
 }

@@ -12,9 +12,20 @@ Include styles:
 <link href="theme.css" rel="stylesheet">
 ```
 
-### Examples
+### Ruler Control
 
-* **[Ruler](https://bravecow.github.io/mapbox-gl-controls/#p-ruler)**
-* **[Styles](https://bravecow.github.io/mapbox-gl-controls/#p-styles)**
-* **[Zoom](https://bravecow.github.io/mapbox-gl-controls/#p-zoom-compass)**
-* **[Compass](https://bravecow.github.io/mapbox-gl-controls/#p-zoom-compass)**
+Ruler is similar to Google Maps Ruler. With draggable points.
+
+![Ruler](ruler.png)
+
+### Style Control
+
+Google maps-like styles switcher.
+
+![Styles](styles.png)
+
+### Zoom and Compass Controls
+
+Zoom and Compass are split to two different controls. Compass is visible only after map has been rotated.
+
+![Compass](compass.png)

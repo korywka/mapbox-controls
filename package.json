@@ -1,6 +1,7 @@
 {
   "name": "mapbox-gl-controls",
   "version": "1.0.0",
+  "license": "MIT",
   "scripts": {
     "lint": "eslint src",
     "watch": "rollup --config --watch",

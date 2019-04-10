@@ -73,5 +73,5 @@
     top: 50%;
     margin-left: -12px;
     margin-top: -12px;
-    background: url("data:image/svg+xml,%3Csvg width='22' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cpath d='M0 0h24v24H0z'/%3E%3Cpath fill='%23212121' d='M12 3l4 8H8z'/%3E%3Cpath fill='%239E9E9E' d='M12 21l-4-8h8z'/%3E%3C/g%3E%3C/svg%3E") no-repeat center;
+    background: url("data:image/svg+xml,%3Csvg width='22' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cpath d='M0 0h24v24H0z'/%3E%3Cpath fill='%23f44336' d='M12 3l4 8H8z'/%3E%3Cpath fill='%239E9E9E' d='M12 21l-4-8h8z'/%3E%3C/g%3E%3C/svg%3E") no-repeat center;
 }

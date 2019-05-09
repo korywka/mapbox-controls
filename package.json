@@ -5,25 +5,30 @@
   "homepage": "https://bravecow.github.io/mapbox-gl-controls/",
   "scripts": {
     "lint": "eslint src",
-    "watch": "rollup --config --watch",
-    "build": "rollup --config"
+    "watch:js": "rollup --config --watch",
+    "watch:css": "postcss src/theme.scss --watch --output theme.css",
+    "build": "rollup --config && postcss src/theme.scss --output theme.css"
   },
   "devDependencies": {
-    "@babel/core": "^7.2.2",
-    "@babel/preset-env": "^7.3.0",
-    "eslint": "^5.12.1",
+    "@babel/core": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
+    "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.14.0",
-    "mapbox-gl": "^0.52.0",
-    "rollup": "^1.1.2",
+    "eslint-plugin-import": "^2.17.2",
+    "mapbox-gl": "^0.54.0",
+    "postcss-cli": "^6.1.2",
+    "postcss-import": "^12.0.1",
+    "postcss-nested": "^4.1.2",
+    "rollup": "^1.11.3",
     "rollup-plugin-babel": "^4.3.2",
-    "rollup-plugin-node-resolve": "^4.0.0"
-  },
-  "peerDependencies": {
-    "mapbox-gl": "^0.52.0"
+    "rollup-plugin-commonjs": "^9.3.4",
+    "rollup-plugin-node-resolve": "^4.2.3"
   },
   "dependencies": {
     "@turf/distance": "6.0.1"
+  },
+  "peerDependencies": {
+    "mapbox-gl": "^0.54.0"
   },
   "repository": "bravecow/mapbox-gl-controls"
 }

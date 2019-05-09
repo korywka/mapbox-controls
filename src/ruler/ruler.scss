@@ -1,0 +1,9 @@
+.mapboxgl-ctrl-ruler {
+  button {
+    &.-active {
+      svg {
+        fill: #4264fb;
+      }
+    }
+  }
+}

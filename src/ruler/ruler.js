@@ -1,5 +1,6 @@
 import mapboxgl from 'mapbox-gl';
 import distance from '@turf/distance';
+import iconRuler from './icon-ruler';
 
 const LAYER_LINE = 'controls-layer-line';
 const LAYER_SYMBOL = 'controls-layer-symbol';
@@ -57,6 +58,7 @@ class Ruler {
     this.container.classList.add('mapboxgl-ctrl-group');
     this.container.classList.add('mapboxgl-ctrl-ruler');
     this.button = document.createElement('button');
+    this.button.innerHTML = iconRuler;
     this.container.appendChild(this.button);
   }
 

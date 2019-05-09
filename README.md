@@ -1,31 +1,19 @@
 # Mapbox Controls
 
-### Installing
-
-```
-npm install mapbox-gl-controls
-```
-
-Include styles:
-
-```html
-<link href="theme.css" rel="stylesheet">
-```
+[![Ruler](./docs/map.png)](https://bravecow.github.io/mapbox-gl-controls/)
 
 ### Ruler Control
 
 Ruler is similar to Google Maps Ruler. With draggable points.
 
-![Ruler](./docs/ruler.png)
-
 ### Style Control
 
 Google maps-like styles switcher.
 
-![Styles](./docs/styles.png)
+### Compass Control
 
-### Zoom and Compass Controls
+Compass control with arrows to rotate map.
 
-Zoom and Compass are split to two different controls. Compass is visible only after map has been rotated.
+### Zoom Control
 
-![Compass](./docs/compass.png)
+Just zoom in and zoom out buttons in single control.

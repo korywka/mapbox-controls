@@ -1,0 +1,56 @@
+.mapboxgl-ctrl-compass {
+  position: relative;
+  border-radius: 50%;
+  overflow: visible;
+  opacity: 0;
+  visibility: hidden;
+  transition: .1s all ease-in-out;
+  cursor: pointer;
+
+  &.-active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  button {
+    position: relative;
+    border-radius: 50%;
+
+    &:hover {
+      background: none;
+    }
+  }
+
+  &-pointer {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -11px;
+    margin-top: -11px;
+
+    &:hover path:nth-child(2) {
+      fill: #f44336;
+    }
+  }
+
+  &-ccw,
+  &-cw {
+    position: absolute;
+    top: 0;
+    width: 11px;
+    height: 28px;
+    transition: .1s fill;
+
+    &:hover {
+      fill: #4264fb;
+    }
+  }
+
+  &-ccw {
+    left: -6px;
+  }
+
+  &-cw {
+    right: -6px;
+  }
+}

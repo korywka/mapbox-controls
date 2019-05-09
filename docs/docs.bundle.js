@@ -48,7 +48,7 @@
 	return mapboxgl;
 
 	}));
-	//# sourceMappingURL=mapbox-gl.js.map
+
 	});
 
 	function _classCallCheck(instance, Constructor) {

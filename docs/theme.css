@@ -1,0 +1,86 @@
+.mapboxgl-ctrl-group {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .3);
+}
+
+  .mapboxgl-ctrl-group button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mapboxgl-ctrl-group button svg {
+      vertical-align: top;
+    }
+.mapboxgl-ctrl-compass {
+  position: relative;
+  border-radius: 50%;
+  overflow: visible;
+  opacity: 0;
+  visibility: hidden;
+  transition: .1s all ease-in-out;
+  cursor: pointer;
+}
+.mapboxgl-ctrl-compass.-active {
+    opacity: 1;
+    visibility: visible;
+  }
+.mapboxgl-ctrl-compass button {
+    position: relative;
+    border-radius: 50%;
+  }
+.mapboxgl-ctrl-compass button:hover {
+      background: none;
+    }
+.mapboxgl-ctrl-compass-pointer {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -11px;
+    margin-top: -11px;
+  }
+.mapboxgl-ctrl-compass-pointer:hover path:nth-child(2) {
+      fill: #f44336;
+    }
+.mapboxgl-ctrl-compass-ccw,
+  .mapboxgl-ctrl-compass-cw {
+    position: absolute;
+    top: 0;
+    width: 11px;
+    height: 28px;
+    transition: .1s fill;
+  }
+.mapboxgl-ctrl-compass-ccw:hover, .mapboxgl-ctrl-compass-cw:hover {
+      fill: #4264fb;
+    }
+.mapboxgl-ctrl-compass-ccw {
+    left: -6px;
+  }
+.mapboxgl-ctrl-compass-cw {
+    right: -6px;
+  }
+.mapboxgl-ctrl-ruler button.-active svg {
+        fill: #4264fb;
+      }
+.mapboxgl-ctrl-styles {
+  display: flex;
+}
+.mapboxgl-ctrl-styles button {
+    width: auto;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+  }
+.mapboxgl-ctrl-styles button + button {
+      border: none;
+    }
+.mapboxgl-ctrl-styles button.-active {
+      font-weight: bold;
+      background: #f5f5f5;
+    }
+.mapboxgl-ctrl-zoom button:first-child {
+      border-radius: 2px 2px 0 0;
+    }
+.mapboxgl-ctrl-zoom button:last-child {
+      border: none;
+      border-radius: 0 0 2px 2px;
+    }

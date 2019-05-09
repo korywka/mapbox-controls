@@ -1,13 +1,13 @@
 {
   "name": "mapbox-gl-controls",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "license": "MIT",
   "homepage": "https://bravecow.github.io/mapbox-gl-controls/",
   "scripts": {
     "lint": "eslint src",
     "watch:js": "rollup --config --watch",
     "watch:css": "postcss src/theme.scss --watch --output theme.css",
-    "build": "rollup --config && postcss src/theme.scss --output theme.css"
+    "build": "rollup --config && postcss src/theme.scss --output theme.css && cp ./theme.css ./docs"
   },
   "devDependencies": {
     "@babel/core": "^7.4.4",

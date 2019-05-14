@@ -1,1 +1,6 @@
 docs/
+.idea
+.eslintignore
+.eslintrc.json
+postcss.config.js
+rollup.config.js

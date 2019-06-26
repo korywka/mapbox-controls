@@ -37,7 +37,7 @@ class Styles {
     this.map.on('styledata', () => {
       [].forEach.call(this.container.querySelectorAll('button'), div => div.classList.remove('-active'));
       // remove GET params: ?optimize=true
-      const styleUrls = this.styles.map(style => {
+      const styleUrls = this.styles.map((style) => {
         if (typeof style.url === 'string') {
           const styleUrlSplit = style.url.split('?');
           return styleUrlSplit.length > 0 ? styleUrlSplit[0] : style.url;

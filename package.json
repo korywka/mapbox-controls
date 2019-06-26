@@ -28,7 +28,7 @@
     "@turf/distance": "6.0.1"
   },
   "peerDependencies": {
-    "mapbox-gl": "^0.54.0"
+    "mapbox-gl": "^0.54.0 <2.0.0"
   },
   "repository": "bravecow/mapbox-gl-controls"
 }

@@ -74,11 +74,13 @@
 	}
 
 	var stylesDefault = [{
-	  name: 'Streets',
-	  url: 'mapbox://styles/mapbox/streets-v9'
+	  label: 'Streets',
+	  styleName: 'Mapbox Streets',
+	  styleUrl: 'mapbox://styles/mapbox/streets-v9'
 	}, {
-	  name: 'Satellite',
-	  url: 'mapbox://styles/mapbox/satellite-v9'
+	  label: 'Satellite',
+	  styleName: 'Satellite',
+	  styleUrl: 'mapbox://styles/mapbox/satellite-v9'
 	}];
 
 	var Styles =
@@ -102,11 +104,11 @@
 	      this.nodes = [];
 	      this.styles.forEach(function (style) {
 	        var node = document.createElement('button');
-	        node.textContent = style.name;
+	        node.textContent = style.label;
 	        node.addEventListener('click', function () {
 	          if (node.classList.contains('-active')) return;
 
-	          _this.map.setStyle(style.url);
+	          _this.map.setStyle(style.styleUrl);
 	        });
 
 	        _this.nodes.push(node);
@@ -123,19 +125,14 @@
 	      this.insertControls();
 	      this.map.on('styledata', function () {
 	        [].forEach.call(_this2.container.querySelectorAll('button'), function (div) {
-	          return div.classList.remove('-active');
-	        }); // remove GET params: ?optimize=true
-
-	        var styleUrls = _this2.styles.map(function (style) {
-	          if (typeof style.url === 'string') {
-	            var styleUrlSplit = style.url.split('?');
-	            return styleUrlSplit.length > 0 ? styleUrlSplit[0] : style.url;
-	          }
-
-	          return style.url;
+	          div.classList.remove('-active');
 	        });
 
-	        var currentStyleIndex = styleUrls.indexOf(_this2.map.getStyle().sprite.replace('sprites', 'styles'));
+	        var styleNames = _this2.styles.map(function (style) {
+	          return style.styleName;
+	        });
+
+	        var currentStyleIndex = styleNames.indexOf(_this2.map.getStyle().name);
 
 	        if (currentStyleIndex !== -1) {
 	          var currentNode = _this2.nodes[currentStyleIndex];

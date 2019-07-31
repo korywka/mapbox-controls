@@ -19,7 +19,3 @@ map.addControl(new RulerControl(), 'top-right');
 map.addControl(new CompassControl(), 'top-right');
 map.addControl(new ZoomControl(), 'top-right');
 map.addControl(new CompassControl({ instant: false }), 'bottom-right');
-
-map.on('load', () => {
-  map.remove();
-});

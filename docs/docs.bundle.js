@@ -1651,8 +1651,4 @@
 	map.addControl(new Zoom(), 'top-right');
 	map.addControl(new Compass({ instant: false }), 'bottom-right');
 
-	map.on('load', () => {
-	  map.remove();
-	});
-
 }());

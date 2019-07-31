@@ -1549,7 +1549,10 @@
 	  }, {
 	    key: "onRemove",
 	    value: function onRemove() {
-	      this.measuringOff();
+	      if (this.isMeasuring) {
+	        this.measuringOff();
+	      }
+
 	      this.map.off('click', this.mapClickListener);
 	      this.container.parentNode.removeChild(this.container);
 	      this.map = undefined;
@@ -1647,5 +1650,9 @@
 	map.addControl(new Compass(), 'top-right');
 	map.addControl(new Zoom(), 'top-right');
 	map.addControl(new Compass({ instant: false }), 'bottom-right');
+
+	map.on('load', () => {
+	  map.remove();
+	});
 
 }());

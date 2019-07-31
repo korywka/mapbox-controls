@@ -146,16 +146,20 @@ class Ruler {
       .addTo(this.map);
     this.coordinates.push([event.lngLat.lng, event.lngLat.lat]);
     this.labels = coordinatesToLabels(this.coordinates);
-    this.map.getSource(SOURCE_LINE).setData(geoLineString(this.coordinates));
-    this.map.getSource(SOURCE_SYMBOL).setData(geoPoint(this.coordinates, this.labels));
+    this.map.getSource(SOURCE_LINE)
+      .setData(geoLineString(this.coordinates));
+    this.map.getSource(SOURCE_SYMBOL)
+      .setData(geoPoint(this.coordinates, this.labels));
     this.markers.push(marker);
     marker.on('drag', () => {
       const index = this.markers.indexOf(marker);
       const lngLat = marker.getLngLat();
       this.coordinates[index] = [lngLat.lng, lngLat.lat];
       this.labels = coordinatesToLabels(this.coordinates);
-      this.map.getSource(SOURCE_LINE).setData(geoLineString(this.coordinates));
-      this.map.getSource(SOURCE_SYMBOL).setData(geoPoint(this.coordinates, this.labels));
+      this.map.getSource(SOURCE_LINE)
+        .setData(geoLineString(this.coordinates));
+      this.map.getSource(SOURCE_SYMBOL)
+        .setData(geoPoint(this.coordinates, this.labels));
     });
   }
 
@@ -177,7 +181,9 @@ class Ruler {
   }
 
   onRemove() {
-    this.measuringOff();
+    if (this.isMeasuring) {
+      this.measuringOff();
+    }
     this.map.off('click', this.mapClickListener);
     this.container.parentNode.removeChild(this.container);
     this.map = undefined;

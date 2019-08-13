@@ -4,3 +4,6 @@ docs/
 .eslintrc.json
 postcss.config.js
 rollup.config.js
+
+language.js
+changeLayerTextProperty.js

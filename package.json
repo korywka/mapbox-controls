@@ -1,6 +1,6 @@
 {
   "name": "mapbox-gl-controls",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "license": "MIT",
   "homepage": "https://bravecow.github.io/mapbox-gl-controls/",
   "scripts": {

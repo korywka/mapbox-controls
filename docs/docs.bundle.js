@@ -1383,30 +1383,28 @@
 	  };
 	};
 
-	var coordinatesToLabels = function coordinatesToLabels(coordinates) {
-	  var sum = 0;
-	  return coordinates.map(function (c, i) {
-	    if (i === 0) return 0;
-	    sum += distance(coordinates[i - 1], coordinates[i]);
+	var defaultLabelFormat = function defaultLabelFormat(number) {
+	  if (number < 1) {
+	    return "".concat((number * 1000).toFixed(), " m");
+	  }
 
-	    if (sum < 1) {
-	      return "".concat((sum * 1000).toFixed(), " m");
-	    }
-
-	    return "".concat(sum.toFixed(2), " km");
-	  });
+	  return "".concat(number.toFixed(2), " km");
 	};
 
 	var Ruler =
 	/*#__PURE__*/
 	function () {
 	  function Ruler() {
+	    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
 	    _classCallCheck$2(this, Ruler);
 
 	    this.isMeasuring = false;
 	    this.markers = [];
 	    this.coordinates = [];
 	    this.labels = [];
+	    this.units = options.units || 'kilometers';
+	    this.labelFormat = options.labelFormat || defaultLabelFormat;
 	    this.mapClickListener = this.mapClickListener.bind(this);
 	    this.styleLoadListener = this.styleLoadListener.bind(this);
 	  }
@@ -1509,7 +1507,7 @@
 	        draggable: true
 	      }).setLngLat(event.lngLat).addTo(this.map);
 	      this.coordinates.push([event.lngLat.lng, event.lngLat.lat]);
-	      this.labels = coordinatesToLabels(this.coordinates);
+	      this.labels = this.coordinatesToLabels();
 	      this.map.getSource(SOURCE_LINE).setData(geoLineString(this.coordinates));
 	      this.map.getSource(SOURCE_SYMBOL).setData(geoPoint(this.coordinates, this.labels));
 	      this.markers.push(marker);
@@ -1518,11 +1516,26 @@
 
 	        var lngLat = marker.getLngLat();
 	        _this.coordinates[index] = [lngLat.lng, lngLat.lat];
-	        _this.labels = coordinatesToLabels(_this.coordinates);
+	        _this.labels = _this.coordinatesToLabels();
 
 	        _this.map.getSource(SOURCE_LINE).setData(geoLineString(_this.coordinates));
 
 	        _this.map.getSource(SOURCE_SYMBOL).setData(geoPoint(_this.coordinates, _this.labels));
+	      });
+	    }
+	  }, {
+	    key: "coordinatesToLabels",
+	    value: function coordinatesToLabels() {
+	      var coordinates = this.coordinates,
+	          units = this.units,
+	          labelFormat = this.labelFormat;
+	      var sum = 0;
+	      return coordinates.map(function (coordinate, index) {
+	        if (index === 0) return 0;
+	        sum += distance(coordinates[index - 1], coordinates[index], {
+	          units: units
+	        });
+	        return labelFormat(sum);
 	      });
 	    }
 	  }, {

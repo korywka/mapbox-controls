@@ -30,24 +30,21 @@ const geoPoint = (coordinates = [], labels = []) => ({
   })),
 });
 
-const coordinatesToLabels = (coordinates) => {
-  let sum = 0;
-  return coordinates.map((c, i) => {
-    if (i === 0) return 0;
-    sum += distance(coordinates[i - 1], coordinates[i]);
-    if (sum < 1) {
-      return `${(sum * 1000).toFixed()} m`;
-    }
-    return `${sum.toFixed(2)} km`;
-  });
+const defaultLabelFormat = (number) => {
+  if (number < 1) {
+    return `${(number * 1000).toFixed()} m`;
+  }
+  return `${number.toFixed(2)} km`;
 };
 
 class Ruler {
-  constructor() {
+  constructor(options = {}) {
     this.isMeasuring = false;
     this.markers = [];
     this.coordinates = [];
     this.labels = [];
+    this.units = options.units || 'kilometers';
+    this.labelFormat = options.labelFormat || defaultLabelFormat;
     this.mapClickListener = this.mapClickListener.bind(this);
     this.styleLoadListener = this.styleLoadListener.bind(this);
   }
@@ -145,7 +142,7 @@ class Ruler {
       .setLngLat(event.lngLat)
       .addTo(this.map);
     this.coordinates.push([event.lngLat.lng, event.lngLat.lat]);
-    this.labels = coordinatesToLabels(this.coordinates);
+    this.labels = this.coordinatesToLabels();
     this.map.getSource(SOURCE_LINE)
       .setData(geoLineString(this.coordinates));
     this.map.getSource(SOURCE_SYMBOL)
@@ -155,11 +152,21 @@ class Ruler {
       const index = this.markers.indexOf(marker);
       const lngLat = marker.getLngLat();
       this.coordinates[index] = [lngLat.lng, lngLat.lat];
-      this.labels = coordinatesToLabels(this.coordinates);
+      this.labels = this.coordinatesToLabels();
       this.map.getSource(SOURCE_LINE)
         .setData(geoLineString(this.coordinates));
       this.map.getSource(SOURCE_SYMBOL)
         .setData(geoPoint(this.coordinates, this.labels));
+    });
+  }
+
+  coordinatesToLabels() {
+    const { coordinates, units, labelFormat } = this;
+    let sum = 0;
+    return coordinates.map((coordinate, index) => {
+      if (index === 0) return 0;
+      sum += distance(coordinates[index - 1], coordinates[index], { units });
+      return labelFormat(sum);
     });
   }
 

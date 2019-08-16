@@ -1794,12 +1794,8 @@
 	    value: function setLanguage() {
 	      var _this = this;
 
-	      var language = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.browserLanguage();
-
-	      if (this.supportedLanguages.indexOf(language) < 0) {
-	        throw new Error("Language ".concat(language, " is not supported"));
-	      }
-
+	      var lang = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.browserLanguage();
+	      var language = this.supportedLanguages.indexOf(lang) < 0 ? 'mul' : lang;
 	      var style = this.map.getStyle();
 	      var languageField = this.getLanguageField(language);
 	      var layers = style.layers.map(function (layer) {
@@ -1829,7 +1825,7 @@
 	        return languageCode;
 	      }
 
-	      return null;
+	      return 'mul';
 	    }
 	  }]);
 

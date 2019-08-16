@@ -36,11 +36,8 @@ class Language {
     this.setLanguage(this.language);
   }
 
-  setLanguage(language = this.browserLanguage()) {
-    if (this.supportedLanguages.indexOf(language) < 0) {
-      throw new Error(`Language ${language} is not supported`);
-    }
-
+  setLanguage(lang = this.browserLanguage()) {
+    const language = this.supportedLanguages.indexOf(lang) < 0 ? 'mul' : lang;
     const style = this.map.getStyle();
     const languageField = this.getLanguageField(language);
     const layers = style.layers.map((layer) => {
@@ -73,7 +70,7 @@ class Language {
     if (this.supportedLanguages.indexOf(languageCode) > -1) {
       return languageCode;
     }
-    return null;
+    return 'mul';
   }
 }
 

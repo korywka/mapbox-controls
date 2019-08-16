@@ -45,10 +45,19 @@ export default [
     plugins,
   },
   {
+    input: 'src/language/language.js',
+    output: {
+      file: 'lib/language.js',
+      format: 'esm',
+    },
+    plugins,
+  },
+  {
     input: 'docs/docs.js',
     output: {
       file: 'docs/docs.bundle.js',
       format: 'iife',
+      sourcemap: true,
     },
     plugins: [
       resolve(),

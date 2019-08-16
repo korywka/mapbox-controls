@@ -9,31 +9,18 @@
     <link href="./styles.css" rel="stylesheet">
 </head>
 <body>
-<div class="wrapper">
-    <h1>MapBox controls</h1>
 
-    <div class="map" id="map"></div>
+<div class="map" id="map"></div>
 
-    <h2>Usage</h2>
-    <h3>Install</h3>
-    <code>npm install mapbox-gl-controls</code>
-    <h3>Include styles</h3>
-    <code>&lt;link href="mapbox-gl-controls/theme.css" rel="stylesheet"&gt;</code>
-
-    <h2>Ruler control</h2>
-    <script src="https://gist.github.com/bravecow/fe0d1473b5094958bca4c02e518e45c2.js"></script>
-
-    <h2>Styles control</h2>
-    <script src="https://gist.github.com/bravecow/f200bc2dce7abfd4232b90aacb36e0a9.js"></script>
-
-    <h2>Compass control</h2>
-    <script src="https://gist.github.com/bravecow/f5952a7f538f0f6e75f49d40a46da36b.js"></script>
-
-    <h2>Zoom control</h2>
-    <script src="https://gist.github.com/bravecow/a0168acc123603fa66ee3ebece4e83e7.js"></script>
-
-    <script src="./docs.bundle.js"></script>
-</div>
+<select id="languages" class="languages">
+    <option value="" selected>browser language</option>
+    <option value="en">en</option>
+    <option value="de">de</option>
+    <option value="ru">ru</option>
+    <option value="zh">zh</option>
+    <option value="ar">ar</option>
+    <option value="mul">mul</option>
+</select>
 
 <a href="https://github.com/bravecow/mapbox-gl-controls" class="github-corner" aria-label="View source on Github">
     <svg width="80" height="80" viewBox="0 0 250 250"
@@ -45,5 +32,8 @@
               fill="currentColor" class="octo-body"></path>
     </svg>
 </a>
+
+<script src="./docs.bundle.js"></script>
+
 </body>
 </html>

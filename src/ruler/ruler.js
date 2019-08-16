@@ -7,35 +7,13 @@ const LAYER_SYMBOL = 'controls-layer-symbol';
 const SOURCE_LINE = 'controls-source-line';
 const SOURCE_SYMBOL = 'controls-source-symbol';
 
-const geoLineString = (coordinates = []) => ({
-  type: 'Feature',
-  properties: {},
-  geometry: {
-    type: 'LineString',
-    coordinates,
-  },
-});
-
-const geoPoint = (coordinates = [], labels = []) => ({
-  type: 'FeatureCollection',
-  features: coordinates.map((c, i) => ({
-    type: 'Feature',
-    properties: {
-      text: labels[i],
-    },
-    geometry: {
-      type: 'Point',
-      coordinates: c,
-    },
-  })),
-});
-
-const defaultLabelFormat = (number) => {
-  if (number < 1) {
-    return `${(number * 1000).toFixed()} m`;
-  }
-  return `${number.toFixed(2)} km`;
-};
+/**
+ * Fires map `ruler.on` and `ruler.off`events at the beginning and at the end of measuring.
+ * @param {object} options
+ * @param {string} [options.units='kilometers'] - Any units [@turf/distance](https://github.com/Turfjs/turf/tree/master/packages/turf-distance) supports
+ * @param {function} [options.labelFormat] - Accepts number and returns label.
+ * Can be used to convert value to any measuring units
+ */
 
 class Ruler {
   constructor(options = {}) {
@@ -198,3 +176,37 @@ class Ruler {
 }
 
 export default Ruler;
+
+function geoLineString(coordinates = []) {
+  return {
+    type: 'Feature',
+    properties: {},
+    geometry: {
+      type: 'LineString',
+      coordinates,
+    },
+  };
+}
+
+function geoPoint(coordinates = [], labels = []) {
+  return {
+    type: 'FeatureCollection',
+    features: coordinates.map((c, i) => ({
+      type: 'Feature',
+      properties: {
+        text: labels[i],
+      },
+      geometry: {
+        type: 'Point',
+        coordinates: c,
+      },
+    })),
+  };
+}
+
+function defaultLabelFormat(number) {
+  if (number < 1) {
+    return `${(number * 1000).toFixed()} m`;
+  }
+  return `${number.toFixed(2)} km`;
+}

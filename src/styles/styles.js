@@ -1,18 +1,28 @@
-const stylesDefault = [
+const defaultStyles = [
   {
     label: 'Streets',
     styleName: 'Mapbox Streets',
-    styleUrl: 'mapbox://styles/mapbox/streets-v9',
+    styleUrl: 'mapbox://styles/mapbox/streets-v11',
   }, {
     label: 'Satellite',
-    styleName: 'Satellite',
-    styleUrl: 'mapbox://styles/mapbox/satellite-v9',
+    styleName: 'Mapbox Satellite Streets',
+    styleUrl: 'mapbox://sprites/mapbox/satellite-streets-v11',
   },
 ];
 
+/**
+ * @param {object} options
+ * @param {object} [options.styles] - Style params
+ * @param {string} [options.styles.label] - Style label to display on switcher
+ * @param {string} [options.styles.styleName] - [Style name from spec](https://docs.mapbox.com/mapbox-gl-js/style-spec/#root-name)
+ * @param {string} [options.styles.styleUrl] - Style url
+ * @param {function} [options.onChange] - Triggered on style change. Accepts `style` object
+ */
+
 class Styles {
-  constructor(styles) {
-    this.styles = styles || stylesDefault;
+  constructor(options = {}) {
+    this.styles = options.styles || defaultStyles;
+    this.onChange = options.onChange;
   }
 
   insertControls() {
@@ -27,6 +37,7 @@ class Styles {
       node.addEventListener('click', () => {
         if (node.classList.contains('-active')) return;
         this.map.setStyle(style.styleUrl);
+        if (this.onChange) this.onChange(style);
       });
       this.nodes.push(node);
       this.container.appendChild(node);

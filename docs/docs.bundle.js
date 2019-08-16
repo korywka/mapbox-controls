@@ -48,7 +48,7 @@
 	return mapboxgl;
 
 	}));
-
+	//# sourceMappingURL=mapbox-gl.js.map
 	});
 
 	function _classCallCheck(instance, Constructor) {
@@ -73,23 +73,34 @@
 	  return Constructor;
 	}
 
-	var stylesDefault = [{
+	var defaultStyles = [{
 	  label: 'Streets',
 	  styleName: 'Mapbox Streets',
-	  styleUrl: 'mapbox://styles/mapbox/streets-v9'
+	  styleUrl: 'mapbox://styles/mapbox/streets-v11'
 	}, {
 	  label: 'Satellite',
-	  styleName: 'Satellite',
-	  styleUrl: 'mapbox://styles/mapbox/satellite-v9'
+	  styleName: 'Mapbox Satellite Streets',
+	  styleUrl: 'mapbox://sprites/mapbox/satellite-streets-v11'
 	}];
+	/**
+	 * @param {object} options
+	 * @param {object} [options.styles] - Style params
+	 * @param {string} [options.styles.label] - Style label to display on switcher
+	 * @param {string} [options.styles.styleName] - [Style name from spec](https://docs.mapbox.com/mapbox-gl-js/style-spec/#root-name)
+	 * @param {string} [options.styles.styleUrl] - Style url
+	 * @param {function} [options.onChange] - Triggered on style change. Accepts `style` object
+	 */
 
 	var Styles =
 	/*#__PURE__*/
 	function () {
-	  function Styles(styles) {
+	  function Styles() {
+	    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
 	    _classCallCheck(this, Styles);
 
-	    this.styles = styles || stylesDefault;
+	    this.styles = options.styles || defaultStyles;
+	    this.onChange = options.onChange;
 	  }
 
 	  _createClass(Styles, [{
@@ -109,6 +120,8 @@
 	          if (node.classList.contains('-active')) return;
 
 	          _this.map.setStyle(style.styleUrl);
+
+	          if (_this.onChange) _this.onChange(style);
 	        });
 
 	        _this.nodes.push(node);
@@ -179,6 +192,11 @@
 	var iconCW = "\n<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"#9E9E9E\" width=\"11\" height=\"28\" viewBox=\"0 0 11 28\">\n    <path d=\"M8.2 23.1c1.3-2.8 2-5.9 1.9-9.1C9.9 8.4 7.4 3.5 3.6 0L.1 3.7C3 6.3 4.8 10 5 14.1c.1 2.2-.3 4.4-1.2 6.3l-2.6-1.5-.5.9L2 27.6l.9.5 7.5-2.5.5-.9-2.7-1.6z\"/>\n</svg>\n";
 
 	var iconPointer = "\n<svg viewBox=\"0 0 24 24\" width=\"22\" height=\"22\" xmlns=\"http://www.w3.org/2000/svg\">\n    <g fill=\"none\" fill-rule=\"evenodd\">\n        <path d=\"M0 0h24v24H0z\"/>\n        <path fill=\"#505050\" d=\"M12 3l4 8H8z\"/>\n        <path fill=\"#9E9E9E\" d=\"M12 21l-4-8h8z\"/>\n    </g>\n</svg>\n";
+
+	/**
+	 * @param {object} options
+	 * @param {boolean} [options.instant=true] - Show compass if bearing is 0
+	 */
 
 	var Compass =
 	/*#__PURE__*/
@@ -1350,46 +1368,13 @@
 	var LAYER_SYMBOL = 'controls-layer-symbol';
 	var SOURCE_LINE = 'controls-source-line';
 	var SOURCE_SYMBOL = 'controls-source-symbol';
-
-	var geoLineString = function geoLineString() {
-	  var coordinates = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-	  return {
-	    type: 'Feature',
-	    properties: {},
-	    geometry: {
-	      type: 'LineString',
-	      coordinates: coordinates
-	    }
-	  };
-	};
-
-	var geoPoint = function geoPoint() {
-	  var coordinates = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-	  var labels = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-	  return {
-	    type: 'FeatureCollection',
-	    features: coordinates.map(function (c, i) {
-	      return {
-	        type: 'Feature',
-	        properties: {
-	          text: labels[i]
-	        },
-	        geometry: {
-	          type: 'Point',
-	          coordinates: c
-	        }
-	      };
-	    })
-	  };
-	};
-
-	var defaultLabelFormat = function defaultLabelFormat(number) {
-	  if (number < 1) {
-	    return "".concat((number * 1000).toFixed(), " m");
-	  }
-
-	  return "".concat(number.toFixed(2), " km");
-	};
+	/**
+	 * Fires map `ruler.on` and `ruler.off`events at the beginning and at the end of measuring.
+	 * @param {object} options
+	 * @param {string} [options.units='kilometers'] - Any units [@turf/distance](https://github.com/Turfjs/turf/tree/master/packages/turf-distance) supports
+	 * @param {function} [options.labelFormat] - Accepts number and returns label.
+	 * Can be used to convert value to any measuring units
+	 */
 
 	var Ruler =
 	/*#__PURE__*/
@@ -1575,6 +1560,46 @@
 	  return Ruler;
 	}();
 
+	function geoLineString() {
+	  var coordinates = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+	  return {
+	    type: 'Feature',
+	    properties: {},
+	    geometry: {
+	      type: 'LineString',
+	      coordinates: coordinates
+	    }
+	  };
+	}
+
+	function geoPoint() {
+	  var coordinates = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+	  var labels = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+	  return {
+	    type: 'FeatureCollection',
+	    features: coordinates.map(function (c, i) {
+	      return {
+	        type: 'Feature',
+	        properties: {
+	          text: labels[i]
+	        },
+	        geometry: {
+	          type: 'Point',
+	          coordinates: c
+	        }
+	      };
+	    })
+	  };
+	}
+
+	function defaultLabelFormat(number) {
+	  if (number < 1) {
+	    return "".concat((number * 1000).toFixed(), " m");
+	  }
+
+	  return "".concat(number.toFixed(2), " km");
+	}
+
 	function _classCallCheck$3(instance, Constructor) {
 	  if (!(instance instanceof Constructor)) {
 	    throw new TypeError("Cannot call a class as a function");
@@ -1648,20 +1673,204 @@
 	  return Zoom;
 	}();
 
+	function _classCallCheck$4(instance, Constructor) {
+	  if (!(instance instanceof Constructor)) {
+	    throw new TypeError("Cannot call a class as a function");
+	  }
+	}
+
+	function _defineProperties$4(target, props) {
+	  for (var i = 0; i < props.length; i++) {
+	    var descriptor = props[i];
+	    descriptor.enumerable = descriptor.enumerable || false;
+	    descriptor.configurable = true;
+	    if ("value" in descriptor) descriptor.writable = true;
+	    Object.defineProperty(target, descriptor.key, descriptor);
+	  }
+	}
+
+	function _createClass$4(Constructor, protoProps, staticProps) {
+	  if (protoProps) _defineProperties$4(Constructor.prototype, protoProps);
+	  if (staticProps) _defineProperties$4(Constructor, staticProps);
+	  return Constructor;
+	}
+
+	function _defineProperty(obj, key, value) {
+	  if (key in obj) {
+	    Object.defineProperty(obj, key, {
+	      value: value,
+	      enumerable: true,
+	      configurable: true,
+	      writable: true
+	    });
+	  } else {
+	    obj[key] = value;
+	  }
+
+	  return obj;
+	}
+
+	function _objectSpread(target) {
+	  for (var i = 1; i < arguments.length; i++) {
+	    var source = arguments[i] != null ? arguments[i] : {};
+	    var ownKeys = Object.keys(source);
+
+	    if (typeof Object.getOwnPropertySymbols === 'function') {
+	      ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
+	        return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+	      }));
+	    }
+
+	    ownKeys.forEach(function (key) {
+	      _defineProperty(target, key, source[key]);
+	    });
+	  }
+
+	  return target;
+	}
+
+	var SUPPORTED_LANGUAGES = ['en', 'es', 'fr', 'de', 'ru', 'zh', 'pt', 'ar', 'ja', 'ko', 'mul'];
+	/**
+	 * Language can be set dynamically with `.setLanguage(lang)` method.
+	 * @param {object} options
+	 * @param {array} [options.supportedLanguages] - (Supported languages)[https://docs.mapbox.com/help/troubleshooting/change-language/]
+	 * @param {string} [options.language] - One of the supported languages to apply
+	 * @param {array} [options.excludedLayerIds=[]] - Array of layer id to exclude from localization
+	 * @param {function} [options.getLanguageField] - Accepts language and returns language field.
+	 * By default fields are `name_LANGUAGE` and `name` for multi language (mul).
+	 */
+
+	var Language =
+	/*#__PURE__*/
+	function () {
+	  function Language() {
+	    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+	    _classCallCheck$4(this, Language);
+
+	    this.supportedLanguages = options.supportedLanguages || SUPPORTED_LANGUAGES;
+	    this.language = options.language;
+	    this.getLanguageField = options.getLanguageField || getLanguageField;
+	    this.excludedLayerIds = options.excludedLayerIds || [];
+	    this.styleChangeListener = this.styleChangeListener.bind(this);
+	  }
+
+	  _createClass$4(Language, [{
+	    key: "onAdd",
+	    value: function onAdd(map) {
+	      this.map = map;
+	      this.map.on('styledata', this.styleChangeListener);
+	      this.container = document.createElement('div');
+	      return this.container;
+	    }
+	  }, {
+	    key: "onRemove",
+	    value: function onRemove() {
+	      this.map.off('styledata', this.styleChangeListener);
+	      this.map = undefined;
+	    }
+	  }, {
+	    key: "styleChangeListener",
+	    value: function styleChangeListener() {
+	      this.map.off('styledata', this.styleChangeListener);
+	      this.setLanguage(this.language);
+	    }
+	  }, {
+	    key: "setLanguage",
+	    value: function setLanguage() {
+	      var _this = this;
+
+	      var language = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.browserLanguage();
+
+	      if (this.supportedLanguages.indexOf(language) < 0) {
+	        throw new Error("Language ".concat(language, " is not supported"));
+	      }
+
+	      var style = this.map.getStyle();
+	      var languageField = this.getLanguageField(language);
+	      var layers = style.layers.map(function (layer) {
+	        if (layer.type !== 'symbol') return layer;
+	        if (!layer.layout || !layer.layout['text-field']) return layer;
+	        if (_this.excludedLayerIds.indexOf(layer.id) !== -1) return layer;
+	        var textField = layer.layout['text-field'];
+	        var textFieldLocalized = localizeTextField(textField, languageField);
+	        return _objectSpread({}, layer, {
+	          layout: _objectSpread({}, layer.layout, {
+	            'text-field': textFieldLocalized
+	          })
+	        });
+	      });
+	      this.map.setStyle(_objectSpread({}, style, {
+	        layers: layers
+	      }));
+	    }
+	  }, {
+	    key: "browserLanguage",
+	    value: function browserLanguage() {
+	      var language = navigator.languages ? navigator.languages[0] : navigator.language;
+	      var parts = language.split('-');
+	      var languageCode = parts.length > 1 ? parts[0] : language;
+
+	      if (this.supportedLanguages.indexOf(languageCode) > -1) {
+	        return languageCode;
+	      }
+
+	      return null;
+	    }
+	  }]);
+
+	  return Language;
+	}();
+
+	function getLanguageField(lang) {
+	  if (lang === 'mul') {
+	    return 'name';
+	  }
+
+	  return "name_".concat(lang);
+	}
+
+	function localizeTextField(field, lang) {
+	  if (typeof field === 'string') {
+	    return field.replace(/{name.*?}/, "{".concat(lang, "}"));
+	  }
+
+	  var str = JSON.stringify(field);
+
+	  if (Array.isArray(field)) {
+	    return JSON.parse(str.replace(/"coalesce",\["get","name.*?"]/g, "\"coalesce\",[\"get\",\"".concat(lang, "\"]")));
+	  }
+
+	  return JSON.parse(str.replace(/{name.*?}/g, "{".concat(lang, "}")));
+	}
+
 	mapboxGl.accessToken = 'pk.eyJ1IjoiYnJhdmVjb3ciLCJhIjoiY2o1ODEwdWljMThwbTJ5bGk0a294ZmVybiJ9.kErON3w2kwEVxU5aNa-EqQ';
 
+	const languages = document.getElementById('languages');
 	const map = new mapboxGl.Map({
 	  container: 'map',
-	  style: 'mapbox://styles/mapbox/streets-v9',
+	  style: 'mapbox://styles/mapbox/streets-v11',
 	  zoom: 14,
 	  center: [30.5234, 50.4501],
-	  scrollZoom: false,
 	});
 
-	map.addControl(new Styles(), 'top-left');
-	map.addControl(new Ruler(), 'top-right');
-	map.addControl(new Compass(), 'top-right');
-	map.addControl(new Zoom(), 'top-right');
-	map.addControl(new Compass({ instant: false }), 'bottom-right');
+	map.addControl(new Zoom(), 'bottom-right');
+	map.addControl(new Compass(), 'bottom-right');
+	map.addControl(new Ruler(), 'bottom-right');
+	map.addControl(new Styles({
+	  onChange: () => {
+	    languages.value = '';
+	  },
+	}), 'top-left');
+
+	(() => {
+	  const languageControl = new Language();
+	  map.addControl(languageControl);
+
+	  languages.addEventListener('change', () => {
+	    languageControl.setLanguage(languages.value);
+	  });
+	})();
 
 }());
+//# sourceMappingURL=docs.bundle.js.map

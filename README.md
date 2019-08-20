@@ -41,17 +41,20 @@ import StylesControl from 'mapbox-gl-controls/lib/styles';
 map.addControl(new StylesControl(), 'top-left');
 
 // with custom styles:
-map.addControl(new StylesControl([
-  {
-    label: 'Streets',
-    styleName: 'Mapbox Streets',
-    styleUrl: 'mapbox://styles/mapbox/streets-v9',
-  }, {
-    label: 'Satellite',
-    styleName: 'Satellite',
-    styleUrl: 'mapbox://styles/mapbox/satellite-v9',
-  },
-]), 'top-left');
+map.addControl(new StylesControl({
+  styles: [
+    {
+      label: 'Streets',
+      styleName: 'Mapbox Streets',
+      styleUrl: 'mapbox://styles/mapbox/streets-v9',
+    }, {
+      label: 'Satellite',
+      styleName: 'Satellite',
+      styleUrl: 'mapbox://styles/mapbox/satellite-v9',
+    },
+  ],
+  onChange: (style) => console.log(style),
+}), 'top-left');
 ```
 
 ### Compass Control
@@ -96,8 +99,8 @@ languageControl.setLanguage('mul');
 
 ##### Parameters
 
--   `options` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)**  (optional, default `{}`)
-    -   `options.instant` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Show compass if bearing is 0 (optional, default `true`)
+-   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)**  (optional, default `{}`)
+    -   `options.instant` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Show compass if bearing is 0 (optional, default `true`)
 
 #### Language
 
@@ -105,11 +108,11 @@ Language can be set dynamically with `.setLanguage(lang)` method.
 
 ##### Parameters
 
--   `options` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)**  (optional, default `{}`)
-    -   `options.supportedLanguages` **[array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)?** (Supported languages)[https://docs.mapbox.com/help/troubleshooting/change-language/]
-    -   `options.language` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** One of the supported languages to apply
-    -   `options.excludedLayerIds` **[array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)** Array of layer id to exclude from localization (optional, default `[]`)
-    -   `options.getLanguageField` **[function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** Accepts language and returns language field.
+-   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)**  (optional, default `{}`)
+    -   `options.supportedLanguages` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)?** (Supported languages)[https://docs.mapbox.com/help/troubleshooting/change-language/]
+    -   `options.language` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** One of the supported languages to apply
+    -   `options.excludedLayerIds` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)** Array of layer id to exclude from localization (optional, default `[]`)
+    -   `options.getLanguageField` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** Accepts language and returns language field.
         By default fields are `name_LANGUAGE` and `name` for multi language (mul).
 
 #### Ruler
@@ -118,18 +121,18 @@ Fires map `ruler.on` and `ruler.off`events at the beginning and at the end of me
 
 ##### Parameters
 
--   `options` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)**  (optional, default `{}`)
-    -   `options.units` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Any units [@turf/distance](https://github.com/Turfjs/turf/tree/master/packages/turf-distance) supports (optional, default `'kilometers'`)
-    -   `options.labelFormat` **[function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** Accepts number and returns label.
+-   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)**  (optional, default `{}`)
+    -   `options.units` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Any units [@turf/distance](https://github.com/Turfjs/turf/tree/master/packages/turf-distance) supports (optional, default `'kilometers'`)
+    -   `options.labelFormat` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** Accepts number and returns label.
         Can be used to convert value to any measuring units
 
 #### Styles
 
 ##### Parameters
 
--   `options` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)**  (optional, default `{}`)
-    -   `options.styles` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Style params
-        -   `options.styles.label` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** Style label to display on switcher
-        -   `options.styles.styleName` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** [Style name from spec](https://docs.mapbox.com/mapbox-gl-js/style-spec/#root-name)
-        -   `options.styles.styleUrl` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** Style url
-    -   `options.onChange` **[function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** Triggered on style change. Accepts `style` object
+-   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)**  (optional, default `{}`)
+    -   `options.styles` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)?** Array of style objects:
+        -   `options.styles.label` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Style label to display on switcher
+        -   `options.styles.styleName` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** [Style name from spec](https://docs.mapbox.com/mapbox-gl-js/style-spec/#root-name)
+        -   `options.styles.styleUrl` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Style url
+    -   `options.onChange` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** Triggered on style change. Accepts `style` object

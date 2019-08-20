@@ -3,8 +3,8 @@ import iconCW from './icon-cw';
 import iconPointer from './icon-pointer';
 
 /**
- * @param {object} options
- * @param {boolean} [options.instant=true] - Show compass if bearing is 0
+ * @param {Object} options
+ * @param {Boolean} [options.instant=true] - Show compass if bearing is 0
  */
 
 class Compass {

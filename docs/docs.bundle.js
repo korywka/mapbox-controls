@@ -83,12 +83,12 @@
 	  styleUrl: 'mapbox://sprites/mapbox/satellite-streets-v11'
 	}];
 	/**
-	 * @param {object} options
-	 * @param {object} [options.styles] - Style params
-	 * @param {string} [options.styles.label] - Style label to display on switcher
-	 * @param {string} [options.styles.styleName] - [Style name from spec](https://docs.mapbox.com/mapbox-gl-js/style-spec/#root-name)
-	 * @param {string} [options.styles.styleUrl] - Style url
-	 * @param {function} [options.onChange] - Triggered on style change. Accepts `style` object
+	 * @param {Object} options
+	 * @param {Array} [options.styles] - Array of style objects:
+	 * @param {String} options.styles.label - Style label to display on switcher
+	 * @param {String} options.styles.styleName - [Style name from spec](https://docs.mapbox.com/mapbox-gl-js/style-spec/#root-name)
+	 * @param {String} options.styles.styleUrl - Style url
+	 * @param {Function} [options.onChange] - Triggered on style change. Accepts `style` object
 	 */
 
 	var Styles =
@@ -194,8 +194,8 @@
 	var iconPointer = "\n<svg viewBox=\"0 0 24 24\" width=\"22\" height=\"22\" xmlns=\"http://www.w3.org/2000/svg\">\n    <g fill=\"none\" fill-rule=\"evenodd\">\n        <path d=\"M0 0h24v24H0z\"/>\n        <path fill=\"#505050\" d=\"M12 3l4 8H8z\"/>\n        <path fill=\"#9E9E9E\" d=\"M12 21l-4-8h8z\"/>\n    </g>\n</svg>\n";
 
 	/**
-	 * @param {object} options
-	 * @param {boolean} [options.instant=true] - Show compass if bearing is 0
+	 * @param {Object} options
+	 * @param {Boolean} [options.instant=true] - Show compass if bearing is 0
 	 */
 
 	var Compass =
@@ -1369,9 +1369,9 @@
 	var SOURCE_SYMBOL = 'controls-source-symbol';
 	/**
 	 * Fires map `ruler.on` and `ruler.off`events at the beginning and at the end of measuring.
-	 * @param {object} options
-	 * @param {string} [options.units='kilometers'] - Any units [@turf/distance](https://github.com/Turfjs/turf/tree/master/packages/turf-distance) supports
-	 * @param {function} [options.labelFormat] - Accepts number and returns label.
+	 * @param {Object} options
+	 * @param {String} [options.units='kilometers'] - Any units [@turf/distance](https://github.com/Turfjs/turf/tree/master/packages/turf-distance) supports
+	 * @param {Function} [options.labelFormat] - Accepts number and returns label.
 	 * Can be used to convert value to any measuring units
 	 */
 
@@ -1746,11 +1746,11 @@
 	var SUPPORTED_LANGUAGES = ['en', 'es', 'fr', 'de', 'ru', 'zh', 'pt', 'ar', 'ja', 'ko', 'mul'];
 	/**
 	 * Language can be set dynamically with `.setLanguage(lang)` method.
-	 * @param {object} options
-	 * @param {array} [options.supportedLanguages] - (Supported languages)[https://docs.mapbox.com/help/troubleshooting/change-language/]
-	 * @param {string} [options.language] - One of the supported languages to apply
-	 * @param {array} [options.excludedLayerIds=[]] - Array of layer id to exclude from localization
-	 * @param {function} [options.getLanguageField] - Accepts language and returns language field.
+	 * @param {Object} options
+	 * @param {Array} [options.supportedLanguages] - (Supported languages)[https://docs.mapbox.com/help/troubleshooting/change-language/]
+	 * @param {String} [options.language] - One of the supported languages to apply
+	 * @param {Array} [options.excludedLayerIds=[]] - Array of layer id to exclude from localization
+	 * @param {Function} [options.getLanguageField] - Accepts language and returns language field.
 	 * By default fields are `name_LANGUAGE` and `name` for multi language (mul).
 	 */
 

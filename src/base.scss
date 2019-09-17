@@ -1,4 +1,6 @@
 .mapboxgl-ctrl-group {
+  overflow: hidden;
+
   &:not(:empty) {
     box-shadow: 0 1px 4px rgba(0, 0, 0, .3);
   }
@@ -11,5 +13,10 @@
     svg {
       vertical-align: top;
     }
+  }
+
+  /* geolocate control is broken for display: flex */
+  .mapboxgl-ctrl-geolocate {
+    display: block;
   }
 }

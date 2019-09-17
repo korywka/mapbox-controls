@@ -15,6 +15,15 @@ const map = new mapboxgl.Map({
   center: [30.5234, 50.4501],
 });
 
+map.on('load', () => {
+  console.log('load');
+});
+map.on('style.load', () => {
+  console.log('style.load');
+});
+map.on('styledata', () => {
+  console.log('styledata');
+});
 map.addControl(new ZoomControl(), 'bottom-right');
 map.addControl(new CompassControl(), 'bottom-right');
 map.addControl(new RulerControl(), 'bottom-right');

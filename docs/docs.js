@@ -4,6 +4,7 @@ import CompassControl from '../lib/compass';
 import RulerControl from '../lib/ruler';
 import ZoomControl from '../lib/zoom';
 import LanguageControl from '../lib/language';
+import InspectControl from '../src/inspect/inspect';
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiYnJhdmVjb3ciLCJhIjoiY2o1ODEwdWljMThwbTJ5bGk0a294ZmVybiJ9.kErON3w2kwEVxU5aNa-EqQ';
 
@@ -23,6 +24,7 @@ map.addControl(new StylesControl({
     languages.value = '';
   },
 }), 'top-left');
+map.addControl(new InspectControl(), 'bottom-right');
 
 (() => {
   const languageControl = new LanguageControl();

@@ -48,7 +48,7 @@
 	return mapboxgl;
 
 	}));
-
+	//# sourceMappingURL=mapbox-gl.js.map
 	});
 
 	function _classCallCheck(instance, Constructor) {
@@ -1902,6 +1902,57 @@
 	  return JSON.parse(str.replace(/{name.*?}/g, "{".concat(lang, "}")));
 	}
 
+	function iconInspect(attrs) {
+	  var node = (new DOMParser().parseFromString("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"#505050\">\n    <path d=\"M0 0h24v24H0z\" fill=\"none\"/>\n    <path d=\"M20 19.59V8l-6-6H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c.45 0 .85-.15 1.19-.4l-4.43-4.43c-.8.52-1.74.83-2.76.83-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5c0 1.02-.31 1.96-.83 2.75L20 19.59zM9 13c0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3-3 1.34-3 3z\"/>\n</svg>", 'text/xml')).firstChild;
+	  if (attrs) {
+	    Object.keys(attrs).forEach(function(key) {
+	      node.setAttribute(key, attrs[key]);
+	    });
+	  }
+	  return node;
+	}
+
+	class Zoom$1 {
+	  insertControls() {
+	    this.container = document.createElement('div');
+	    this.container.classList.add('mapboxgl-ctrl');
+	    this.container.classList.add('mapboxgl-ctrl-group');
+	    this.container.classList.add('mapboxgl-ctrl-inspect');
+	    this.button = document.createElement('button');
+	    this.button.appendChild(iconInspect());
+	    this.container.appendChild(this.button);
+	  }
+
+	  onAdd(map) {
+	    this.map = map;
+	    this.isInspecting = false;
+	    this.insertControls();
+	    this.button.addEventListener('click', () => {
+	      if (this.isInspecting) {
+	        this.inspectingOff();
+	      } else {
+	        this.inspectingOn();
+	      }
+	    });
+	    return this.container;
+	  }
+
+	  inspectingOn() {
+	    this.isInspecting = true;
+	    this.button.classList.add('-active');
+	  }
+
+	  inspectingOff() {
+	    this.isInspecting = false;
+	    this.button.classList.remove('-active');
+	  }
+
+	  onRemove() {
+	    this.container.parentNode.removeChild(this.container);
+	    this.map = undefined;
+	  }
+	}
+
 	mapboxGl.accessToken = 'pk.eyJ1IjoiYnJhdmVjb3ciLCJhIjoiY2o1ODEwdWljMThwbTJ5bGk0a294ZmVybiJ9.kErON3w2kwEVxU5aNa-EqQ';
 
 	const languages = document.getElementById('languages');
@@ -1920,6 +1971,7 @@
 	    languages.value = '';
 	  },
 	}), 'top-left');
+	map.addControl(new Zoom$1(), 'bottom-right');
 
 	(() => {
 	  const languageControl = new Language();

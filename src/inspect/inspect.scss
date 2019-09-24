@@ -1,0 +1,9 @@
+.mapboxgl-ctrl-inspect {
+  button {
+    &.-active {
+      svg {
+        fill: #4264fb;
+      }
+    }
+  }
+}

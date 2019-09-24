@@ -1,5 +1,5 @@
-import iconPlus from './icon-plus';
-import iconMinus from './icon-minus';
+import iconPlus from './icon-plus.svg';
+import iconMinus from './icon-minus.svg';
 
 class Zoom {
   insertControls() {
@@ -8,9 +8,9 @@ class Zoom {
     this.container.classList.add('mapboxgl-ctrl-group');
     this.container.classList.add('mapboxgl-ctrl-zoom');
     this.zoomIn = document.createElement('button');
-    this.zoomIn.innerHTML = iconPlus;
+    this.zoomIn.appendChild(iconPlus());
     this.zoomOut = document.createElement('button');
-    this.zoomOut.innerHTML = iconMinus;
+    this.zoomOut.appendChild(iconMinus());
     this.container.appendChild(this.zoomIn);
     this.container.appendChild(this.zoomOut);
   }

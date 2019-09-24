@@ -1,6 +1,6 @@
-import iconCCW from './icon-ccw';
-import iconCW from './icon-cw';
-import iconPointer from './icon-pointer';
+import iconCCW from './icon-ccw.svg';
+import iconCW from './icon-cw.svg';
+import iconPointer from './icon-pointer.svg';
 
 /**
  * @param {Object} options
@@ -10,31 +10,25 @@ import iconPointer from './icon-pointer';
 class Compass {
   constructor(options = {}) {
     this.instant = typeof options.instant === 'boolean' ? options.instant : true;
-    this.nodeCCW = (new DOMParser().parseFromString(iconCCW, 'text/xml')).firstChild;
-    this.nodeCW = (new DOMParser().parseFromString(iconCW, 'text/xml')).firstChild;
-    this.nodePointer = (new DOMParser().parseFromString(iconPointer, 'text/xml')).firstChild;
     this.toggle = this.toggle.bind(this);
   }
 
   insertControls() {
     this.container = document.createElement('div');
     this.compassButton = document.createElement('button');
-    this.pointer = this.nodePointer;
-    this.pointer.classList.add('mapboxgl-ctrl-compass-pointer');
-    this.arrowCCW = this.nodeCCW;
-    this.arrowCCW.classList.add('mapboxgl-ctrl-compass-ccw');
-    this.arrowCW = this.nodeCW;
-    this.arrowCW.classList.add('mapboxgl-ctrl-compass-cw');
     this.container.classList.add('mapboxgl-ctrl');
     this.container.classList.add('mapboxgl-ctrl-group');
     this.container.classList.add('mapboxgl-ctrl-compass');
+    this.pointer = iconPointer({ class: 'mapboxgl-ctrl-compass-pointer' });
+    this.arrowCW = iconCW({ class: 'mapboxgl-ctrl-compass-cw' });
+    this.arrowCCW = iconCCW({ class: 'mapboxgl-ctrl-compass-ccw' });
     if (this.instant) {
       this.container.classList.add('-active');
     }
     this.container.appendChild(this.compassButton);
     this.compassButton.appendChild(this.pointer);
-    this.compassButton.appendChild(this.arrowCCW);
     this.compassButton.appendChild(this.arrowCW);
+    this.compassButton.appendChild(this.arrowCCW);
   }
 
   onAdd(map) {

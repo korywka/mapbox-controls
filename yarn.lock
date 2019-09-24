@@ -4740,10 +4740,10 @@ rimraf@^2.6.1:
   dependencies:
     glob "^7.1.3"
 
-rollup-inline-svg@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/rollup-inline-svg/-/rollup-inline-svg-1.0.3.tgz#7c87f0929640f72771b7d21c9ec0364d570e5870"
-  integrity sha512-c1Tl/smqdzs6SF6N9ttxThDyAgrRYbfuok4eRGl0Zi3+c1rrIR7mbgW62yUxpP30XHQ/xnfDztbV6sNCrtzBKA==
+rollup-inline-svg@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/rollup-inline-svg/-/rollup-inline-svg-1.0.4.tgz#769f0a514106a3e44d4e1fae2dfcbb5983b5ea6c"
+  integrity sha512-1TgLZXtWAjIR6hdWiAyIFl870y2451Ao0eRn6/79nORXSRbRlqh0nGoXrHUO2Ja8DknpwPYFEH8Qe/e9FuYWOA==
 
 rollup-plugin-babel@^4.3.3:
   version "4.3.3"

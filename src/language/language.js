@@ -12,6 +12,7 @@ const SUPPORTED_LANGUAGES = ['en', 'es', 'fr', 'de', 'ru', 'zh', 'pt', 'ar', 'ja
 
 class Language {
   constructor(options = {}) {
+    this.container = document.createElement('div');
     this.supportedLanguages = options.supportedLanguages || SUPPORTED_LANGUAGES;
     this.language = options.language;
     this.getLanguageField = options.getLanguageField || getLanguageField;
@@ -22,7 +23,6 @@ class Language {
   onAdd(map) {
     this.map = map;
     this.map.on('styledata', this.styleChangeListener);
-    this.container = document.createElement('div');
     return this.container;
   }
 

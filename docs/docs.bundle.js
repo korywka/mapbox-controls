@@ -1902,6 +1902,28 @@
 	  return JSON.parse(str.replace(/{name.*?}/g, "{".concat(lang, "}")));
 	}
 
+	function _classCallCheck$5(instance, Constructor) {
+	  if (!(instance instanceof Constructor)) {
+	    throw new TypeError("Cannot call a class as a function");
+	  }
+	}
+
+	function _defineProperties$5(target, props) {
+	  for (var i = 0; i < props.length; i++) {
+	    var descriptor = props[i];
+	    descriptor.enumerable = descriptor.enumerable || false;
+	    descriptor.configurable = true;
+	    if ("value" in descriptor) descriptor.writable = true;
+	    Object.defineProperty(target, descriptor.key, descriptor);
+	  }
+	}
+
+	function _createClass$5(Constructor, protoProps, staticProps) {
+	  if (protoProps) _defineProperties$5(Constructor.prototype, protoProps);
+	  if (staticProps) _defineProperties$5(Constructor, staticProps);
+	  return Constructor;
+	}
+
 	function iconInspect(attrs) {
 	  var node = (new DOMParser().parseFromString("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"#505050\">\n    <path d=\"M0 0h24v24H0z\" fill=\"none\"/>\n    <path d=\"M20 19.59V8l-6-6H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c.45 0 .85-.15 1.19-.4l-4.43-4.43c-.8.52-1.74.83-2.76.83-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5c0 1.02-.31 1.96-.83 2.75L20 19.59zM9 13c0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3-3 1.34-3 3z\"/>\n</svg>", 'text/xml')).firstChild;
 	  if (attrs) {
@@ -1932,70 +1954,66 @@
 	  return node;
 	}
 
-	const featureData = (feature) => {
-	  const props = feature.properties;
-	  const data = [
-	    {
-	      key: '$id',
-	      value: feature.layer.id,
-	    },
-	    {
-	      key: '$type',
-	      value: feature.layer.type,
-	    },
-	    {
-	      key: 'source',
-	      value: feature.layer.source,
-	    },
-	    {
-	      key: 'source-layer',
-	      value: feature.layer['source-layer'],
-	    },
-	  ];
-
-	  Object.keys(props)
-	    .forEach((key) => {
-	      data.push({
-	        key,
-	        value: props[key],
-	      });
+	var featureData = function featureData(feature) {
+	  var props = feature.properties;
+	  var data = [{
+	    key: '$id',
+	    value: feature.layer.id
+	  }, {
+	    key: '$type',
+	    value: feature.layer.type
+	  }, {
+	    key: 'source',
+	    value: feature.layer.source
+	  }, {
+	    key: 'source-layer',
+	    value: feature.layer['source-layer']
+	  }];
+	  Object.keys(props).forEach(function (key) {
+	    data.push({
+	      key: key,
+	      value: props[key]
 	    });
-
+	  });
 	  return data;
 	};
 
-	const popup = (features) => {
-	  let current = 0;
-	  const root = document.createElement('div');
+	var popup = function popup(features) {
+	  var current = 0;
+	  var root = document.createElement('div');
 	  root.classList.add('mapboxgl-ctrl-inspect-popup');
-	  const content = document.createElement('div');
+	  var content = document.createElement('div');
 	  content.classList.add('mapboxgl-ctrl-inspect-content');
 
-	  const templatePrev = () => {
-	    const button = document.createElement('div');
+	  var templatePrev = function templatePrev() {
+	    var button = document.createElement('div');
 	    button.classList.add('mapboxgl-ctrl-inspect-prev');
 	    button.appendChild(iconLeft());
-	    button.addEventListener('click', () => goTo('-1'));
+	    button.addEventListener('click', function () {
+	      return goTo('-1');
+	    });
 	    return button;
 	  };
 
-	  const templateNext = () => {
-	    const button = document.createElement('div');
+	  var templateNext = function templateNext() {
+	    var button = document.createElement('div');
 	    button.classList.add('mapboxgl-ctrl-inspect-next');
-	    button.appendChild((iconRight()));
-	    button.addEventListener('click', () => goTo('+1'));
+	    button.appendChild(iconRight());
+	    button.addEventListener('click', function () {
+	      return goTo('+1');
+	    });
 	    return button;
 	  };
 
-	  const templateTitle = () => {
-	    const title = document.createElement('div');
+	  var templateTitle = function templateTitle() {
+	    var title = document.createElement('div');
 	    title.classList.add('mapboxgl-ctrl-inspect-current');
-	    title.textContent = `${current + 1} / ${features.length}`;
+	    title.textContent = "".concat(current + 1, " / ").concat(features.length);
 	    return title;
 	  };
 
-	  const templateHeader = () => {
-	    const header = document.createElement('div');
+	  var templateHeader = function templateHeader() {
+	    var header = document.createElement('div');
 	    header.classList.add('mapboxgl-ctrl-inspect-header');
 	    header.appendChild(templatePrev());
 	    header.appendChild(templateTitle());
@@ -2003,21 +2021,20 @@
 	    return header;
 	  };
 
-	  const templateFeature = (feature) => {
-	    const table = document.createElement('table');
+	  var templateFeature = function templateFeature(feature) {
+	    var table = document.createElement('table');
 	    table.classList.add('mapboxgl-ctrl-inspect-feature');
-	    const data = featureData(feature);
-	    data.forEach((prop) => {
-	      const row = document.createElement('tr');
-	      const key = document.createElement('th');
-	      const value = document.createElement('td');
+	    var data = featureData(feature);
+	    data.forEach(function (prop) {
+	      var row = document.createElement('tr');
+	      var key = document.createElement('th');
+	      var value = document.createElement('td');
 	      key.textContent = prop.key;
 	      value.textContent = prop.value;
 	      row.appendChild(key);
 	      row.appendChild(value);
 	      table.append(row);
 	    });
-
 	    return table;
 	  };
 
@@ -2041,101 +2058,123 @@
 	    if (features.length > 1) {
 	      content.appendChild(templateHeader());
 	    }
+
 	    content.appendChild(templateFeature(features[current]));
 	  }
 
 	  return root;
 	};
 
-	class Inspect {
-	  insertControls() {
-	    this.container = document.createElement('div');
-	    this.container.classList.add('mapboxgl-ctrl');
-	    this.container.classList.add('mapboxgl-ctrl-group');
-	    this.container.classList.add('mapboxgl-ctrl-inspect');
-	    this.button = document.createElement('button');
-	    this.button.appendChild(iconInspect());
-	    this.container.appendChild(this.button);
-	    this.popup = null;
-	    this.lngLat = null;
-	    this.clickListener = this.clickListener.bind(this);
-	    this.updatePosition = this.updatePosition.bind(this);
+	var Inspect =
+	/*#__PURE__*/
+	function () {
+	  function Inspect() {
+	    _classCallCheck$5(this, Inspect);
 	  }
 
-	  inspectingOn() {
-	    this.isInspecting = true;
-	    this.button.classList.add('-active');
-	    this.map.on('click', this.clickListener);
-	    this.map.on('move', this.updatePosition);
-	    this.map.getCanvas().style.cursor = 'pointer';
-	  }
+	  _createClass$5(Inspect, [{
+	    key: "insertControls",
+	    value: function insertControls() {
+	      this.container = document.createElement('div');
+	      this.container.classList.add('mapboxgl-ctrl');
+	      this.container.classList.add('mapboxgl-ctrl-group');
+	      this.container.classList.add('mapboxgl-ctrl-inspect');
+	      this.button = document.createElement('button');
+	      this.button.appendChild(iconInspect());
+	      this.container.appendChild(this.button);
+	      this.popup = null;
+	      this.lngLat = null;
+	      this.clickListener = this.clickListener.bind(this);
+	      this.updatePosition = this.updatePosition.bind(this);
+	    }
+	  }, {
+	    key: "inspectingOn",
+	    value: function inspectingOn() {
+	      this.isInspecting = true;
+	      this.button.classList.add('-active');
+	      this.map.on('click', this.clickListener);
+	      this.map.on('move', this.updatePosition);
+	      this.map.getCanvas().style.cursor = 'pointer';
+	    }
+	  }, {
+	    key: "inspectingOff",
+	    value: function inspectingOff() {
+	      this.removePopup();
+	      this.isInspecting = false;
+	      this.button.classList.remove('-active');
+	      this.map.off('click', this.clickListener);
+	      this.map.off('move', this.updatePosition);
+	      this.map.getCanvas().style.cursor = '';
+	    }
+	  }, {
+	    key: "getFeatures",
+	    value: function getFeatures(event) {
+	      var selectThreshold = 3;
+	      var queryBox = [[event.point.x - selectThreshold, event.point.y + selectThreshold], // bottom left (SW)
+	      [event.point.x + selectThreshold, event.point.y - selectThreshold] // top right (NE)
+	      ];
+	      return this.map.queryRenderedFeatures(queryBox);
+	    }
+	  }, {
+	    key: "addPopup",
+	    value: function addPopup(features) {
+	      this.popup = popup(features);
+	      this.mapContainer.appendChild(this.popup);
+	      this.updatePosition();
+	    }
+	  }, {
+	    key: "removePopup",
+	    value: function removePopup() {
+	      if (!this.popup) return;
+	      this.mapContainer.removeChild(this.popup);
+	      this.popup = null;
+	    }
+	  }, {
+	    key: "updatePosition",
+	    value: function updatePosition() {
+	      var canvasRect = this.canvas.getBoundingClientRect();
+	      var pos = this.map.project(this.lngLat);
+	      this.popup.style.left = "".concat(pos.x - canvasRect.left, "px");
+	      this.popup.style.top = "".concat(pos.y - canvasRect.top, "px");
+	    }
+	  }, {
+	    key: "clickListener",
+	    value: function clickListener(event) {
+	      this.lngLat = event.lngLat;
+	      var features = this.getFeatures(event);
+	      this.removePopup();
+	      this.addPopup(features);
+	    }
+	  }, {
+	    key: "onAdd",
+	    value: function onAdd(map) {
+	      var _this = this;
 
-	  inspectingOff() {
-	    this.removePopup();
-	    this.isInspecting = false;
-	    this.button.classList.remove('-active');
-	    this.map.off('click', this.clickListener);
-	    this.map.off('move', this.updatePosition);
-	    this.map.getCanvas().style.cursor = '';
-	  }
+	      this.map = map;
+	      this.mapContainer = this.map.getContainer();
+	      this.canvas = this.map.getCanvas();
+	      this.isInspecting = false;
+	      this.insertControls();
+	      this.button.addEventListener('click', function () {
+	        if (_this.isInspecting) {
+	          _this.inspectingOff();
+	        } else {
+	          _this.inspectingOn();
+	        }
+	      });
+	      return this.container;
+	    }
+	  }, {
+	    key: "onRemove",
+	    value: function onRemove() {
+	      this.inspectingOff();
+	      this.container.parentNode.removeChild(this.container);
+	      this.map = undefined;
+	    }
+	  }]);
 
-	  getFeatures(event) {
-	    const selectThreshold = 3;
-	    const queryBox = [
-	      [event.point.x - selectThreshold, event.point.y + selectThreshold], // bottom left (SW)
-	      [event.point.x + selectThreshold, event.point.y - selectThreshold], // top right (NE)
-	    ];
-	    return this.map.queryRenderedFeatures(queryBox);
-	  }
-
-	  addPopup(features) {
-	    this.popup = popup(features);
-	    this.mapContainer.appendChild(this.popup);
-	    this.updatePosition();
-	  }
-
-	  removePopup() {
-	    if (!this.popup) return;
-	    this.mapContainer.removeChild(this.popup);
-	    this.popup = null;
-	  }
-
-	  updatePosition() {
-	    const canvasRect = this.canvas.getBoundingClientRect();
-	    const pos = this.map.project(this.lngLat);
-	    this.popup.style.left = `${pos.x - canvasRect.left}px`;
-	    this.popup.style.top = `${pos.y - canvasRect.top}px`;
-	  }
-
-	  clickListener(event) {
-	    this.lngLat = event.lngLat;
-	    const features = this.getFeatures(event);
-	    this.removePopup();
-	    this.addPopup(features);
-	  }
-
-	  onAdd(map) {
-	    this.map = map;
-	    this.mapContainer = this.map.getContainer();
-	    this.canvas = this.map.getCanvas();
-	    this.isInspecting = false;
-	    this.insertControls();
-	    this.button.addEventListener('click', () => {
-	      if (this.isInspecting) {
-	        this.inspectingOff();
-	      } else {
-	        this.inspectingOn();
-	      }
-	    });
-	    return this.container;
-	  }
-
-	  onRemove() {
-	    this.inspectingOff();
-	    this.container.parentNode.removeChild(this.container);
-	    this.map = undefined;
-	  }
-	}
+	  return Inspect;
+	}();
 
 	mapboxGl.accessToken = 'pk.eyJ1IjoiYnJhdmVjb3ciLCJhIjoiY2o1ODEwdWljMThwbTJ5bGk0a294ZmVybiJ9.kErON3w2kwEVxU5aNa-EqQ';
 

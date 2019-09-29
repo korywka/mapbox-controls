@@ -55,6 +55,14 @@ export default [
     plugins,
   },
   {
+    input: 'src/inspect/inspect.js',
+    output: {
+      file: 'lib/inspect.js',
+      format: 'esm',
+    },
+    plugins,
+  },
+  {
     input: 'docs/docs.js',
     output: {
       file: 'docs/docs.bundle.js',

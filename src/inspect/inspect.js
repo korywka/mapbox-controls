@@ -171,6 +171,7 @@ class Inspect {
   }
 
   updatePosition() {
+    if (!this.lngLat) return;
     const canvasRect = this.canvas.getBoundingClientRect();
     const pos = this.map.project(this.lngLat);
     this.popup.style.left = `${pos.x - canvasRect.left}px`;

@@ -1798,8 +1798,8 @@
 	 * @param {Array} [options.supportedLanguages] - (Supported languages)[https://docs.mapbox.com/help/troubleshooting/change-language/]
 	 * @param {String} [options.language] - One of the supported languages to apply
 	 * @param {Array} [options.excludedLayerIds=[]] - Array of layer id to exclude from localization
-	 * @param {Function} [options.getLanguageField] - Accepts language and returns language field.
-	 * By default fields are `name_LANGUAGE` and `name` for multi language (mul).
+	 * @param {Function} [options.getLanguageField] - Accepts language and returns language field
+	 * By default fields are `name_LANGUAGE` and `name` for multi language (mul)
 	 */
 
 	var Language =
@@ -2177,6 +2177,133 @@
 	  return Inspect;
 	}();
 
+	function _classCallCheck$6(instance, Constructor) {
+	  if (!(instance instanceof Constructor)) {
+	    throw new TypeError("Cannot call a class as a function");
+	  }
+	}
+
+	function _defineProperties$6(target, props) {
+	  for (var i = 0; i < props.length; i++) {
+	    var descriptor = props[i];
+	    descriptor.enumerable = descriptor.enumerable || false;
+	    descriptor.configurable = true;
+	    if ("value" in descriptor) descriptor.writable = true;
+	    Object.defineProperty(target, descriptor.key, descriptor);
+	  }
+	}
+
+	function _createClass$6(Constructor, protoProps, staticProps) {
+	  if (protoProps) _defineProperties$6(Constructor.prototype, protoProps);
+	  if (staticProps) _defineProperties$6(Constructor, staticProps);
+	  return Constructor;
+	}
+
+	var defaultGetContent = function defaultGetContent(event) {
+	  var coords = event.lngLat;
+	  return "LngLat: ".concat(coords.lng.toFixed(6), ", ").concat(coords.lat.toFixed(6));
+	};
+	/**
+	 * Shows tooltip on hover
+	 * @param {Object} options
+	 * @param {String} options.layer - Layer id to show the tooltip on hover.
+	 * If not specified, tooltip will be shown for whole map container
+	 * @param {Function} [options.getContent] - Triggered each time mouse moved over `layer` option.
+	 * Accepts `event` object
+	 */
+
+
+	var Tooltip =
+	/*#__PURE__*/
+	function () {
+	  function Tooltip() {
+	    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+	    _classCallCheck$6(this, Tooltip);
+
+	    this.layer = options.layer;
+	    this.getContent = options.getContent || defaultGetContent;
+	    this.container = document.createElement('div');
+	    this.eventShow = this.layer ? 'mouseenter' : 'mouseover';
+	    this.eventHide = this.layer ? 'mouseleave' : 'mouseout';
+	    this.node = document.createElement('div');
+	    this.node.classList.add('mapboxgl-ctrl-tooltip');
+	    this.lngLat = null;
+	    this.show = this.show.bind(this);
+	    this.move = this.move.bind(this);
+	    this.hide = this.hide.bind(this);
+	    this.updatePosition = this.updatePosition.bind(this);
+	  }
+
+	  _createClass$6(Tooltip, [{
+	    key: "show",
+	    value: function show() {
+	      this.mapContainer.appendChild(this.node);
+	      this.map.getCanvas().style.cursor = 'pointer';
+	      this.map.on('move', this.updatePosition);
+	    }
+	  }, {
+	    key: "hide",
+	    value: function hide() {
+	      this.node.innerHTML = '';
+	      this.mapContainer.removeChild(this.node);
+	      this.map.getCanvas().style.cursor = '';
+	      this.map.off('move', this.updatePosition);
+	    }
+	  }, {
+	    key: "move",
+	    value: function move(event) {
+	      this.node.innerHTML = this.getContent(event);
+	      this.lngLat = event.lngLat;
+	      this.updatePosition();
+	    }
+	  }, {
+	    key: "updatePosition",
+	    value: function updatePosition() {
+	      if (!this.lngLat) return;
+	      var canvasRect = this.canvas.getBoundingClientRect();
+	      var pos = this.map.project(this.lngLat);
+	      this.node.style.left = "".concat(pos.x - canvasRect.left, "px");
+	      this.node.style.top = "".concat(pos.y - canvasRect.top, "px");
+	    }
+	  }, {
+	    key: "onAdd",
+	    value: function onAdd(map) {
+	      this.map = map;
+	      this.mapContainer = this.map.getContainer();
+	      this.canvas = this.map.getCanvas();
+
+	      if (this.layer) {
+	        this.map.on(this.eventShow, this.layer, this.show);
+	        this.map.on(this.eventHide, this.layer, this.hide);
+	      } else {
+	        this.map.on(this.eventShow, this.show);
+	        this.map.on(this.eventHide, this.hide);
+	      }
+
+	      this.map.on('mousemove', this.move);
+	      return this.container;
+	    }
+	  }, {
+	    key: "onRemove",
+	    value: function onRemove() {
+	      if (this.layer) {
+	        this.map.off(this.eventShow, this.layer, this.show);
+	        this.map.off(this.eventHide, this.layer, this.hide);
+	      } else {
+	        this.map.off(this.eventShow, this.show);
+	        this.map.off(this.eventHide, this.hide);
+	      }
+
+	      this.map.off('mousemove', this.move);
+	      this.hide();
+	      this.map = undefined;
+	    }
+	  }]);
+
+	  return Tooltip;
+	}();
+
 	mapboxGl.accessToken = 'pk.eyJ1IjoiYnJhdmVjb3ciLCJhIjoiY2o1ODEwdWljMThwbTJ5bGk0a294ZmVybiJ9.kErON3w2kwEVxU5aNa-EqQ';
 
 	const languages = document.getElementById('languages');
@@ -2186,6 +2313,21 @@
 	  zoom: 14,
 	  center: [30.5234, 50.4501],
 	});
+	const geoJSON = {
+	  type: 'Feature',
+	  geometry: {
+	    type: 'Polygon',
+	    coordinates: [
+	      [
+	        [30.51611423492432, 50.452667766971196],
+	        [30.514655113220215, 50.449006093706274],
+	        [30.516843795776367, 50.44862351447756],
+	        [30.518345832824707, 50.45217591688964],
+	        [30.51611423492432, 50.452667766971196],
+	      ]
+	    ]
+	  }
+	};
 
 	map.addControl(new Zoom(), 'bottom-right');
 	map.addControl(new Compass(), 'bottom-right');
@@ -2205,6 +2347,36 @@
 	    languageControl.setLanguage(languages.value);
 	  });
 	})();
+
+	map.on('load', () => {
+	  map.addLayer({
+	    id: '$fill',
+	    type: 'fill',
+	    source: {
+	      type: 'geojson',
+	      data: geoJSON,
+	    },
+	    paint: {
+	      'fill-opacity': 0.3,
+	      'fill-color': '#4264fb',
+	    }
+	  });
+	  map.addLayer({
+	    id: '$line',
+	    type: 'line',
+	    source: {
+	      type: 'geojson',
+	      data: geoJSON,
+	    },
+	    paint: {
+	      'line-width': 2,
+	      'line-color': '#4264fb',
+	    }
+	  });
+	  map.addControl(new Tooltip({
+	    layer: '$fill'
+	  }));
+	});
 
 	/* Example for mapbox issue: https://github.com/mapbox/mapbox-gl-js/issues/8765 */
 	map.on('load', () => {

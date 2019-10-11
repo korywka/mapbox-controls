@@ -63,6 +63,14 @@ export default [
     plugins,
   },
   {
+    input: 'src/tooltip/tooltip.js',
+    output: {
+      file: 'lib/tooltip.js',
+      format: 'esm',
+    },
+    plugins,
+  },
+  {
     input: 'docs/docs.js',
     output: {
       file: 'docs/docs.bundle.js',

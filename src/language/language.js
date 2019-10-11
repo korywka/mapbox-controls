@@ -6,8 +6,8 @@ const SUPPORTED_LANGUAGES = ['en', 'es', 'fr', 'de', 'ru', 'zh', 'pt', 'ar', 'ja
  * @param {Array} [options.supportedLanguages] - (Supported languages)[https://docs.mapbox.com/help/troubleshooting/change-language/]
  * @param {String} [options.language] - One of the supported languages to apply
  * @param {Array} [options.excludedLayerIds=[]] - Array of layer id to exclude from localization
- * @param {Function} [options.getLanguageField] - Accepts language and returns language field.
- * By default fields are `name_LANGUAGE` and `name` for multi language (mul).
+ * @param {Function} [options.getLanguageField] - Accepts language and returns language field
+ * By default fields are `name_LANGUAGE` and `name` for multi language (mul)
  */
 
 class Language {

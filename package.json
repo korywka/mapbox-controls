@@ -1,6 +1,6 @@
 {
   "name": "mapbox-gl-controls",
-  "version": "1.4.2",
+  "version": "1.5.0",
   "description": "Controls for mapbox-gl",
   "scripts": {
     "lint": "eslint src",

@@ -3,6 +3,9 @@ const defaultGetContent = (event) => {
   return `LngLat: ${coords.lng.toFixed(6)}, ${coords.lat.toFixed(6)}`;
 };
 
+const mouseMoveEvent = 'mousemove';
+const mapMoveEvent = 'move';
+
 /**
  * Shows tooltip on hover
  * @param {Object} options
@@ -31,14 +34,14 @@ class Tooltip {
   show() {
     this.mapContainer.appendChild(this.node);
     this.map.getCanvas().style.cursor = 'pointer';
-    this.map.on('move', this.updatePosition);
+    this.map.on(mapMoveEvent, this.updatePosition);
   }
 
   hide() {
     this.node.innerHTML = '';
     this.mapContainer.removeChild(this.node);
     this.map.getCanvas().style.cursor = '';
-    this.map.off('move', this.updatePosition);
+    this.map.off(mapMoveEvent, this.updatePosition);
   }
 
   move(event) {
@@ -61,24 +64,26 @@ class Tooltip {
     this.canvas = this.map.getCanvas();
     if (this.layer) {
       this.map.on(this.eventShow, this.layer, this.show);
+      this.map.on(mouseMoveEvent, this.layer, this.move);
       this.map.on(this.eventHide, this.layer, this.hide);
     } else {
       this.map.on(this.eventShow, this.show);
+      this.map.on(mouseMoveEvent, this.move);
       this.map.on(this.eventHide, this.hide);
     }
-    this.map.on('mousemove', this.move);
     return this.container;
   }
 
   onRemove() {
     if (this.layer) {
       this.map.off(this.eventShow, this.layer, this.show);
+      this.map.off(mouseMoveEvent, this.layer, this.move);
       this.map.off(this.eventHide, this.layer, this.hide);
     } else {
       this.map.off(this.eventShow, this.show);
+      this.map.off(mouseMoveEvent, this.move);
       this.map.off(this.eventHide, this.hide);
     }
-    this.map.off('mousemove', this.move);
     this.hide();
     this.map = undefined;
   }

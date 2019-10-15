@@ -8,4 +8,7 @@
   font-size: 14px;
   white-space: nowrap;
   z-index: 3; /* show tooltip over controls buttons with z-index 2 */
+  &:empty {
+    display: none;
+  }
 }

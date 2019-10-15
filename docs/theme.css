@@ -174,5 +174,9 @@
   margin-top: 24px;
   font-size: 14px;
   white-space: nowrap;
-  z-index: 3; /* show tooltip over controls buttons with z-index 2 */
+  z-index: 3;
 }
+/* show tooltip over controls buttons with z-index 2 */
+.mapboxgl-ctrl-tooltip:empty {
+    display: none;
+  }

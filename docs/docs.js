@@ -27,9 +27,9 @@ const geoJSON = {
         [30.516843795776367, 50.44862351447756],
         [30.518345832824707, 50.45217591688964],
         [30.51611423492432, 50.452667766971196],
-      ]
-    ]
-  }
+      ],
+    ],
+  },
 };
 
 map.addControl(new ZoomControl(), 'bottom-right');
@@ -62,7 +62,7 @@ map.on('load', () => {
     paint: {
       'fill-opacity': 0.3,
       'fill-color': '#4264fb',
-    }
+    },
   });
   map.addLayer({
     id: '$line',
@@ -74,10 +74,10 @@ map.on('load', () => {
     paint: {
       'line-width': 2,
       'line-color': '#4264fb',
-    }
+    },
   });
   map.addControl(new TooltipControl({
-    layer: '$fill'
+    layer: '$fill',
   }));
 });
 

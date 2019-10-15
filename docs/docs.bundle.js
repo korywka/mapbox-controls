@@ -2263,10 +2263,9 @@
 	    key: "updatePosition",
 	    value: function updatePosition() {
 	      if (!this.lngLat) return;
-	      var canvasRect = this.canvas.getBoundingClientRect();
 	      var pos = this.map.project(this.lngLat);
-	      this.node.style.left = "".concat(pos.x - canvasRect.left, "px");
-	      this.node.style.top = "".concat(pos.y - canvasRect.top, "px");
+	      this.node.style.left = "".concat(pos.x, "px");
+	      this.node.style.top = "".concat(pos.y, "px");
 	    }
 	  }, {
 	    key: "onAdd",

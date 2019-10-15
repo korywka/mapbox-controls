@@ -52,10 +52,9 @@ class Tooltip {
 
   updatePosition() {
     if (!this.lngLat) return;
-    const canvasRect = this.canvas.getBoundingClientRect();
     const pos = this.map.project(this.lngLat);
-    this.node.style.left = `${pos.x - canvasRect.left}px`;
-    this.node.style.top = `${pos.y - canvasRect.top}px`;
+    this.node.style.left = `${pos.x}px`;
+    this.node.style.top = `${pos.y}px`;
   }
 
   onAdd(map) {

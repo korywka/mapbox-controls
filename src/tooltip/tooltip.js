@@ -25,6 +25,7 @@ class Tooltip {
     this.node = document.createElement('div');
     this.node.classList.add('mapboxgl-ctrl-tooltip');
     this.lngLat = null;
+    this.cursorStyle = '';
     this.show = this.show.bind(this);
     this.move = this.move.bind(this);
     this.hide = this.hide.bind(this);
@@ -33,6 +34,7 @@ class Tooltip {
 
   show() {
     this.mapContainer.appendChild(this.node);
+    this.cursorStyle = this.map.getCanvas().style.cursor;
     this.map.getCanvas().style.cursor = 'pointer';
     this.map.on(mapMoveEvent, this.updatePosition);
   }
@@ -40,7 +42,7 @@ class Tooltip {
   hide() {
     this.node.innerHTML = '';
     this.mapContainer.removeChild(this.node);
-    this.map.getCanvas().style.cursor = '';
+    this.map.getCanvas().style.cursor = this.cursorStyle;
     this.map.off(mapMoveEvent, this.updatePosition);
   }
 

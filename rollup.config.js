@@ -1,10 +1,10 @@
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
-import inlineSVG from 'rollup-inline-svg';
+import svg from 'rollup-plugin-svg-import';
 
 const plugins = [
-  inlineSVG(),
+  svg(),
   resolve(),
   babel({
     exclude: 'node_modules/**',
@@ -78,7 +78,7 @@ export default [
       sourcemap: true,
     },
     plugins: [
-      inlineSVG(),
+      svg(),
       resolve(),
       commonjs({
         sourceMap: false,

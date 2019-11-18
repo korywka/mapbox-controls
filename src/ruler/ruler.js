@@ -13,6 +13,7 @@ const SOURCE_SYMBOL = 'controls-source-symbol';
  * @param {String} [options.units='kilometers'] - Any units [@turf/distance](https://github.com/Turfjs/turf/tree/master/packages/turf-distance) supports
  * @param {Function} [options.labelFormat] - Accepts number and returns label.
  * Can be used to convert value to any measuring units
+ * @param {Array} [options.font=['Roboto Medium']] - Array of fonts.
  */
 
 class Ruler {
@@ -22,7 +23,7 @@ class Ruler {
     this.coordinates = [];
     this.labels = [];
     this.units = options.units || 'kilometers';
-    this.font = options.font ? options.font : ['Roboto Medium'];
+    this.font = options.font || ['Roboto Medium'];
     this.labelFormat = options.labelFormat || defaultLabelFormat;
     this.mapClickListener = this.mapClickListener.bind(this);
     this.styleLoadListener = this.styleLoadListener.bind(this);

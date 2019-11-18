@@ -141,6 +141,7 @@ Fires map `ruler.on` and `ruler.off`events at the beginning and at the end of me
     -   `options.units` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Any units [@turf/distance](https://github.com/Turfjs/turf/tree/master/packages/turf-distance) supports (optional, default `'kilometers'`)
     -   `options.labelFormat` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** Accepts number and returns label.
         Can be used to convert value to any measuring units
+    -   `options.font` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)** Array of fonts. (optional, default `['Roboto Medium']`)
 
 #### Styles
 

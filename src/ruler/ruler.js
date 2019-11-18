@@ -22,6 +22,7 @@ class Ruler {
     this.coordinates = [];
     this.labels = [];
     this.units = options.units || 'kilometers';
+    this.font = options.font ? options.font : ['Roboto Medium'];
     this.labelFormat = options.labelFormat || defaultLabelFormat;
     this.mapClickListener = this.mapClickListener.bind(this);
     this.styleLoadListener = this.styleLoadListener.bind(this);
@@ -64,7 +65,7 @@ class Ruler {
       source: SOURCE_SYMBOL,
       layout: {
         'text-field': '{text}',
-        'text-font': ['Roboto Medium'],
+        'text-font': this.font,
         'text-anchor': 'top',
         'text-size': 12,
         'text-offset': [0, 0.8],

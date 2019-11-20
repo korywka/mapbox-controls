@@ -34,15 +34,15 @@ class Tooltip {
 
   show() {
     this.mapContainer.appendChild(this.node);
-    this.cursorStyle = this.map.getCanvas().style.cursor;
-    this.map.getCanvas().style.cursor = 'pointer';
+    this.cursorStyle = this.canvas.style.cursor;
+    this.canvas.style.cursor = 'pointer';
     this.map.on(mapMoveEvent, this.updatePosition);
   }
 
   hide() {
     this.node.innerHTML = '';
     this.mapContainer.removeChild(this.node);
-    this.map.getCanvas().style.cursor = this.cursorStyle;
+    this.canvas.style.cursor = this.cursorStyle;
     this.map.off(mapMoveEvent, this.updatePosition);
   }
 

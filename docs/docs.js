@@ -6,6 +6,7 @@ import ZoomControl from '../lib/zoom';
 import LanguageControl from '../lib/language';
 import InspectControl from '../lib/inspect';
 import TooltipControl from '../lib/tooltip';
+import PitchControl from '../lib/pitch';
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiYnJhdmVjb3ciLCJhIjoiY2o1ODEwdWljMThwbTJ5bGk0a294ZmVybiJ9.kErON3w2kwEVxU5aNa-EqQ';
 
@@ -32,15 +33,15 @@ const geoJSON = {
   },
 };
 
-map.addControl(new ZoomControl(), 'bottom-right');
-map.addControl(new CompassControl(), 'bottom-right');
-map.addControl(new RulerControl(), 'bottom-right');
 map.addControl(new StylesControl({
-  onChange: () => {
-    languages.value = '';
-  },
+  onChange: () => languages.value = '',
 }), 'top-left');
+
+map.addControl(new ZoomControl(), 'bottom-right');
+map.addControl(new RulerControl(), 'bottom-right');
 map.addControl(new InspectControl(), 'bottom-right');
+map.addControl(new PitchControl(), 'bottom-right');
+map.addControl(new CompassControl(), 'bottom-right');
 
 (() => {
   const languageControl = new LanguageControl();

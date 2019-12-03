@@ -1,5 +1,3 @@
-import iconCCW from './icon-ccw.svg';
-import iconCW from './icon-cw.svg';
 import iconPointer from './icon-pointer.svg';
 
 /**
@@ -10,54 +8,31 @@ import iconPointer from './icon-pointer.svg';
 class Compass {
   constructor(options = {}) {
     this.instant = typeof options.instant === 'boolean' ? options.instant : true;
-    this.toggle = this.toggle.bind(this);
+    this.onRotate = this.onRotate.bind(this);
   }
 
   insertControls() {
     this.container = document.createElement('div');
-    this.compassButton = document.createElement('button');
+    this.button = document.createElement('button');
     this.container.classList.add('mapboxgl-ctrl');
     this.container.classList.add('mapboxgl-ctrl-group');
     this.container.classList.add('mapboxgl-ctrl-compass');
-    this.pointer = iconPointer({ class: 'mapboxgl-ctrl-compass-pointer' });
-    this.arrowCW = iconCW({ class: 'mapboxgl-ctrl-compass-cw' });
-    this.arrowCCW = iconCCW({ class: 'mapboxgl-ctrl-compass-ccw' });
+    this.pointer = iconPointer();
     if (this.instant) {
       this.container.classList.add('-active');
     }
-    this.container.appendChild(this.compassButton);
-    this.compassButton.appendChild(this.pointer);
-    this.compassButton.appendChild(this.arrowCW);
-    this.compassButton.appendChild(this.arrowCCW);
+    this.container.appendChild(this.button);
+    this.button.appendChild(this.pointer);
   }
 
   onAdd(map) {
     this.map = map;
     this.insertControls();
-    this.compassButton.addEventListener('click', () => {
-      this.map.easeTo({
-        pitch: 0,
-        bearing: 0,
-      });
+    this.button.addEventListener('click', () => {
+      this.map.easeTo({ bearing: 0, pitch: 0 });
     });
-    this.arrowCW.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (!this.map.isRotating()) {
-        this.map.easeTo({
-          bearing: this.map.getBearing() - 45,
-        });
-      }
-    });
-    this.arrowCCW.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (!this.map.isRotating()) {
-        this.map.easeTo({
-          bearing: this.map.getBearing() + 45,
-        });
-      }
-    });
-    this.map.on('rotate', this.toggle);
-    this.toggle();
+    this.map.on('rotate', this.onRotate);
+    this.onRotate();
     return this.container;
   }
 
@@ -66,7 +41,7 @@ class Compass {
     this.map = undefined;
   }
 
-  toggle() {
+  onRotate() {
     const angle = this.map.getBearing() * (-1);
     if (!this.instant) {
       if (angle === 0) {

@@ -187,28 +187,8 @@
 	  return Constructor;
 	}
 
-	function iconCCW(attrs) {
-	  var node = (new DOMParser().parseFromString("<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"#9E9E9E\" width=\"11\" height=\"28\" viewBox=\"0 0 11 28\">\n    <path d=\"M7.2 20.5C6.4 18.6 6 16.4 6 14.2c.2-4.1 2-7.8 4.9-10.4L7.5 0C3.7 3.5 1.2 8.4 1 13.9c-.1 3.3.6 6.4 1.9 9.1L.2 24.6l.5.9L8.2 28l.8-.4 1.2-7.8-.5-.9-2.5 1.6z\"/>\n</svg>", 'text/xml')).firstChild;
-	  if (attrs) {
-	    Object.keys(attrs).forEach(function(key) {
-	      node.setAttribute(key, attrs[key]);
-	    });
-	  }
-	  return node;
-	}
-
-	function iconCW(attrs) {
-	  var node = (new DOMParser().parseFromString("<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"#9E9E9E\" width=\"11\" height=\"28\" viewBox=\"0 0 11 28\">\n    <path d=\"M8.2 23.1c1.3-2.8 2-5.9 1.9-9.1C9.9 8.4 7.4 3.5 3.6 0L.1 3.7C3 6.3 4.8 10 5 14.1c.1 2.2-.3 4.4-1.2 6.3l-2.6-1.5-.5.9L2 27.6l.9.5 7.5-2.5.5-.9-2.7-1.6z\"/>\n</svg>", 'text/xml')).firstChild;
-	  if (attrs) {
-	    Object.keys(attrs).forEach(function(key) {
-	      node.setAttribute(key, attrs[key]);
-	    });
-	  }
-	  return node;
-	}
-
 	function iconPointer(attrs) {
-	  var node = (new DOMParser().parseFromString("<svg viewBox=\"0 0 24 24\" width=\"22\" height=\"22\" xmlns=\"http://www.w3.org/2000/svg\">\n    <g fill=\"none\" fill-rule=\"evenodd\">\n        <path d=\"M0 0h24v24H0z\"/>\n        <path fill=\"#505050\" d=\"M12 3l4 8H8z\"/>\n        <path fill=\"#9E9E9E\" d=\"M12 21l-4-8h8z\"/>\n    </g>\n</svg>", 'text/xml')).firstChild;
+	  var node = (new DOMParser().parseFromString("<svg viewBox=\"0 0 24 24\" width=\"22\" height=\"22\" xmlns=\"http://www.w3.org/2000/svg\">\n    <g fill=\"none\" fill-rule=\"evenodd\">\n        <path d=\"M0 0h24v24H0z\"/>\n        <path fill=\"#f44336\" d=\"M12 3l4 8H8z\"/>\n        <path fill=\"#9E9E9E\" d=\"M12 21l-4-8h8z\"/>\n    </g>\n</svg>", 'text/xml')).firstChild;
 	  if (attrs) {
 	    Object.keys(attrs).forEach(function(key) {
 	      node.setAttribute(key, attrs[key]);
@@ -231,35 +211,25 @@
 	    _classCallCheck$1(this, Compass);
 
 	    this.instant = typeof options.instant === 'boolean' ? options.instant : true;
-	    this.toggle = this.toggle.bind(this);
+	    this.onRotate = this.onRotate.bind(this);
 	  }
 
 	  _createClass$1(Compass, [{
 	    key: "insertControls",
 	    value: function insertControls() {
 	      this.container = document.createElement('div');
-	      this.compassButton = document.createElement('button');
+	      this.button = document.createElement('button');
 	      this.container.classList.add('mapboxgl-ctrl');
 	      this.container.classList.add('mapboxgl-ctrl-group');
 	      this.container.classList.add('mapboxgl-ctrl-compass');
-	      this.pointer = iconPointer({
-	        "class": 'mapboxgl-ctrl-compass-pointer'
-	      });
-	      this.arrowCW = iconCW({
-	        "class": 'mapboxgl-ctrl-compass-cw'
-	      });
-	      this.arrowCCW = iconCCW({
-	        "class": 'mapboxgl-ctrl-compass-ccw'
-	      });
+	      this.pointer = iconPointer();
 
 	      if (this.instant) {
 	        this.container.classList.add('-active');
 	      }
 
-	      this.container.appendChild(this.compassButton);
-	      this.compassButton.appendChild(this.pointer);
-	      this.compassButton.appendChild(this.arrowCW);
-	      this.compassButton.appendChild(this.arrowCCW);
+	      this.container.appendChild(this.button);
+	      this.button.appendChild(this.pointer);
 	    }
 	  }, {
 	    key: "onAdd",
@@ -268,32 +238,14 @@
 
 	      this.map = map;
 	      this.insertControls();
-	      this.compassButton.addEventListener('click', function () {
+	      this.button.addEventListener('click', function () {
 	        _this.map.easeTo({
-	          pitch: 0,
-	          bearing: 0
+	          bearing: 0,
+	          pitch: 0
 	        });
 	      });
-	      this.arrowCW.addEventListener('click', function (e) {
-	        e.stopPropagation();
-
-	        if (!_this.map.isRotating()) {
-	          _this.map.easeTo({
-	            bearing: _this.map.getBearing() - 45
-	          });
-	        }
-	      });
-	      this.arrowCCW.addEventListener('click', function (e) {
-	        e.stopPropagation();
-
-	        if (!_this.map.isRotating()) {
-	          _this.map.easeTo({
-	            bearing: _this.map.getBearing() + 45
-	          });
-	        }
-	      });
-	      this.map.on('rotate', this.toggle);
-	      this.toggle();
+	      this.map.on('rotate', this.onRotate);
+	      this.onRotate();
 	      return this.container;
 	    }
 	  }, {
@@ -303,8 +255,8 @@
 	      this.map = undefined;
 	    }
 	  }, {
-	    key: "toggle",
-	    value: function toggle() {
+	    key: "onRotate",
+	    value: function onRotate() {
 	      var angle = this.map.getBearing() * -1;
 
 	      if (!this.instant) {
@@ -1656,7 +1608,7 @@
 	}
 
 	function iconPlus(attrs) {
-	  var node = (new DOMParser().parseFromString("<svg fill=\"#232323\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n    <path d=\"M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z\"/>\n    <path d=\"M0 0h24v24H0z\" fill=\"none\"/>\n</svg>", 'text/xml')).firstChild;
+	  var node = (new DOMParser().parseFromString("<svg fill=\"#505050\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n    <path d=\"M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z\"/>\n    <path d=\"M0 0h24v24H0z\" fill=\"none\"/>\n</svg>", 'text/xml')).firstChild;
 	  if (attrs) {
 	    Object.keys(attrs).forEach(function(key) {
 	      node.setAttribute(key, attrs[key]);
@@ -1666,7 +1618,7 @@
 	}
 
 	function iconMinus(attrs) {
-	  var node = (new DOMParser().parseFromString("<svg fill=\"#232323\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n    <path d=\"M19 13H5v-2h14v2z\"/>\n    <path d=\"M0 0h24v24H0z\" fill=\"none\"/>\n</svg>", 'text/xml')).firstChild;
+	  var node = (new DOMParser().parseFromString("<svg fill=\"#505050\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n    <path d=\"M19 13H5v-2h14v2z\"/>\n    <path d=\"M0 0h24v24H0z\" fill=\"none\"/>\n</svg>", 'text/xml')).firstChild;
 	  if (attrs) {
 	    Object.keys(attrs).forEach(function(key) {
 	      node.setAttribute(key, attrs[key]);
@@ -2244,8 +2196,8 @@
 	    key: "show",
 	    value: function show() {
 	      this.mapContainer.appendChild(this.node);
-	      this.cursorStyle = this.map.getCanvas().style.cursor;
-	      this.map.getCanvas().style.cursor = 'pointer';
+	      this.cursorStyle = this.canvas.style.cursor;
+	      this.canvas.style.cursor = 'pointer';
 	      this.map.on(mapMoveEvent, this.updatePosition);
 	    }
 	  }, {
@@ -2253,7 +2205,7 @@
 	    value: function hide() {
 	      this.node.innerHTML = '';
 	      this.mapContainer.removeChild(this.node);
-	      this.map.getCanvas().style.cursor = this.cursorStyle;
+	      this.canvas.style.cursor = this.cursorStyle;
 	      this.map.off(mapMoveEvent, this.updatePosition);
 	    }
 	  }, {
@@ -2311,6 +2263,103 @@
 	  return Tooltip;
 	}();
 
+	function _classCallCheck$7(instance, Constructor) {
+	  if (!(instance instanceof Constructor)) {
+	    throw new TypeError("Cannot call a class as a function");
+	  }
+	}
+
+	function _defineProperties$7(target, props) {
+	  for (var i = 0; i < props.length; i++) {
+	    var descriptor = props[i];
+	    descriptor.enumerable = descriptor.enumerable || false;
+	    descriptor.configurable = true;
+	    if ("value" in descriptor) descriptor.writable = true;
+	    Object.defineProperty(target, descriptor.key, descriptor);
+	  }
+	}
+
+	function _createClass$7(Constructor, protoProps, staticProps) {
+	  if (protoProps) _defineProperties$7(Constructor.prototype, protoProps);
+	  if (staticProps) _defineProperties$7(Constructor, staticProps);
+	  return Constructor;
+	}
+
+	function icon3D(attrs) {
+	  var node = (new DOMParser().parseFromString("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"#505050\">\n    <path d=\"M0 0h24v24H0z\" fill=\"none\"/>\n    <path d=\"M7.52 21.48C4.25 19.94 1.91 16.76 1.55 13H.05C.56 19.16 5.71 24 12 24l.66-.03-3.81-3.81-1.33 1.32zm.89-6.52c-.19 0-.37-.03-.52-.08-.16-.06-.29-.13-.4-.24-.11-.1-.2-.22-.26-.37-.06-.14-.09-.3-.09-.47h-1.3c0 .36.07.68.21.95.14.27.33.5.56.69.24.18.51.32.82.41.3.1.62.15.96.15.37 0 .72-.05 1.03-.15.32-.1.6-.25.83-.44s.42-.43.55-.72c.13-.29.2-.61.2-.97 0-.19-.02-.38-.07-.56-.05-.18-.12-.35-.23-.51-.1-.16-.24-.3-.4-.43-.17-.13-.37-.23-.61-.31.2-.09.37-.2.52-.33.15-.13.27-.27.37-.42.1-.15.17-.3.22-.46.05-.16.07-.32.07-.48 0-.36-.06-.68-.18-.96-.12-.28-.29-.51-.51-.69-.2-.19-.47-.33-.77-.43C9.1 8.05 8.76 8 8.39 8c-.36 0-.69.05-1 .16-.3.11-.57.26-.79.45-.21.19-.38.41-.51.67-.12.26-.18.54-.18.85h1.3c0-.17.03-.32.09-.45s.14-.25.25-.34c.11-.09.23-.17.38-.22.15-.05.3-.08.48-.08.4 0 .7.1.89.31.19.2.29.49.29.86 0 .18-.03.34-.08.49-.05.15-.14.27-.25.37-.11.1-.25.18-.41.24-.16.06-.36.09-.58.09H7.5v1.03h.77c.22 0 .42.02.6.07s.33.13.45.23c.12.11.22.24.29.4.07.16.1.35.1.57 0 .41-.12.72-.35.93-.23.23-.55.33-.95.33zm8.55-5.92c-.32-.33-.7-.59-1.14-.77-.43-.18-.92-.27-1.46-.27H12v8h2.3c.55 0 1.06-.09 1.51-.27.45-.18.84-.43 1.16-.76.32-.33.57-.73.74-1.19.17-.47.26-.99.26-1.57v-.4c0-.58-.09-1.1-.26-1.57-.18-.47-.43-.87-.75-1.2zm-.39 3.16c0 .42-.05.79-.14 1.13-.1.33-.24.62-.43.85-.19.23-.43.41-.71.53-.29.12-.62.18-.99.18h-.91V9.12h.97c.72 0 1.27.23 1.64.69.38.46.57 1.12.57 1.99v.4zM12 0l-.66.03 3.81 3.81 1.33-1.33c3.27 1.55 5.61 4.72 5.96 8.48h1.5C23.44 4.84 18.29 0 12 0z\"/>\n</svg>", 'text/xml')).firstChild;
+	  if (attrs) {
+	    Object.keys(attrs).forEach(function(key) {
+	      node.setAttribute(key, attrs[key]);
+	    });
+	  }
+	  return node;
+	}
+
+	var Pitch =
+	/*#__PURE__*/
+	function () {
+	  function Pitch() {
+	    _classCallCheck$7(this, Pitch);
+
+	    this.onClick = this.onClick.bind(this);
+	  }
+
+	  _createClass$7(Pitch, [{
+	    key: "insertControls",
+	    value: function insertControls() {
+	      this.container = document.createElement('div');
+	      this.button = document.createElement('button');
+	      this.container.classList.add('mapboxgl-ctrl');
+	      this.container.classList.add('mapboxgl-ctrl-group');
+	      this.container.classList.add('mapboxgl-ctrl-pitch');
+	      this.button.appendChild(icon3D());
+	      this.container.appendChild(this.button);
+	    }
+	  }, {
+	    key: "onAdd",
+	    value: function onAdd(map) {
+	      var _this = this;
+
+	      this.map = map;
+	      this.insertControls();
+	      this.button.addEventListener('click', this.onClick);
+	      this.map.on('pitchend', function () {
+	        if (_this.map.getPitch() > 30) {
+	          _this.container.classList.add('-active');
+	        } else {
+	          _this.container.classList.remove('-active');
+	        }
+	      });
+	      return this.container;
+	    }
+	  }, {
+	    key: "onClick",
+	    value: function onClick() {
+	      if (this.map.getPitch() > 30) {
+	        this.map.easeTo({
+	          bearing: 0,
+	          pitch: 0,
+	          duration: 600
+	        });
+	      } else {
+	        this.map.easeTo({
+	          bearing: -40,
+	          pitch: 60,
+	          duration: 600
+	        });
+	      }
+	    }
+	  }, {
+	    key: "onRemove",
+	    value: function onRemove() {
+	      this.container.parentNode.removeChild(this.container);
+	      this.map = undefined;
+	    }
+	  }]);
+
+	  return Pitch;
+	}();
+
 	mapboxGl.accessToken = 'pk.eyJ1IjoiYnJhdmVjb3ciLCJhIjoiY2o1ODEwdWljMThwbTJ5bGk0a294ZmVybiJ9.kErON3w2kwEVxU5aNa-EqQ';
 
 	const languages = document.getElementById('languages');
@@ -2336,15 +2385,15 @@
 	  },
 	};
 
-	map.addControl(new Zoom(), 'bottom-right');
-	map.addControl(new Compass(), 'bottom-right');
-	map.addControl(new Ruler(), 'bottom-right');
 	map.addControl(new Styles({
-	  onChange: () => {
-	    languages.value = '';
-	  },
+	  onChange: () => languages.value = '',
 	}), 'top-left');
+
+	map.addControl(new Zoom(), 'bottom-right');
+	map.addControl(new Ruler(), 'bottom-right');
 	map.addControl(new Inspect(), 'bottom-right');
+	map.addControl(new Pitch(), 'bottom-right');
+	map.addControl(new Compass(), 'bottom-right');
 
 	(() => {
 	  const languageControl = new Language();

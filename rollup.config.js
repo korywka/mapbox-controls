@@ -71,6 +71,14 @@ export default [
     plugins,
   },
   {
+    input: 'src/pitch/pitch.js',
+    output: {
+      file: 'lib/pitch.js',
+      format: 'esm',
+    },
+    plugins,
+  },
+  {
     input: 'docs/docs.js',
     output: {
       file: 'docs/docs.bundle.js',

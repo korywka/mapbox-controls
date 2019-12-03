@@ -38,35 +38,12 @@
     position: relative;
     border-radius: 50%;
   }
-.mapboxgl-ctrl-compass button:hover {
-      background: none;
-    }
-.mapboxgl-ctrl-compass-pointer {
+.mapboxgl-ctrl-compass svg {
     position: absolute;
     left: 50%;
     top: 50%;
     margin-left: -11px;
     margin-top: -11px;
-  }
-.mapboxgl-ctrl-compass-pointer:hover path:nth-child(2) {
-      fill: #f44336;
-    }
-.mapboxgl-ctrl-compass-ccw,
-  .mapboxgl-ctrl-compass-cw {
-    position: absolute;
-    top: 0;
-    width: 11px;
-    height: 28px;
-    transition: .1s fill;
-  }
-.mapboxgl-ctrl-compass-ccw:hover, .mapboxgl-ctrl-compass-cw:hover {
-      fill: #4264fb;
-    }
-.mapboxgl-ctrl-compass-ccw {
-    left: -6px;
-  }
-.mapboxgl-ctrl-compass-cw {
-    right: -6px;
   }
 .mapboxgl-ctrl-ruler button.-active svg {
         fill: #4264fb;
@@ -180,3 +157,9 @@
 .mapboxgl-ctrl-tooltip:empty {
     display: none;
   }
+.mapboxgl-ctrl-pitch {
+  border-radius: 50%;
+}
+.mapboxgl-ctrl-pitch.-active svg {
+      fill: #4264fb;
+    }

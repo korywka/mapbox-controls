@@ -1,0 +1,8 @@
+.mapboxgl-ctrl-pitch {
+  border-radius: 50%;
+  &.-active {
+    svg {
+      fill: #4264fb;
+    }
+  }
+}

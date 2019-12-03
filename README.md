@@ -131,6 +131,13 @@ Language can be set dynamically with `.setLanguage(lang)` method.
     -   `options.getLanguageField` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** Accepts language and returns language field
         By default fields are `name_LANGUAGE` and `name` for multi language (mul)
 
+#### Pitch
+
+##### Parameters
+
+-   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)**  (optional, default `{}`)
+    -   `options.zoom` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** Zoom to while pitch
+
 #### Ruler
 
 Fires map `ruler.on` and `ruler.off`events at the beginning and at the end of measuring.

@@ -1,7 +1,13 @@
 import icon3D from './icon-3d.svg';
 
+/**
+ * @param {Object} options
+ * @param {Number} [options.zoom] - Zoom to while pitch
+ */
+
 class Pitch {
-  constructor() {
+  constructor(options = {}) {
+    this.zoom = options.zoom;
     this.onClick = this.onClick.bind(this);
   }
 
@@ -30,10 +36,18 @@ class Pitch {
   }
 
   onClick() {
+    const duration = 600;
+    const on = { bearing: -40, pitch: 60, duration };
+    const off = { bearing: 0, pitch: 0, duration };
+
+    if (this.zoom && this.zoom > this.map.getZoom()) {
+      on.zoom = this.zoom;
+    }
+
     if (this.map.getPitch() > 30) {
-      this.map.easeTo({ bearing: 0, pitch: 0, duration: 600 });
+      this.map.easeTo(off);
     } else {
-      this.map.easeTo({ bearing: -40, pitch: 60, duration: 600 });
+      this.map.easeTo(on);
     }
   }
 

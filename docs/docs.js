@@ -40,7 +40,7 @@ map.addControl(new StylesControl({
 map.addControl(new ZoomControl(), 'bottom-right');
 map.addControl(new RulerControl(), 'bottom-right');
 map.addControl(new InspectControl(), 'bottom-right');
-map.addControl(new PitchControl(), 'bottom-right');
+map.addControl(new PitchControl({ zoom: 15 }), 'bottom-right');
 map.addControl(new CompassControl(), 'bottom-right');
 
 (() => {

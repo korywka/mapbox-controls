@@ -2295,12 +2295,20 @@
 	  return node;
 	}
 
+	/**
+	 * @param {Object} options
+	 * @param {Number} [options.zoom] - Zoom to while pitch
+	 */
+
 	var Pitch =
 	/*#__PURE__*/
 	function () {
 	  function Pitch() {
+	    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
 	    _classCallCheck$7(this, Pitch);
 
+	    this.zoom = options.zoom;
 	    this.onClick = this.onClick.bind(this);
 	  }
 
@@ -2335,18 +2343,26 @@
 	  }, {
 	    key: "onClick",
 	    value: function onClick() {
+	      var duration = 600;
+	      var on = {
+	        bearing: -40,
+	        pitch: 60,
+	        duration: duration
+	      };
+	      var off = {
+	        bearing: 0,
+	        pitch: 0,
+	        duration: duration
+	      };
+
+	      if (this.zoom && this.zoom > this.map.getZoom()) {
+	        on.zoom = this.zoom;
+	      }
+
 	      if (this.map.getPitch() > 30) {
-	        this.map.easeTo({
-	          bearing: 0,
-	          pitch: 0,
-	          duration: 600
-	        });
+	        this.map.easeTo(off);
 	      } else {
-	        this.map.easeTo({
-	          bearing: -40,
-	          pitch: 60,
-	          duration: 600
-	        });
+	        this.map.easeTo(on);
 	      }
 	    }
 	  }, {
@@ -2392,7 +2408,7 @@
 	map.addControl(new Zoom(), 'bottom-right');
 	map.addControl(new Ruler(), 'bottom-right');
 	map.addControl(new Inspect(), 'bottom-right');
-	map.addControl(new Pitch(), 'bottom-right');
+	map.addControl(new Pitch({ zoom: 15 }), 'bottom-right');
 	map.addControl(new Compass(), 'bottom-right');
 
 	(() => {

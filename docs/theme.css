@@ -21,6 +21,12 @@
   .mapboxgl-ctrl-group .mapboxgl-ctrl-geolocate {
     display: block;
   }
+
+  /* remove broken button focus shadow */
+
+  .mapboxgl-ctrl-group button:focus {
+    box-shadow: none;
+  }
 .mapboxgl-ctrl-compass {
   position: relative;
   border-radius: 50%;

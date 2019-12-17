@@ -19,4 +19,9 @@
   .mapboxgl-ctrl-geolocate {
     display: block;
   }
+
+  /* remove broken button focus shadow */
+  button:focus {
+    box-shadow: none;
+  }
 }

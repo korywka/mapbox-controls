@@ -35,6 +35,7 @@ class Ruler {
     this.container.classList.add('mapboxgl-ctrl-group');
     this.container.classList.add('mapboxgl-ctrl-ruler');
     this.button = document.createElement('button');
+    this.button.setAttribute("type", "button")
     this.button.appendChild(iconRuler());
     this.container.appendChild(this.button);
   }

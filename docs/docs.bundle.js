@@ -115,6 +115,7 @@
 	      this.nodes = [];
 	      this.styles.forEach(function (style) {
 	        var node = document.createElement('button');
+	        node.setAttribute("type", "button");
 	        node.textContent = style.label;
 	        node.addEventListener('click', function () {
 	          if (node.classList.contains('-active')) return;
@@ -219,6 +220,7 @@
 	    value: function insertControls() {
 	      this.container = document.createElement('div');
 	      this.button = document.createElement('button');
+	      this.button.setAttribute("type", "button");
 	      this.container.classList.add('mapboxgl-ctrl');
 	      this.container.classList.add('mapboxgl-ctrl-group');
 	      this.container.classList.add('mapboxgl-ctrl-compass');
@@ -1387,6 +1389,7 @@
 	      this.container.classList.add('mapboxgl-ctrl-group');
 	      this.container.classList.add('mapboxgl-ctrl-ruler');
 	      this.button = document.createElement('button');
+	      this.button.setAttribute("type", "button");
 	      this.button.appendChild(iconRuler());
 	      this.container.appendChild(this.button);
 	    }
@@ -1642,8 +1645,10 @@
 	      this.container.classList.add('mapboxgl-ctrl-group');
 	      this.container.classList.add('mapboxgl-ctrl-zoom');
 	      this.zoomIn = document.createElement('button');
+	      this.zoomIn.setAttribute("type", "button");
 	      this.zoomIn.appendChild(iconPlus());
 	      this.zoomOut = document.createElement('button');
+	      this.zoomOut.setAttribute("type", "button");
 	      this.zoomOut.appendChild(iconMinus());
 	      this.container.appendChild(this.zoomIn);
 	      this.container.appendChild(this.zoomOut);
@@ -1941,6 +1946,7 @@
 
 	  var templatePrev = function templatePrev() {
 	    var button = document.createElement('div');
+	    button.setAttribute("type", "button");
 	    button.classList.add('mapboxgl-ctrl-inspect-prev');
 	    button.appendChild(iconLeft());
 	    button.addEventListener('click', function () {
@@ -1951,6 +1957,7 @@
 
 	  var templateNext = function templateNext() {
 	    var button = document.createElement('div');
+	    button.setAttribute("type", "button");
 	    button.classList.add('mapboxgl-ctrl-inspect-next');
 	    button.appendChild(iconRight());
 	    button.addEventListener('click', function () {
@@ -2034,6 +2041,7 @@
 	      this.container.classList.add('mapboxgl-ctrl-group');
 	      this.container.classList.add('mapboxgl-ctrl-inspect');
 	      this.button = document.createElement('button');
+	      this.button.setAttribute("type", "button");
 	      this.button.appendChild(iconInspect());
 	      this.container.appendChild(this.button);
 	      this.popup = null;
@@ -2317,6 +2325,7 @@
 	    value: function insertControls() {
 	      this.container = document.createElement('div');
 	      this.button = document.createElement('button');
+	      this.button.setAttribute("type", "button");
 	      this.container.classList.add('mapboxgl-ctrl');
 	      this.container.classList.add('mapboxgl-ctrl-group');
 	      this.container.classList.add('mapboxgl-ctrl-pitch');

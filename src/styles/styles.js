@@ -33,6 +33,7 @@ class Styles {
     this.nodes = [];
     this.styles.forEach((style) => {
       const node = document.createElement('button');
+      node.setAttribute('type', 'button');
       node.textContent = style.label;
       node.addEventListener('click', () => {
         if (node.classList.contains('-active')) return;

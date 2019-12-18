@@ -14,7 +14,7 @@ class Pitch {
   insertControls() {
     this.container = document.createElement('div');
     this.button = document.createElement('button');
-    this.button.setAttribute("type", "button")
+    this.button.setAttribute('type', 'button');
     this.container.classList.add('mapboxgl-ctrl');
     this.container.classList.add('mapboxgl-ctrl-group');
     this.container.classList.add('mapboxgl-ctrl-pitch');

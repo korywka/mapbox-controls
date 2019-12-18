@@ -43,7 +43,7 @@ const popup = (features) => {
 
   const templatePrev = () => {
     const button = document.createElement('div');
-    button.setAttribute("type", "button")
+    button.setAttribute('type', 'button');
     button.classList.add('mapboxgl-ctrl-inspect-prev');
     button.appendChild(iconLeft());
     button.addEventListener('click', () => goTo('-1'));
@@ -52,7 +52,7 @@ const popup = (features) => {
 
   const templateNext = () => {
     const button = document.createElement('div');
-    button.setAttribute("type", "button")
+    button.setAttribute('type', 'button');
     button.classList.add('mapboxgl-ctrl-inspect-next');
     button.appendChild((iconRight()));
     button.addEventListener('click', () => goTo('+1'));
@@ -126,7 +126,7 @@ class Inspect {
     this.container.classList.add('mapboxgl-ctrl-group');
     this.container.classList.add('mapboxgl-ctrl-inspect');
     this.button = document.createElement('button');
-    this.button.setAttribute("type", "button")
+    this.button.setAttribute('type', 'button');
     this.button.appendChild(iconInspect());
     this.container.appendChild(this.button);
     this.popup = null;

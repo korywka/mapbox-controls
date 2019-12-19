@@ -119,6 +119,9 @@ const popup = (features) => {
   return root;
 };
 
+/**
+ * Inspect control to debug style layers and source
+ */
 class Inspect {
   insertControls() {
     this.container = document.createElement('div');

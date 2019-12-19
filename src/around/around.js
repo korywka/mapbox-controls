@@ -1,13 +1,16 @@
 import icon3D from './icon-3d.svg';
 
 /**
+ * Set pitch to 60 and rotate a little camera with easing.
  * @param {Object} options
- * @param {Number} [options.zoom] - Zoom to while pitch
+ * @param {Number} [options.minZoom] - Minimal zoom while rotation
+ * @param {Array} [options.center] - Fly to center while rotation
  */
 
-class Pitch {
+class Around {
   constructor(options = {}) {
-    this.zoom = options.zoom;
+    this.minZoom = options.minZoom;
+    this.center = options.center;
     this.onClick = this.onClick.bind(this);
   }
 
@@ -17,7 +20,7 @@ class Pitch {
     this.button.setAttribute('type', 'button');
     this.container.classList.add('mapboxgl-ctrl');
     this.container.classList.add('mapboxgl-ctrl-group');
-    this.container.classList.add('mapboxgl-ctrl-pitch');
+    this.container.classList.add('mapboxgl-ctrl-around');
     this.button.appendChild(icon3D());
     this.container.appendChild(this.button);
   }
@@ -38,11 +41,16 @@ class Pitch {
 
   onClick() {
     const duration = 600;
-    const on = { bearing: -40, pitch: 60, duration };
+    const on = {
+      bearing: -40,
+      pitch: 60,
+      center: this.center,
+      duration,
+    };
     const off = { bearing: 0, pitch: 0, duration };
 
-    if (this.zoom && this.zoom > this.map.getZoom()) {
-      on.zoom = this.zoom;
+    if (this.minZoom && this.minZoom > this.map.getZoom()) {
+      on.zoom = this.minZoom;
     }
 
     if (this.map.getPitch() > 30) {
@@ -58,4 +66,4 @@ class Pitch {
   }
 }
 
-export default Pitch;
+export default Around;

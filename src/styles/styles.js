@@ -11,6 +11,7 @@ const defaultStyles = [
 ];
 
 /**
+ * Adds style switcher similar to Google Maps.
  * @param {Object} options
  * @param {Array} [options.styles] - Array of style objects:
  * @param {String} options.styles.label - Style label to display on switcher

@@ -163,9 +163,9 @@
 .mapboxgl-ctrl-tooltip:empty {
     display: none;
   }
-.mapboxgl-ctrl-pitch {
+.mapboxgl-ctrl-around {
   border-radius: 50%;
 }
-.mapboxgl-ctrl-pitch.-active svg {
+.mapboxgl-ctrl-around.-active svg {
       fill: #4264fb;
     }

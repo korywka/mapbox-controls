@@ -83,6 +83,7 @@
 	  styleUrl: 'mapbox://sprites/mapbox/satellite-streets-v11'
 	}];
 	/**
+	 * Adds style switcher similar to Google Maps.
 	 * @param {Object} options
 	 * @param {Array} [options.styles] - Array of style objects:
 	 * @param {String} options.styles.label - Style label to display on switcher
@@ -199,6 +200,7 @@
 	}
 
 	/**
+	 * Simple compass
 	 * @param {Object} options
 	 * @param {Boolean} [options.instant=true] - Show compass if bearing is 0
 	 */
@@ -1354,7 +1356,7 @@
 	var SOURCE_LINE = 'controls-source-line';
 	var SOURCE_SYMBOL = 'controls-source-symbol';
 	/**
-	 * Fires map `ruler.on` and `ruler.off`events at the beginning and at the end of measuring.
+	 * Adds ruler control to map. Fires map `ruler.on` and `ruler.off`events at the beginning and at the end of measuring.
 	 * @param {Object} options
 	 * @param {String} [options.units='kilometers'] - Any units [@turf/distance](https://github.com/Turfjs/turf/tree/master/packages/turf-distance) supports
 	 * @param {Function} [options.labelFormat] - Accepts number and returns label.
@@ -1630,6 +1632,10 @@
 	  return node;
 	}
 
+	/**
+	 * Simple zoom control
+	 */
+
 	var Zoom =
 	/*#__PURE__*/
 	function () {
@@ -1752,7 +1758,7 @@
 
 	var SUPPORTED_LANGUAGES = ['en', 'es', 'fr', 'de', 'ru', 'zh', 'pt', 'ar', 'ja', 'ko', 'mul'];
 	/**
-	 * Language can be set dynamically with `.setLanguage(lang)` method.
+	 * Localize map. Language can be set dynamically with `.setLanguage(lang)` method.
 	 * @param {Object} options
 	 * @param {Array} [options.supportedLanguages] - (Supported languages)[https://docs.mapbox.com/help/troubleshooting/change-language/]
 	 * @param {String} [options.language] - One of the supported languages to apply
@@ -2025,6 +2031,10 @@
 
 	  return root;
 	};
+	/**
+	 * Inspect control to debug style layers and source
+	 */
+
 
 	var Inspect =
 	/*#__PURE__*/
@@ -2169,7 +2179,7 @@
 	var mouseMoveEvent = 'mousemove';
 	var mapMoveEvent = 'move';
 	/**
-	 * Shows tooltip on hover
+	 * Shows tooltip on hover on some layer or whole map.
 	 * @param {Object} options
 	 * @param {String} options.layer - Layer id to show the tooltip on hover.
 	 * If not specified, tooltip will be shown for whole map container
@@ -2304,23 +2314,26 @@
 	}
 
 	/**
+	 * Set pitch to 60 and rotate a little camera with easing.
 	 * @param {Object} options
-	 * @param {Number} [options.zoom] - Zoom to while pitch
+	 * @param {Number} [options.minZoom] - Minimal zoom while rotation
+	 * @param {Array} [options.center] - Fly to center while rotation
 	 */
 
-	var Pitch =
+	var Around =
 	/*#__PURE__*/
 	function () {
-	  function Pitch() {
+	  function Around() {
 	    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-	    _classCallCheck$7(this, Pitch);
+	    _classCallCheck$7(this, Around);
 
-	    this.zoom = options.zoom;
+	    this.minZoom = options.minZoom;
+	    this.center = options.center;
 	    this.onClick = this.onClick.bind(this);
 	  }
 
-	  _createClass$7(Pitch, [{
+	  _createClass$7(Around, [{
 	    key: "insertControls",
 	    value: function insertControls() {
 	      this.container = document.createElement('div');
@@ -2328,7 +2341,7 @@
 	      this.button.setAttribute('type', 'button');
 	      this.container.classList.add('mapboxgl-ctrl');
 	      this.container.classList.add('mapboxgl-ctrl-group');
-	      this.container.classList.add('mapboxgl-ctrl-pitch');
+	      this.container.classList.add('mapboxgl-ctrl-around');
 	      this.button.appendChild(icon3D());
 	      this.container.appendChild(this.button);
 	    }
@@ -2356,6 +2369,7 @@
 	      var on = {
 	        bearing: -40,
 	        pitch: 60,
+	        center: this.center,
 	        duration: duration
 	      };
 	      var off = {
@@ -2364,8 +2378,8 @@
 	        duration: duration
 	      };
 
-	      if (this.zoom && this.zoom > this.map.getZoom()) {
-	        on.zoom = this.zoom;
+	      if (this.minZoom && this.minZoom > this.map.getZoom()) {
+	        on.zoom = this.minZoom;
 	      }
 
 	      if (this.map.getPitch() > 30) {
@@ -2382,7 +2396,7 @@
 	    }
 	  }]);
 
-	  return Pitch;
+	  return Around;
 	}();
 
 	mapboxGl.accessToken = 'pk.eyJ1IjoiYnJhdmVjb3ciLCJhIjoiY2o1ODEwdWljMThwbTJ5bGk0a294ZmVybiJ9.kErON3w2kwEVxU5aNa-EqQ';
@@ -2410,24 +2424,36 @@
 	  },
 	};
 
+	/* Language */
+	const languageControl = new Language();
+	map.addControl(languageControl);
+	languages.addEventListener('change', () => {
+	  languageControl.setLanguage(languages.value);
+	});
+
+	/* Style */
 	map.addControl(new Styles({
 	  onChange: () => languages.value = '',
 	}), 'top-left');
 
+	/* Zoom */
 	map.addControl(new Zoom(), 'bottom-right');
+
+	/* Ruler */
 	map.addControl(new Ruler(), 'bottom-right');
+
+	/* Inspect */
 	map.addControl(new Inspect(), 'bottom-right');
-	map.addControl(new Pitch({ zoom: 15 }), 'bottom-right');
+
+	/* Around */
+	const aroundControl = new Around({ minZoom: 15, center: [30.5164, 50.4505] });
+	map.addControl(aroundControl, 'bottom-right');
+	setTimeout(() => {
+	  aroundControl.fly(0.7);
+	}, 4000);
+
+	/* Compass */
 	map.addControl(new Compass(), 'bottom-right');
-
-	(() => {
-	  const languageControl = new Language();
-	  map.addControl(languageControl);
-
-	  languages.addEventListener('change', () => {
-	    languageControl.setLanguage(languages.value);
-	  });
-	})();
 
 	map.on('load', () => {
 	  map.addLayer({

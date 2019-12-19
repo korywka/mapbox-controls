@@ -1,6 +1,7 @@
 import iconPointer from './icon-pointer.svg';
 
 /**
+ * Simple compass
  * @param {Object} options
  * @param {Boolean} [options.instant=true] - Show compass if bearing is 0
  */

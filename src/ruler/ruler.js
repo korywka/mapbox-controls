@@ -8,7 +8,7 @@ const SOURCE_LINE = 'controls-source-line';
 const SOURCE_SYMBOL = 'controls-source-symbol';
 
 /**
- * Fires map `ruler.on` and `ruler.off`events at the beginning and at the end of measuring.
+ * Adds ruler control to map. Fires map `ruler.on` and `ruler.off`events at the beginning and at the end of measuring.
  * @param {Object} options
  * @param {String} [options.units='kilometers'] - Any units [@turf/distance](https://github.com/Turfjs/turf/tree/master/packages/turf-distance) supports
  * @param {Function} [options.labelFormat] - Accepts number and returns label.

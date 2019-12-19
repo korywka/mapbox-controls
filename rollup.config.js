@@ -71,9 +71,9 @@ export default [
     plugins,
   },
   {
-    input: 'src/pitch/pitch.js',
+    input: 'src/around/around.js',
     output: {
-      file: 'lib/pitch.js',
+      file: 'lib/around.js',
       format: 'esm',
     },
     plugins,

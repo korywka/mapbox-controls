@@ -6,7 +6,7 @@ import ZoomControl from '../lib/zoom';
 import LanguageControl from '../lib/language';
 import InspectControl from '../lib/inspect';
 import TooltipControl from '../lib/tooltip';
-import PitchControl from '../lib/pitch';
+import AroundControl from '../lib/around';
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiYnJhdmVjb3ciLCJhIjoiY2o1ODEwdWljMThwbTJ5bGk0a294ZmVybiJ9.kErON3w2kwEVxU5aNa-EqQ';
 
@@ -33,24 +33,36 @@ const geoJSON = {
   },
 };
 
+/* Language */
+const languageControl = new LanguageControl();
+map.addControl(languageControl);
+languages.addEventListener('change', () => {
+  languageControl.setLanguage(languages.value);
+});
+
+/* Style */
 map.addControl(new StylesControl({
   onChange: () => languages.value = '',
 }), 'top-left');
 
+/* Zoom */
 map.addControl(new ZoomControl(), 'bottom-right');
+
+/* Ruler */
 map.addControl(new RulerControl(), 'bottom-right');
+
+/* Inspect */
 map.addControl(new InspectControl(), 'bottom-right');
-map.addControl(new PitchControl({ zoom: 15 }), 'bottom-right');
+
+/* Around */
+const aroundControl = new AroundControl({ minZoom: 15, center: [30.5164, 50.4505] });
+map.addControl(aroundControl, 'bottom-right');
+setTimeout(() => {
+  aroundControl.fly(0.7);
+}, 4000);
+
+/* Compass */
 map.addControl(new CompassControl(), 'bottom-right');
-
-(() => {
-  const languageControl = new LanguageControl();
-  map.addControl(languageControl);
-
-  languages.addEventListener('change', () => {
-    languageControl.setLanguage(languages.value);
-  });
-})();
 
 map.on('load', () => {
   map.addLayer({

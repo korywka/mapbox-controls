@@ -1,6 +1,9 @@
 import iconPlus from './icon-plus.svg';
 import iconMinus from './icon-minus.svg';
 
+/**
+ * Simple zoom control
+ */
 class Zoom {
   insertControls() {
     this.container = document.createElement('div');

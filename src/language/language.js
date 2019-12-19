@@ -1,7 +1,7 @@
 const SUPPORTED_LANGUAGES = ['en', 'es', 'fr', 'de', 'ru', 'zh', 'pt', 'ar', 'ja', 'ko', 'mul'];
 
 /**
- * Language can be set dynamically with `.setLanguage(lang)` method.
+ * Localize map. Language can be set dynamically with `.setLanguage(lang)` method.
  * @param {Object} options
  * @param {Array} [options.supportedLanguages] - (Supported languages)[https://docs.mapbox.com/help/troubleshooting/change-language/]
  * @param {String} [options.language] - One of the supported languages to apply

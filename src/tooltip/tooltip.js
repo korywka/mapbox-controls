@@ -7,7 +7,7 @@ const mouseMoveEvent = 'mousemove';
 const mapMoveEvent = 'move';
 
 /**
- * Shows tooltip on hover
+ * Shows tooltip on hover on some layer or whole map.
  * @param {Object} options
  * @param {String} options.layer - Layer id to show the tooltip on hover.
  * If not specified, tooltip will be shown for whole map container

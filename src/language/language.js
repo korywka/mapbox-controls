@@ -1,5 +1,32 @@
 const SUPPORTED_LANGUAGES = ['en', 'es', 'fr', 'de', 'ru', 'zh', 'pt', 'ar', 'ja', 'ko', 'mul'];
 
+function getLanguageField(lang) {
+  if (lang === 'mul') {
+    return 'name';
+  }
+  return `name_${lang}`;
+}
+
+function localizeTextField(field, lang) {
+  if (typeof field === 'string') {
+    return field.replace(/{name.*?}/, `{${lang}}`);
+  }
+
+  const str = JSON.stringify(field);
+
+  if (Array.isArray(field)) {
+    return JSON.parse(str.replace(
+      /"coalesce",\["get","name.*?"]/g,
+      `"coalesce",["get","${lang}"]`,
+    ));
+  }
+
+  return JSON.parse(str.replace(
+    /{name.*?}/g,
+    `{${lang}}`,
+  ));
+}
+
 /**
  * Localize map. Language can be set dynamically with `.setLanguage(lang)` method.
  * @param {Object} options
@@ -10,7 +37,7 @@ const SUPPORTED_LANGUAGES = ['en', 'es', 'fr', 'de', 'ru', 'zh', 'pt', 'ar', 'ja
  * By default fields are `name_LANGUAGE` and `name` for multi language (mul)
  */
 
-class Language {
+export default class LanguageControl {
   constructor(options = {}) {
     this.container = document.createElement('div');
     this.supportedLanguages = options.supportedLanguages || SUPPORTED_LANGUAGES;
@@ -72,33 +99,4 @@ class Language {
     }
     return 'mul';
   }
-}
-
-export default Language;
-
-function getLanguageField(lang) {
-  if (lang === 'mul') {
-    return 'name';
-  }
-  return `name_${lang}`;
-}
-
-function localizeTextField(field, lang) {
-  if (typeof field === 'string') {
-    return field.replace(/{name.*?}/, `{${lang}}`);
-  }
-
-  const str = JSON.stringify(field);
-
-  if (Array.isArray(field)) {
-    return JSON.parse(str.replace(
-      /"coalesce",\["get","name.*?"]/g,
-      `"coalesce",["get","${lang}"]`,
-    ));
-  }
-
-  return JSON.parse(str.replace(
-    /{name.*?}/g,
-    `{${lang}}`,
-  ));
 }

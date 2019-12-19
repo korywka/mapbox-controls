@@ -15,7 +15,7 @@ const mapMoveEvent = 'move';
  * Accepts `event` object
  */
 
-class Tooltip {
+export default class TooltipControl {
   constructor(options = {}) {
     this.layer = options.layer;
     this.getContent = options.getContent || defaultGetContent;
@@ -89,5 +89,3 @@ class Tooltip {
     this.map = undefined;
   }
 }
-
-export default Tooltip;

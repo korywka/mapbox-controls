@@ -7,8 +7,42 @@ const LAYER_SYMBOL = 'controls-layer-symbol';
 const SOURCE_LINE = 'controls-source-line';
 const SOURCE_SYMBOL = 'controls-source-symbol';
 
+function geoLineString(coordinates = []) {
+  return {
+    type: 'Feature',
+    properties: {},
+    geometry: {
+      type: 'LineString',
+      coordinates,
+    },
+  };
+}
+
+function geoPoint(coordinates = [], labels = []) {
+  return {
+    type: 'FeatureCollection',
+    features: coordinates.map((c, i) => ({
+      type: 'Feature',
+      properties: {
+        text: labels[i],
+      },
+      geometry: {
+        type: 'Point',
+        coordinates: c,
+      },
+    })),
+  };
+}
+
+function defaultLabelFormat(number) {
+  if (number < 1) {
+    return `${(number * 1000).toFixed()} m`;
+  }
+  return `${number.toFixed(2)} km`;
+}
+
 /**
- * Adds ruler control to map. Fires map `ruler.on` and `ruler.off`events at the beginning and at the end of measuring.
+ * Fires map `ruler.on` and `ruler.off`events at the beginning and at the end of measuring.
  * @param {Object} options
  * @param {String} [options.units='kilometers'] - Any units [@turf/distance](https://github.com/Turfjs/turf/tree/master/packages/turf-distance) supports
  * @param {Function} [options.labelFormat] - Accepts number and returns label.
@@ -16,7 +50,7 @@ const SOURCE_SYMBOL = 'controls-source-symbol';
  * @param {Array} [options.font=['Roboto Medium']] - Array of fonts.
  */
 
-class Ruler {
+export default class RulerControl {
   constructor(options = {}) {
     this.isMeasuring = false;
     this.markers = [];
@@ -176,40 +210,4 @@ class Ruler {
     this.container.parentNode.removeChild(this.container);
     this.map = undefined;
   }
-}
-
-export default Ruler;
-
-function geoLineString(coordinates = []) {
-  return {
-    type: 'Feature',
-    properties: {},
-    geometry: {
-      type: 'LineString',
-      coordinates,
-    },
-  };
-}
-
-function geoPoint(coordinates = [], labels = []) {
-  return {
-    type: 'FeatureCollection',
-    features: coordinates.map((c, i) => ({
-      type: 'Feature',
-      properties: {
-        text: labels[i],
-      },
-      geometry: {
-        type: 'Point',
-        coordinates: c,
-      },
-    })),
-  };
-}
-
-function defaultLabelFormat(number) {
-  if (number < 1) {
-    return `${(number * 1000).toFixed()} m`;
-  }
-  return `${number.toFixed(2)} km`;
 }

@@ -6,7 +6,7 @@ import iconPointer from './icon-pointer.svg';
  * @param {Boolean} [options.instant=true] - Show compass if bearing is 0
  */
 
-class Compass {
+export default class CompassControl {
   constructor(options = {}) {
     this.instant = typeof options.instant === 'boolean' ? options.instant : true;
     this.onRotate = this.onRotate.bind(this);
@@ -55,5 +55,3 @@ class Compass {
     this.pointer.style.transform = `rotate(${angle}deg)`;
   }
 }
-
-export default Compass;

@@ -2,7 +2,7 @@ import iconInspect from './icon-inspect.svg';
 import iconLeft from './icon-left.svg';
 import iconRight from './icon-right.svg';
 
-const featureData = (feature) => {
+function featureData(feature) {
   const props = feature.properties;
   const data = [
     {
@@ -32,9 +32,9 @@ const featureData = (feature) => {
     });
 
   return data;
-};
+}
 
-const popup = (features) => {
+function popup(features) {
   let current = 0;
   const root = document.createElement('div');
   root.classList.add('mapboxgl-ctrl-inspect-popup');
@@ -117,12 +117,12 @@ const popup = (features) => {
   }
 
   return root;
-};
+}
 
 /**
  * Inspect control to debug style layers and source
  */
-class Inspect {
+export default class InspectControl {
   insertControls() {
     this.container = document.createElement('div');
     this.container.classList.add('mapboxgl-ctrl');
@@ -213,5 +213,3 @@ class Inspect {
     this.map = undefined;
   }
 }
-
-export default Inspect;

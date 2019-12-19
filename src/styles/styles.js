@@ -20,7 +20,7 @@ const defaultStyles = [
  * @param {Function} [options.onChange] - Triggered on style change. Accepts `style` object
  */
 
-class Styles {
+export default class StylesControl {
   constructor(options = {}) {
     this.styles = options.styles || defaultStyles;
     this.onChange = options.onChange;
@@ -68,5 +68,3 @@ class Styles {
     this.map = undefined;
   }
 }
-
-export default Styles;

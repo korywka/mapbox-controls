@@ -92,19 +92,19 @@
 	 * @param {Function} [options.onChange] - Triggered on style change. Accepts `style` object
 	 */
 
-	var Styles =
+	var StylesControl =
 	/*#__PURE__*/
 	function () {
-	  function Styles() {
+	  function StylesControl() {
 	    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-	    _classCallCheck(this, Styles);
+	    _classCallCheck(this, StylesControl);
 
 	    this.styles = options.styles || defaultStyles;
 	    this.onChange = options.onChange;
 	  }
 
-	  _createClass(Styles, [{
+	  _createClass(StylesControl, [{
 	    key: "insertControls",
 	    value: function insertControls() {
 	      var _this = this;
@@ -164,7 +164,7 @@
 	    }
 	  }]);
 
-	  return Styles;
+	  return StylesControl;
 	}();
 
 	function _classCallCheck$1(instance, Constructor) {
@@ -205,19 +205,19 @@
 	 * @param {Boolean} [options.instant=true] - Show compass if bearing is 0
 	 */
 
-	var Compass =
+	var CompassControl =
 	/*#__PURE__*/
 	function () {
-	  function Compass() {
+	  function CompassControl() {
 	    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-	    _classCallCheck$1(this, Compass);
+	    _classCallCheck$1(this, CompassControl);
 
 	    this.instant = typeof options.instant === 'boolean' ? options.instant : true;
 	    this.onRotate = this.onRotate.bind(this);
 	  }
 
-	  _createClass$1(Compass, [{
+	  _createClass$1(CompassControl, [{
 	    key: "insertControls",
 	    value: function insertControls() {
 	      this.container = document.createElement('div');
@@ -275,7 +275,7 @@
 	    }
 	  }]);
 
-	  return Compass;
+	  return CompassControl;
 	}();
 
 	var helpers = createCommonjsModule(function (module, exports) {
@@ -1355,8 +1355,48 @@
 	var LAYER_SYMBOL = 'controls-layer-symbol';
 	var SOURCE_LINE = 'controls-source-line';
 	var SOURCE_SYMBOL = 'controls-source-symbol';
+
+	function geoLineString() {
+	  var coordinates = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+	  return {
+	    type: 'Feature',
+	    properties: {},
+	    geometry: {
+	      type: 'LineString',
+	      coordinates: coordinates
+	    }
+	  };
+	}
+
+	function geoPoint() {
+	  var coordinates = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+	  var labels = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+	  return {
+	    type: 'FeatureCollection',
+	    features: coordinates.map(function (c, i) {
+	      return {
+	        type: 'Feature',
+	        properties: {
+	          text: labels[i]
+	        },
+	        geometry: {
+	          type: 'Point',
+	          coordinates: c
+	        }
+	      };
+	    })
+	  };
+	}
+
+	function defaultLabelFormat(number) {
+	  if (number < 1) {
+	    return "".concat((number * 1000).toFixed(), " m");
+	  }
+
+	  return "".concat(number.toFixed(2), " km");
+	}
 	/**
-	 * Adds ruler control to map. Fires map `ruler.on` and `ruler.off`events at the beginning and at the end of measuring.
+	 * Fires map `ruler.on` and `ruler.off`events at the beginning and at the end of measuring.
 	 * @param {Object} options
 	 * @param {String} [options.units='kilometers'] - Any units [@turf/distance](https://github.com/Turfjs/turf/tree/master/packages/turf-distance) supports
 	 * @param {Function} [options.labelFormat] - Accepts number and returns label.
@@ -1364,13 +1404,14 @@
 	 * @param {Array} [options.font=['Roboto Medium']] - Array of fonts.
 	 */
 
-	var Ruler =
+
+	var RulerControl =
 	/*#__PURE__*/
 	function () {
-	  function Ruler() {
+	  function RulerControl() {
 	    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-	    _classCallCheck$2(this, Ruler);
+	    _classCallCheck$2(this, RulerControl);
 
 	    this.isMeasuring = false;
 	    this.markers = [];
@@ -1383,7 +1424,7 @@
 	    this.styleLoadListener = this.styleLoadListener.bind(this);
 	  }
 
-	  _createClass$2(Ruler, [{
+	  _createClass$2(RulerControl, [{
 	    key: "insertControls",
 	    value: function insertControls() {
 	      this.container = document.createElement('div');
@@ -1547,48 +1588,8 @@
 	    }
 	  }]);
 
-	  return Ruler;
+	  return RulerControl;
 	}();
-
-	function geoLineString() {
-	  var coordinates = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-	  return {
-	    type: 'Feature',
-	    properties: {},
-	    geometry: {
-	      type: 'LineString',
-	      coordinates: coordinates
-	    }
-	  };
-	}
-
-	function geoPoint() {
-	  var coordinates = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-	  var labels = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-	  return {
-	    type: 'FeatureCollection',
-	    features: coordinates.map(function (c, i) {
-	      return {
-	        type: 'Feature',
-	        properties: {
-	          text: labels[i]
-	        },
-	        geometry: {
-	          type: 'Point',
-	          coordinates: c
-	        }
-	      };
-	    })
-	  };
-	}
-
-	function defaultLabelFormat(number) {
-	  if (number < 1) {
-	    return "".concat((number * 1000).toFixed(), " m");
-	  }
-
-	  return "".concat(number.toFixed(2), " km");
-	}
 
 	function _classCallCheck$3(instance, Constructor) {
 	  if (!(instance instanceof Constructor)) {
@@ -1636,14 +1637,14 @@
 	 * Simple zoom control
 	 */
 
-	var Zoom =
+	var ZoomControl =
 	/*#__PURE__*/
 	function () {
-	  function Zoom() {
-	    _classCallCheck$3(this, Zoom);
+	  function ZoomControl() {
+	    _classCallCheck$3(this, ZoomControl);
 	  }
 
-	  _createClass$3(Zoom, [{
+	  _createClass$3(ZoomControl, [{
 	    key: "insertControls",
 	    value: function insertControls() {
 	      this.container = document.createElement('div');
@@ -1682,7 +1683,7 @@
 	    }
 	  }]);
 
-	  return Zoom;
+	  return ZoomControl;
 	}();
 
 	function _classCallCheck$4(instance, Constructor) {
@@ -1757,6 +1758,28 @@
 	}
 
 	var SUPPORTED_LANGUAGES = ['en', 'es', 'fr', 'de', 'ru', 'zh', 'pt', 'ar', 'ja', 'ko', 'mul'];
+
+	function getLanguageField(lang) {
+	  if (lang === 'mul') {
+	    return 'name';
+	  }
+
+	  return "name_".concat(lang);
+	}
+
+	function localizeTextField(field, lang) {
+	  if (typeof field === 'string') {
+	    return field.replace(/{name.*?}/, "{".concat(lang, "}"));
+	  }
+
+	  var str = JSON.stringify(field);
+
+	  if (Array.isArray(field)) {
+	    return JSON.parse(str.replace(/"coalesce",\["get","name.*?"]/g, "\"coalesce\",[\"get\",\"".concat(lang, "\"]")));
+	  }
+
+	  return JSON.parse(str.replace(/{name.*?}/g, "{".concat(lang, "}")));
+	}
 	/**
 	 * Localize map. Language can be set dynamically with `.setLanguage(lang)` method.
 	 * @param {Object} options
@@ -1767,13 +1790,14 @@
 	 * By default fields are `name_LANGUAGE` and `name` for multi language (mul)
 	 */
 
-	var Language =
+
+	var LanguageControl =
 	/*#__PURE__*/
 	function () {
-	  function Language() {
+	  function LanguageControl() {
 	    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-	    _classCallCheck$4(this, Language);
+	    _classCallCheck$4(this, LanguageControl);
 
 	    this.container = document.createElement('div');
 	    this.supportedLanguages = options.supportedLanguages || SUPPORTED_LANGUAGES;
@@ -1783,7 +1807,7 @@
 	    this.styleChangeListener = this.styleChangeListener.bind(this);
 	  }
 
-	  _createClass$4(Language, [{
+	  _createClass$4(LanguageControl, [{
 	    key: "onAdd",
 	    value: function onAdd(map) {
 	      this.map = map;
@@ -1842,30 +1866,8 @@
 	    }
 	  }]);
 
-	  return Language;
+	  return LanguageControl;
 	}();
-
-	function getLanguageField(lang) {
-	  if (lang === 'mul') {
-	    return 'name';
-	  }
-
-	  return "name_".concat(lang);
-	}
-
-	function localizeTextField(field, lang) {
-	  if (typeof field === 'string') {
-	    return field.replace(/{name.*?}/, "{".concat(lang, "}"));
-	  }
-
-	  var str = JSON.stringify(field);
-
-	  if (Array.isArray(field)) {
-	    return JSON.parse(str.replace(/"coalesce",\["get","name.*?"]/g, "\"coalesce\",[\"get\",\"".concat(lang, "\"]")));
-	  }
-
-	  return JSON.parse(str.replace(/{name.*?}/g, "{".concat(lang, "}")));
-	}
 
 	function _classCallCheck$5(instance, Constructor) {
 	  if (!(instance instanceof Constructor)) {
@@ -1919,7 +1921,7 @@
 	  return node;
 	}
 
-	var featureData = function featureData(feature) {
+	function featureData(feature) {
 	  var props = feature.properties;
 	  var data = [{
 	    key: '$id',
@@ -1941,9 +1943,9 @@
 	    });
 	  });
 	  return data;
-	};
+	}
 
-	var popup = function popup(features) {
+	function popup(features) {
 	  var current = 0;
 	  var root = document.createElement('div');
 	  root.classList.add('mapboxgl-ctrl-inspect-popup');
@@ -2030,20 +2032,20 @@
 	  }
 
 	  return root;
-	};
+	}
 	/**
 	 * Inspect control to debug style layers and source
 	 */
 
 
-	var Inspect =
+	var InspectControl =
 	/*#__PURE__*/
 	function () {
-	  function Inspect() {
-	    _classCallCheck$5(this, Inspect);
+	  function InspectControl() {
+	    _classCallCheck$5(this, InspectControl);
 	  }
 
-	  _createClass$5(Inspect, [{
+	  _createClass$5(InspectControl, [{
 	    key: "insertControls",
 	    value: function insertControls() {
 	      this.container = document.createElement('div');
@@ -2146,7 +2148,7 @@
 	    }
 	  }]);
 
-	  return Inspect;
+	  return InspectControl;
 	}();
 
 	function _classCallCheck$6(instance, Constructor) {
@@ -2187,13 +2189,13 @@
 	 * Accepts `event` object
 	 */
 
-	var Tooltip =
+	var TooltipControl =
 	/*#__PURE__*/
 	function () {
-	  function Tooltip() {
+	  function TooltipControl() {
 	    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-	    _classCallCheck$6(this, Tooltip);
+	    _classCallCheck$6(this, TooltipControl);
 
 	    this.layer = options.layer;
 	    this.getContent = options.getContent || defaultGetContent;
@@ -2210,7 +2212,7 @@
 	    this.updatePosition = this.updatePosition.bind(this);
 	  }
 
-	  _createClass$6(Tooltip, [{
+	  _createClass$6(TooltipControl, [{
 	    key: "show",
 	    value: function show() {
 	      this.mapContainer.appendChild(this.node);
@@ -2278,7 +2280,7 @@
 	    }
 	  }]);
 
-	  return Tooltip;
+	  return TooltipControl;
 	}();
 
 	function _classCallCheck$7(instance, Constructor) {
@@ -2320,20 +2322,20 @@
 	 * @param {Array} [options.center] - Fly to center while rotation
 	 */
 
-	var Around =
+	var AroundControl =
 	/*#__PURE__*/
 	function () {
-	  function Around() {
+	  function AroundControl() {
 	    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-	    _classCallCheck$7(this, Around);
+	    _classCallCheck$7(this, AroundControl);
 
 	    this.minZoom = options.minZoom;
 	    this.center = options.center;
 	    this.onClick = this.onClick.bind(this);
 	  }
 
-	  _createClass$7(Around, [{
+	  _createClass$7(AroundControl, [{
 	    key: "insertControls",
 	    value: function insertControls() {
 	      this.container = document.createElement('div');
@@ -2396,7 +2398,7 @@
 	    }
 	  }]);
 
-	  return Around;
+	  return AroundControl;
 	}();
 
 	mapboxGl.accessToken = 'pk.eyJ1IjoiYnJhdmVjb3ciLCJhIjoiY2o1ODEwdWljMThwbTJ5bGk0a294ZmVybiJ9.kErON3w2kwEVxU5aNa-EqQ';
@@ -2425,35 +2427,35 @@
 	};
 
 	/* Language */
-	const languageControl = new Language();
+	const languageControl = new LanguageControl();
 	map.addControl(languageControl);
 	languages.addEventListener('change', () => {
 	  languageControl.setLanguage(languages.value);
 	});
 
 	/* Style */
-	map.addControl(new Styles({
+	map.addControl(new StylesControl({
 	  onChange: () => languages.value = '',
 	}), 'top-left');
 
 	/* Zoom */
-	map.addControl(new Zoom(), 'bottom-right');
+	map.addControl(new ZoomControl(), 'bottom-right');
 
 	/* Ruler */
-	map.addControl(new Ruler(), 'bottom-right');
+	map.addControl(new RulerControl(), 'bottom-right');
 
 	/* Inspect */
-	map.addControl(new Inspect(), 'bottom-right');
+	map.addControl(new InspectControl(), 'bottom-right');
 
 	/* Around */
-	const aroundControl = new Around({ minZoom: 15, center: [30.5164, 50.4505] });
+	const aroundControl = new AroundControl({ minZoom: 15, center: [30.5164, 50.4505] });
 	map.addControl(aroundControl, 'bottom-right');
 	setTimeout(() => {
 	  aroundControl.fly(0.7);
 	}, 4000);
 
 	/* Compass */
-	map.addControl(new Compass(), 'bottom-right');
+	map.addControl(new CompassControl(), 'bottom-right');
 
 	map.on('load', () => {
 	  map.addLayer({
@@ -2480,7 +2482,7 @@
 	      'line-color': '#4264fb',
 	    },
 	  });
-	  map.addControl(new Tooltip({
+	  map.addControl(new TooltipControl({
 	    layer: '$fill',
 	  }));
 	});

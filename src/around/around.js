@@ -7,7 +7,7 @@ import icon3D from './icon-3d.svg';
  * @param {Array} [options.center] - Fly to center while rotation
  */
 
-class Around {
+export default class AroundControl {
   constructor(options = {}) {
     this.minZoom = options.minZoom;
     this.center = options.center;
@@ -65,5 +65,3 @@ class Around {
     this.map = undefined;
   }
 }
-
-export default Around;

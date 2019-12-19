@@ -4,7 +4,7 @@ import iconMinus from './icon-minus.svg';
 /**
  * Simple zoom control
  */
-class Zoom {
+export default class ZoomControl {
   insertControls() {
     this.container = document.createElement('div');
     this.container.classList.add('mapboxgl-ctrl');
@@ -37,5 +37,3 @@ class Zoom {
     this.map = undefined;
   }
 }
-
-export default Zoom;

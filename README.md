@@ -1,6 +1,6 @@
 # Mapbox Controls
 
-[![Ruler](./docs/map.png)](https://bravecow.github.io/mapbox-gl-controls/)
+[![Preview](./docs/map.png)](https://bravecow.github.io/mapbox-gl-controls/)
 
 ## Usage
 

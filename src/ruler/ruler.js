@@ -6,6 +6,8 @@ const LAYER_LINE = 'controls-layer-line';
 const LAYER_SYMBOL = 'controls-layer-symbol';
 const SOURCE_LINE = 'controls-source-line';
 const SOURCE_SYMBOL = 'controls-source-symbol';
+const MAIN_COLOR = '#263238';
+const HALO_COLOR = '#fff';
 
 function geoLineString(coordinates = []) {
   return {
@@ -48,6 +50,8 @@ function defaultLabelFormat(number) {
  * @param {Function} [options.labelFormat] - Accepts number and returns label.
  * Can be used to convert value to any measuring units
  * @param {Array} [options.font=['Roboto Medium']] - Array of fonts.
+ * @param {String} [options.mainColor='#263238'] - Color of ruler lines.
+ * @param {String} [options.secondaryColor='#fff'] - Color of halo and inner marker background.
  */
 
 export default class RulerControl {
@@ -59,6 +63,8 @@ export default class RulerControl {
     this.units = options.units || 'kilometers';
     this.font = options.font || ['Roboto Medium'];
     this.labelFormat = options.labelFormat || defaultLabelFormat;
+    this.mainColor = options.mainColor || MAIN_COLOR;
+    this.secondaryColor = options.secondaryColor || HALO_COLOR;
     this.mapClickListener = this.mapClickListener.bind(this);
     this.styleLoadListener = this.styleLoadListener.bind(this);
   }
@@ -90,7 +96,7 @@ export default class RulerControl {
       type: 'line',
       source: SOURCE_LINE,
       paint: {
-        'line-color': '#263238',
+        'line-color': this.mainColor,
         'line-width': 2,
       },
     });
@@ -107,8 +113,8 @@ export default class RulerControl {
         'text-offset': [0, 0.8],
       },
       paint: {
-        'text-color': '#263238',
-        'text-halo-color': '#fff',
+        'text-color': this.mainColor,
+        'text-halo-color': this.secondaryColor,
         'text-halo-width': 1,
       },
     });
@@ -147,9 +153,9 @@ export default class RulerControl {
     markerNode.style.width = '12px';
     markerNode.style.height = '12px';
     markerNode.style.borderRadius = '50%';
-    markerNode.style.background = '#fff';
+    markerNode.style.background = this.secondaryColor;
     markerNode.style.boxSizing = 'border-box';
-    markerNode.style.border = '2px solid #263238';
+    markerNode.style.border = `2px solid ${this.mainColor}`;
     const marker = new mapboxgl.Marker({
       element: markerNode,
       draggable: true,

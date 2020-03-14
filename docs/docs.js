@@ -57,9 +57,6 @@ map.addControl(new InspectControl(), 'bottom-right');
 /* Around */
 const aroundControl = new AroundControl({ minZoom: 15, center: [30.5164, 50.4505] });
 map.addControl(aroundControl, 'bottom-right');
-setTimeout(() => {
-  aroundControl.fly(0.7);
-}, 4000);
 
 /* Compass */
 map.addControl(new CompassControl(), 'bottom-right');

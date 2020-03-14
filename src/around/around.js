@@ -12,6 +12,9 @@ export default class AroundControl {
     this.minZoom = options.minZoom;
     this.center = options.center;
     this.onClick = this.onClick.bind(this);
+    this.isActive = false;
+    this.beforeZoom = null;
+    this.beforeCenter = null;
   }
 
   insertControls() {
@@ -29,39 +32,45 @@ export default class AroundControl {
     this.map = map;
     this.insertControls();
     this.button.addEventListener('click', this.onClick);
-    this.map.on('pitchend', () => {
-      if (this.map.getPitch() > 30) {
-        this.container.classList.add('-active');
-      } else {
-        this.container.classList.remove('-active');
-      }
-    });
     return this.container;
   }
 
   onClick() {
+    this.isActive = !this.isActive;
     const duration = 600;
-    const on = {
-      bearing: -40,
-      pitch: 60,
-      center: this.center,
-      duration,
-    };
-    const off = { bearing: 0, pitch: 0, duration };
-
-    if (this.minZoom && this.minZoom > this.map.getZoom()) {
-      on.zoom = this.minZoom;
+    let options = { duration };
+    if (this.minZoom) {
+      options.zoom = this.minZoom;
     }
 
-    if (this.map.getPitch() > 30) {
-      this.map.easeTo(off);
+    if (this.isActive) {
+      this.beforeZoom = this.map.getZoom();
+      this.beforeCenter = this.map.getCenter();
+      this.container.classList.add('-active');
+      options = Object.assign(options, {
+        bearing: -40,
+        pitch: 60,
+        center: this.center,
+      });
     } else {
-      this.map.easeTo(on);
+      options = Object.assign(options, {
+        bearing: 0, pitch: 0,
+      });
+      options.zoom = this.beforeZoom;
+      options.center = this.beforeCenter;
+      this.beforeZoom = null;
+      this.beforeCenter = null;
+      this.container.classList.remove('-active');
     }
+
+    this.map.easeTo(options);
   }
 
   onRemove() {
     this.container.parentNode.removeChild(this.container);
     this.map = undefined;
+    this.isActive = false;
+    this.beforeZoom = null;
+    this.beforeCenter = null;
   }
 }

@@ -25,13 +25,13 @@
     "postcss-import": "^12.0.1",
     "postcss-nested": "^4.2.1",
     "rollup": "^2.10.4",
-    "rollup-plugin-svg-import": "^1.5.0"
+    "rollup-plugin-svg-import": "^1.5.1"
   },
   "dependencies": {
     "@turf/distance": "6.0.1"
   },
   "peerDependencies": {
-    "mapbox-gl": "^1.0.0 <2.0.0"
+    "mapbox-gl": ">=1.0.0 <2.0.0"
   },
   "homepage": "https://bravecow.github.io/mapbox-gl-controls/",
   "repository": "bravecow/mapbox-gl-controls",

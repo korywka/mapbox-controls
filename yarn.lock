@@ -4596,10 +4596,10 @@ rimraf@2.6.3:
   dependencies:
     glob "^7.1.3"
 
-rollup-plugin-svg-import@^1.5.0:
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/rollup-plugin-svg-import/-/rollup-plugin-svg-import-1.5.0.tgz#6ba0d08ced73568f1058487627b0f0773663690e"
-  integrity sha512-lwujg/Y4OdnU2GO58auDtt3FZx93LzkyyGHBqhCEeT7u/HMyRgbCzr87giDc7YLZN9i214MB4oFwvu3F6Ey+rQ==
+rollup-plugin-svg-import@^1.5.1:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/rollup-plugin-svg-import/-/rollup-plugin-svg-import-1.5.1.tgz#8476635f408f568de1ebb2ee3077fd600b1bbebb"
+  integrity sha512-8Oex1WmSU5EV/n09SZq269pUDPs+YsF6nmJ7XnjgcT9psFpBi+e9Q+DSPxtVzN3HdCD9rSihZ/Ksw8UkkQqtFg==
   dependencies:
     "@rollup/pluginutils" "^3.0.10"
 

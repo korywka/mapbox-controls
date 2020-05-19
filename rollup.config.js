@@ -1,6 +1,6 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
-import babel from 'rollup-plugin-babel';
+import babel from '@rollup/plugin-babel';
 import svg from 'rollup-plugin-svg-import';
 
 const plugins = [
@@ -8,6 +8,7 @@ const plugins = [
   resolve(),
   babel({
     exclude: 'node_modules/**',
+    babelHelpers: 'bundled',
   }),
 ];
 
@@ -66,14 +67,6 @@ export default [
     input: 'src/tooltip/tooltip.js',
     output: {
       file: 'lib/tooltip.js',
-      format: 'esm',
-    },
-    plugins,
-  },
-  {
-    input: 'src/around/around.js',
-    output: {
-      file: 'lib/around.js',
       format: 'esm',
     },
     plugins,

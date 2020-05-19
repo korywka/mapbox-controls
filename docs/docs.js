@@ -6,7 +6,6 @@ import ZoomControl from '../lib/zoom';
 import LanguageControl from '../lib/language';
 import InspectControl from '../lib/inspect';
 import TooltipControl from '../lib/tooltip';
-import AroundControl from '../lib/around';
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiYnJhdmVjb3ciLCJhIjoiY2o1ODEwdWljMThwbTJ5bGk0a294ZmVybiJ9.kErON3w2kwEVxU5aNa-EqQ';
 
@@ -53,10 +52,6 @@ map.addControl(new RulerControl(), 'bottom-right');
 
 /* Inspect */
 map.addControl(new InspectControl(), 'bottom-right');
-
-/* Around */
-const aroundControl = new AroundControl({ minZoom: 15, center: [30.5164, 50.4505] });
-map.addControl(aroundControl, 'bottom-right');
 
 /* Compass */
 map.addControl(new CompassControl(), 'bottom-right');

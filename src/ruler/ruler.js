@@ -187,7 +187,7 @@ export default class RulerControl {
     const { coordinates, units, labelFormat } = this;
     let sum = 0;
     return coordinates.map((coordinate, index) => {
-      if (index === 0) return 0;
+      if (index === 0) return labelFormat(0);
       sum += distance(coordinates[index - 1], coordinates[index], { units });
       return labelFormat(sum);
     });

@@ -1405,6 +1405,8 @@
 	    this.labels = [];
 	    this.units = options.units || 'kilometers';
 	    this.font = options.font || ['Roboto Medium'];
+	    this.fontSize = options.fontSize || 12;
+	    this.fontHalo = options.fontHalo || 1;
 	    this.labelFormat = options.labelFormat || defaultLabelFormat;
 	    this.mainColor = options.mainColor || MAIN_COLOR;
 	    this.secondaryColor = options.secondaryColor || HALO_COLOR;
@@ -1452,13 +1454,13 @@
 	          'text-field': '{text}',
 	          'text-font': this.font,
 	          'text-anchor': 'top',
-	          'text-size': 12,
+	          'text-size': this.fontSize,
 	          'text-offset': [0, 0.8]
 	        },
 	        paint: {
 	          'text-color': this.mainColor,
 	          'text-halo-color': this.secondaryColor,
-	          'text-halo-width': 1
+	          'text-halo-width': this.fontHalo
 	        }
 	      });
 	    }
@@ -1535,7 +1537,7 @@
 	          labelFormat = this.labelFormat;
 	      var sum = 0;
 	      return coordinates.map(function (coordinate, index) {
-	        if (index === 0) return 0;
+	        if (index === 0) return labelFormat(0);
 	        sum += distance(coordinates[index - 1], coordinates[index], {
 	          units: units
 	        });

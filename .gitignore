@@ -10,3 +10,6 @@ yarn-error.log*
 
 # osx
 .DS_Store
+
+# build
+lib/

@@ -150,6 +150,8 @@ Fires map `ruler.on` and `ruler.off`events at the beginning and at the end of me
     -   `options.font` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)** Array of fonts. (optional, default `['Roboto Medium']`)
     -   `options.mainColor` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Color of ruler lines. (optional, default `'#263238'`)
     -   `options.secondaryColor` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Color of halo and inner marker background. (optional, default `'#fff'`)
+    -   `options.fontSize` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Label font size (optional, default `'12'`)
+    -   `options.fontHalo` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Label font halo (optional, default `'1'`)
 
 #### StylesControl
 

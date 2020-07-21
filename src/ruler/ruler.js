@@ -52,6 +52,8 @@ function defaultLabelFormat(number) {
  * @param {Array} [options.font=['Roboto Medium']] - Array of fonts.
  * @param {String} [options.mainColor='#263238'] - Color of ruler lines.
  * @param {String} [options.secondaryColor='#fff'] - Color of halo and inner marker background.
+ * @param {String} [options.fontSize='12'] - Label font size
+ * @param {String} [options.fontHalo='1'] - Label font halo
  */
 
 export default class RulerControl {

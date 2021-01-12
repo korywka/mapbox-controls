@@ -7,7 +7,20 @@ import LanguageControl from '../lib/language';
 import InspectControl from '../lib/inspect';
 import TooltipControl from '../lib/tooltip';
 
-mapboxgl.accessToken = 'pk.eyJ1IjoiYnJhdmVjb3ciLCJhIjoiY2o1ODEwdWljMThwbTJ5bGk0a294ZmVybiJ9.kErON3w2kwEVxU5aNa-EqQ';
+// if ('serviceWorker' in navigator) {
+//   navigator.serviceWorker.register('./sw.js', {
+//     scope: '/',
+//     origins: ['*'],
+//   })
+//     .then(function (registration) {
+//       console.log('Registration successful, scope is:', registration.scope);
+//     })
+//     .catch(function (error) {
+//       console.log('Service worker registration failed, error:', error);
+//     });
+// }
+
+mapboxgl.accessToken = 'pk.eyJ1Ijoia29yeXdrYSIsImEiOiJja2p1ajdlOWozMnF2MzBtajRvOTVzZDRpIn0.nnlX7TDuZ3zuGkZGr_oA3A';
 
 const languages = document.getElementById('languages');
 const map = new mapboxgl.Map({

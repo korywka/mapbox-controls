@@ -1,5 +1,5 @@
 {
-  "extends": "airbnb-base",
+  "extends": "eslint-config-xxx",
   "env": {
     "browser": true
   },
@@ -10,12 +10,6 @@
         "functions": false,
         "classes": true,
         "variables": true
-      }
-    ],
-    "import/no-extraneous-dependencies": [
-      "error",
-      {
-        "devDependencies": true
       }
     ]
   }

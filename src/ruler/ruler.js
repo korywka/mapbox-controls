@@ -142,7 +142,7 @@ export default class RulerControl {
     this.map.removeLayer(LAYER_SYMBOL);
     this.map.removeSource(SOURCE_LINE);
     this.map.removeSource(SOURCE_SYMBOL);
-    this.markers.forEach((m) => m.remove());
+    this.markers.forEach(m => m.remove());
     this.map.off('click', this.mapClickListener);
     this.map.off('style.load', this.styleLoadListener);
     this.map.fire('ruler.off');

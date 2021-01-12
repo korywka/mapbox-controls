@@ -53,7 +53,7 @@ export default class StylesControl {
       [].forEach.call(this.container.querySelectorAll('button'), (div) => {
         div.classList.remove('-active');
       });
-      const styleNames = this.styles.map((style) => style.styleName);
+      const styleNames = this.styles.map(style => style.styleName);
       const currentStyleIndex = styleNames.indexOf(this.map.getStyle().name);
       if (currentStyleIndex !== -1) {
         const currentNode = this.nodes[currentStyleIndex];

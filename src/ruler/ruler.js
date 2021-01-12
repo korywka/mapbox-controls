@@ -52,6 +52,8 @@ function defaultLabelFormat(number) {
  * @param {Array} [options.font=['Roboto Medium']] - Array of fonts.
  * @param {String} [options.mainColor='#263238'] - Color of ruler lines.
  * @param {String} [options.secondaryColor='#fff'] - Color of halo and inner marker background.
+ * @param {String} [options.fontSize='12'] - Label font size
+ * @param {String} [options.fontHalo='1'] - Label font halo
  */
 
 export default class RulerControl {
@@ -62,6 +64,8 @@ export default class RulerControl {
     this.labels = [];
     this.units = options.units || 'kilometers';
     this.font = options.font || ['Roboto Medium'];
+    this.fontSize = options.fontSize || 12;
+    this.fontHalo = options.fontHalo || 1;
     this.labelFormat = options.labelFormat || defaultLabelFormat;
     this.mainColor = options.mainColor || MAIN_COLOR;
     this.secondaryColor = options.secondaryColor || HALO_COLOR;
@@ -109,13 +113,13 @@ export default class RulerControl {
         'text-field': '{text}',
         'text-font': this.font,
         'text-anchor': 'top',
-        'text-size': 12,
+        'text-size': this.fontSize,
         'text-offset': [0, 0.8],
       },
       paint: {
         'text-color': this.mainColor,
         'text-halo-color': this.secondaryColor,
-        'text-halo-width': 1,
+        'text-halo-width': this.fontHalo,
       },
     });
   }
@@ -185,7 +189,7 @@ export default class RulerControl {
     const { coordinates, units, labelFormat } = this;
     let sum = 0;
     return coordinates.map((coordinate, index) => {
-      if (index === 0) return 0;
+      if (index === 0) return labelFormat(0);
       sum += distance(coordinates[index - 1], coordinates[index], { units });
       return labelFormat(sum);
     });

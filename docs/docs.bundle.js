@@ -484,6 +484,13 @@
 	 * @param {Array} [options.font=['Roboto Medium']] - Array of fonts.
 	 * @param {String} [options.mainColor='#263238'] - Color of ruler lines.
 	 * @param {String} [options.secondaryColor='#fff'] - Color of halo and inner marker background.
+	 * @param {String} [options.fontSize='12'] - Label font size
+	 * @param {String} [options.fontHalo='1'] - Label font halo
+	 * @param {Array} [options.textVariableAnchor=['top']] - Array of anchor positions.
+	 * @param {Boolean} [options.textAllowOverlap=false] - Is allowed to overlap labels
+	 * @param {String} [options.markerNodeWidth='12px'] - Width of the marker
+	 * @param {String} [options.markerNodeHeight='12px'] - Height of the marker
+	 * @param {String} [options.markerNodeBorderWidth='2px'] - Width of the marker's border
 	 */
 
 
@@ -499,6 +506,13 @@
 	    this.labels = [];
 	    this.units = options.units || 'kilometers';
 	    this.font = options.font || ['Roboto Medium'];
+	    this.fontSize = options.fontSize || 12;
+	    this.fontHalo = options.fontHalo || 1;
+	    this.textVariableAnchor = options.textVariableAnchor || ['top'];
+	    this.textAllowOverlap = options.textAllowOverlap || false;
+	    this.markerNodeWidth = options.markerNodeWidth || '12px';
+	    this.markerNodeHeight = options.markerNodeHeight || '12px';
+	    this.markerNodeBorderWidth = options.markerNodeBorderWidth || '2px';
 	    this.labelFormat = options.labelFormat || defaultLabelFormat;
 	    this.mainColor = options.mainColor || MAIN_COLOR;
 	    this.secondaryColor = options.secondaryColor || HALO_COLOR;
@@ -545,14 +559,15 @@
 	        layout: {
 	          'text-field': '{text}',
 	          'text-font': this.font,
-	          'text-anchor': 'top',
-	          'text-size': 12,
+	          'text-allow-overlap': this.textAllowOverlap,
+	          'text-variable-anchor': this.textVariableAnchor,
+	          'text-size': this.fontSize,
 	          'text-offset': [0, 0.8]
 	        },
 	        paint: {
 	          'text-color': this.mainColor,
 	          'text-halo-color': this.secondaryColor,
-	          'text-halo-width': 1
+	          'text-halo-width': this.fontHalo
 	        }
 	      });
 	    }
@@ -594,12 +609,12 @@
 	      var _this = this;
 
 	      var markerNode = document.createElement('div');
-	      markerNode.style.width = '12px';
-	      markerNode.style.height = '12px';
+	      markerNode.style.width = this.markerNodeWidth;
+	      markerNode.style.height = this.markerNodeHeight;
 	      markerNode.style.borderRadius = '50%';
 	      markerNode.style.background = this.secondaryColor;
 	      markerNode.style.boxSizing = 'border-box';
-	      markerNode.style.border = "2px solid ".concat(this.mainColor);
+	      markerNode.style.border = "".concat(this.markerNodeBorderWidth, " solid ").concat(this.mainColor);
 	      var marker = new mapboxGl.Marker({
 	        element: markerNode,
 	        draggable: true
@@ -629,7 +644,7 @@
 	          labelFormat = this.labelFormat;
 	      var sum = 0;
 	      return coordinates.map(function (coordinate, index) {
-	        if (index === 0) return 0;
+	        if (index === 0) return labelFormat(0);
 	        sum += distance(coordinates[index - 1], coordinates[index], {
 	          units: units
 	        });

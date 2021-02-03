@@ -1,14 +1,13 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
-import babel from '@rollup/plugin-babel';
+import buble from '@rollup/plugin-buble';
 import svg from 'rollup-plugin-svg-import';
 
 const plugins = [
   svg(),
   resolve(),
-  babel({
-    exclude: 'node_modules/**',
-    babelHelpers: 'bundled',
+  buble({
+    objectAssign: 'Object.assign',
   }),
 ];
 

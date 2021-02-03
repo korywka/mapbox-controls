@@ -1,6 +1,6 @@
 {
   "name": "mapbox-gl-controls",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "main": "./lib/index.js",
   "description": "Controls for mapbox-gl",
   "scripts": {
@@ -11,13 +11,11 @@
     "docs": "documentation readme src/** --section=API --markdown-toc=false"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.10",
-    "@babel/preset-env": "^7.12.11",
-    "@rollup/plugin-babel": "^5.2.2",
-    "@rollup/plugin-commonjs": "^17.0.0",
-    "@rollup/plugin-node-resolve": "^11.0.1",
-    "documentation": "^13.1.0",
-    "eslint": "^7.17.0",
+    "@rollup/plugin-buble": "^0.21.3",
+    "@rollup/plugin-commonjs": "^17.1.0",
+    "@rollup/plugin-node-resolve": "^11.1.1",
+    "documentation": "^13.1.1",
+    "eslint": "^7.19.0",
     "eslint-config-xxx": "^1.0.0",
     "eslint-plugin-import": "^2.22.1",
     "mapbox-gl": "^2.0.1",
@@ -25,11 +23,11 @@
     "postcss-cli": "^8.3.1",
     "postcss-import": "^14.0.0",
     "postcss-nested": "^5.0.3",
-    "rollup": "^2.36.1",
+    "rollup": "^2.38.4",
     "rollup-plugin-svg-import": "^1.5.1"
   },
   "dependencies": {
-    "@turf/distance": "6.2.0"
+    "@turf/distance": "6.3.0"
   },
   "peerDependencies": {
     "mapbox-gl": ">=1.0.0 <3.0.0"

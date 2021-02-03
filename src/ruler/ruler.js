@@ -43,22 +43,28 @@ function defaultLabelFormat(number) {
   return `${number.toFixed(2)} km`;
 }
 
+function safeDefault(value, defaultValue) {
+  if (typeof value === 'undefined') {
+    return defaultValue;
+  }
+  return value;
+}
+
 /**
  * Fires map `ruler.on` and `ruler.off`events at the beginning and at the end of measuring.
  * @param {Object} options
  * @param {String} [options.units='kilometers'] - Any units [@turf/distance](https://github.com/Turfjs/turf/tree/master/packages/turf-distance) supports
- * @param {Function} [options.labelFormat] - Accepts number and returns label.
+ * @param {Function} [options.labelFormat] - Accepts number and returns label
  * Can be used to convert value to any measuring units
- * @param {Array} [options.font=['Roboto Medium']] - Array of fonts.
- * @param {String} [options.mainColor='#263238'] - Color of ruler lines.
- * @param {String} [options.secondaryColor='#fff'] - Color of halo and inner marker background.
- * @param {String} [options.fontSize='12'] - Label font size
- * @param {String} [options.fontHalo='1'] - Label font halo
- * @param {Array} [options.textVariableAnchor=['top']] - Array of anchor positions.
+ * @param {Array} [options.font=['Roboto Medium']] - Array of fonts
+ * @param {String} [options.mainColor='#263238'] - Color of ruler lines
+ * @param {String} [options.secondaryColor='#fff'] - Color of halo and inner marker background
+ * @param {Number} [options.fontSize=12] - Label font size in `px`
+ * @param {Number} [options.fontHalo=1] - Label font halo
+ * @param {Array} [options.textVariableAnchor=['top']] - Array of anchor positions
  * @param {Boolean} [options.textAllowOverlap=false] - Is allowed to overlap labels
- * @param {String} [options.markerNodeWidth='12px'] - Width of the marker
- * @param {String} [options.markerNodeHeight='12px'] - Height of the marker
- * @param {String} [options.markerNodeBorderWidth='2px'] - Width of the marker's border
+ * @param {Number} [options.markerNodeSize=12] - Width and Height of the marker in `px`
+ * @param {Number} [options.markerNodeBorderWidth=2] - Width of the marker's border in `px`
  */
 
 export default class RulerControl {
@@ -69,13 +75,12 @@ export default class RulerControl {
     this.labels = [];
     this.units = options.units || 'kilometers';
     this.font = options.font || ['Roboto Medium'];
-    this.fontSize = options.fontSize || 12;
-    this.fontHalo = options.fontHalo || 1;
+    this.fontSize = safeDefault(options.fontSize, 12);
+    this.fontHalo = safeDefault(options.fontHalo, 1);
     this.textVariableAnchor = options.textVariableAnchor || ['top'];
     this.textAllowOverlap = options.textAllowOverlap || false;
-    this.markerNodeWidth = options.markerNodeWidth || '12px';
-    this.markerNodeHeight = options.markerNodeHeight || '12px';
-    this.markerNodeBorderWidth = options.markerNodeBorderWidth || '2px';
+    this.markerNodeSize = `${safeDefault(options.markerNodeSize, 12)}px`;
+    this.markerNodeBorderWidth = `${safeDefault(options.markerNodeBorderWidth, 2)}px`;
     this.labelFormat = options.labelFormat || defaultLabelFormat;
     this.mainColor = options.mainColor || MAIN_COLOR;
     this.secondaryColor = options.secondaryColor || HALO_COLOR;
@@ -165,8 +170,8 @@ export default class RulerControl {
 
   mapClickListener(event) {
     const markerNode = document.createElement('div');
-    markerNode.style.width = this.markerNodeWidth;
-    markerNode.style.height = this.markerNodeHeight;
+    markerNode.style.width = this.markerNodeSize;
+    markerNode.style.height = this.markerNodeSize;
     markerNode.style.borderRadius = '50%';
     markerNode.style.background = this.secondaryColor;
     markerNode.style.boxSizing = 'border-box';

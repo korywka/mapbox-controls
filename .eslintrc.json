@@ -1,5 +1,8 @@
 {
   "extends": "eslint-config-xxx",
+  "parserOptions": {
+    "ecmaVersion": 2020
+  },
   "env": {
     "browser": true
   },

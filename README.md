@@ -145,18 +145,17 @@ Fires map `ruler.on` and `ruler.off`events at the beginning and at the end of me
 
 -   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)**  (optional, default `{}`)
     -   `options.units` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Any units [@turf/distance](https://github.com/Turfjs/turf/tree/master/packages/turf-distance) supports (optional, default `'kilometers'`)
-    -   `options.labelFormat` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** Accepts number and returns label.
+    -   `options.labelFormat` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** Accepts number and returns label
         Can be used to convert value to any measuring units
-    -   `options.font` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)** Array of fonts. (optional, default `['Roboto Medium']`)
-    -   `options.mainColor` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Color of ruler lines. (optional, default `'#263238'`)
-    -   `options.secondaryColor` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Color of halo and inner marker background. (optional, default `'#fff'`)
-    -   `options.fontSize` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Label font size (optional, default `'12'`)
-    -   `options.fontHalo` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Label font halo (optional, default `'1'`)
-    -   `options.textVariableAnchor` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)** Array of anchor positions. (optional, default `['top']`)
+    -   `options.font` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)** Array of fonts (optional, default `['Roboto Medium']`)
+    -   `options.mainColor` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Color of ruler lines (optional, default `'#263238'`)
+    -   `options.secondaryColor` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Color of halo and inner marker background (optional, default `'#fff'`)
+    -   `options.fontSize` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Label font size in `px` (optional, default `12`)
+    -   `options.fontHalo` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Label font halo (optional, default `1`)
+    -   `options.textVariableAnchor` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)** Array of anchor positions (optional, default `['top']`)
     -   `options.textAllowOverlap` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Is allowed to overlap labels (optional, default `false`)
-    -   `options.markerNodeWidth` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Width of the marker (optional, default `'12px'`)
-    -   `options.markerNodeHeight` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Height of the marker (optional, default `'12px'`)
-    -   `options.markerNodeBorderWidth` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Width of the marker's border (optional, default `'2px'`)
+    -   `options.markerNodeSize` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Width and Height of the marker in `px` (optional, default `12`)
+    -   `options.markerNodeBorderWidth` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Width of the marker's border in `px` (optional, default `2`)
 
 #### StylesControl
 

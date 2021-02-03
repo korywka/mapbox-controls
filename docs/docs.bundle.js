@@ -51,37 +51,17 @@
 
 	});
 
-	function _classCallCheck(instance, Constructor) {
-	  if (!(instance instanceof Constructor)) {
-	    throw new TypeError("Cannot call a class as a function");
-	  }
-	}
+	var defaultStyles = [
+	  {
+	    label: 'Streets',
+	    styleName: 'Mapbox Streets',
+	    styleUrl: 'mapbox://styles/mapbox/streets-v11',
+	  }, {
+	    label: 'Satellite',
+	    styleName: 'Mapbox Satellite Streets',
+	    styleUrl: 'mapbox://sprites/mapbox/satellite-streets-v11',
+	  } ];
 
-	function _defineProperties(target, props) {
-	  for (var i = 0; i < props.length; i++) {
-	    var descriptor = props[i];
-	    descriptor.enumerable = descriptor.enumerable || false;
-	    descriptor.configurable = true;
-	    if ("value" in descriptor) descriptor.writable = true;
-	    Object.defineProperty(target, descriptor.key, descriptor);
-	  }
-	}
-
-	function _createClass(Constructor, protoProps, staticProps) {
-	  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-	  if (staticProps) _defineProperties(Constructor, staticProps);
-	  return Constructor;
-	}
-
-	var defaultStyles = [{
-	  label: 'Streets',
-	  styleName: 'Mapbox Streets',
-	  styleUrl: 'mapbox://styles/mapbox/streets-v11'
-	}, {
-	  label: 'Satellite',
-	  styleName: 'Mapbox Satellite Streets',
-	  styleUrl: 'mapbox://sprites/mapbox/satellite-streets-v11'
-	}];
 	/**
 	 * Adds style switcher similar to Google Maps.
 	 * @param {Object} options
@@ -92,100 +72,58 @@
 	 * @param {Function} [options.onChange] - Triggered on style change. Accepts `style` object
 	 */
 
-	var StylesControl = /*#__PURE__*/function () {
-	  function StylesControl() {
-	    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+	var StylesControl = function StylesControl(options) {
+	  if ( options === void 0 ) options = {};
 
-	    _classCallCheck(this, StylesControl);
+	  this.styles = options.styles || defaultStyles;
+	  this.onChange = options.onChange;
+	};
 
-	    this.styles = options.styles || defaultStyles;
-	    this.onChange = options.onChange;
-	  }
+	StylesControl.prototype.insertControls = function insertControls () {
+	    var this$1 = this;
 
-	  _createClass(StylesControl, [{
-	    key: "insertControls",
-	    value: function insertControls() {
-	      var _this = this;
+	  this.container = document.createElement('div');
+	  this.container.classList.add('mapboxgl-ctrl');
+	  this.container.classList.add('mapboxgl-ctrl-group');
+	  this.container.classList.add('mapboxgl-ctrl-styles');
+	  this.nodes = [];
+	  this.styles.forEach(function (style) {
+	    var node = document.createElement('button');
+	    node.setAttribute('type', 'button');
+	    node.textContent = style.label;
+	    node.addEventListener('click', function () {
+	      if (node.classList.contains('-active')) { return; }
+	      this$1.map.setStyle(style.styleUrl);
+	      if (this$1.onChange) { this$1.onChange(style); }
+	    });
+	    this$1.nodes.push(node);
+	    this$1.container.appendChild(node);
+	  });
+	};
 
-	      this.container = document.createElement('div');
-	      this.container.classList.add('mapboxgl-ctrl');
-	      this.container.classList.add('mapboxgl-ctrl-group');
-	      this.container.classList.add('mapboxgl-ctrl-styles');
-	      this.nodes = [];
-	      this.styles.forEach(function (style) {
-	        var node = document.createElement('button');
-	        node.setAttribute('type', 'button');
-	        node.textContent = style.label;
-	        node.addEventListener('click', function () {
-	          if (node.classList.contains('-active')) return;
+	StylesControl.prototype.onAdd = function onAdd (map) {
+	    var this$1 = this;
 
-	          _this.map.setStyle(style.styleUrl);
-
-	          if (_this.onChange) _this.onChange(style);
-	        });
-
-	        _this.nodes.push(node);
-
-	        _this.container.appendChild(node);
-	      });
+	  this.map = map;
+	  this.insertControls();
+	  this.map.on('styledata', function () {
+	    [].forEach.call(this$1.container.querySelectorAll('button'), function (div) {
+	      div.classList.remove('-active');
+	    });
+	    var styleNames = this$1.styles.map(function (style) { return style.styleName; });
+	    var currentStyleIndex = styleNames.indexOf(this$1.map.getStyle().name);
+	    if (currentStyleIndex !== -1) {
+	      var currentNode = this$1.nodes[currentStyleIndex];
+	      currentNode.classList.add('-active');
 	    }
-	  }, {
-	    key: "onAdd",
-	    value: function onAdd(map) {
-	      var _this2 = this;
+	  });
+	  return this.container;
+	};
 
-	      this.map = map;
-	      this.insertControls();
-	      this.map.on('styledata', function () {
-	        [].forEach.call(_this2.container.querySelectorAll('button'), function (div) {
-	          div.classList.remove('-active');
-	        });
-
-	        var styleNames = _this2.styles.map(function (style) {
-	          return style.styleName;
-	        });
-
-	        var currentStyleIndex = styleNames.indexOf(_this2.map.getStyle().name);
-
-	        if (currentStyleIndex !== -1) {
-	          var currentNode = _this2.nodes[currentStyleIndex];
-	          currentNode.classList.add('-active');
-	        }
-	      });
-	      return this.container;
-	    }
-	  }, {
-	    key: "onRemove",
-	    value: function onRemove() {
-	      this.container.parentNode.removeChild(this.container);
-	      this.map = undefined;
-	    }
-	  }]);
-
-	  return StylesControl;
-	}();
-
-	function _classCallCheck$1(instance, Constructor) {
-	  if (!(instance instanceof Constructor)) {
-	    throw new TypeError("Cannot call a class as a function");
-	  }
-	}
-
-	function _defineProperties$1(target, props) {
-	  for (var i = 0; i < props.length; i++) {
-	    var descriptor = props[i];
-	    descriptor.enumerable = descriptor.enumerable || false;
-	    descriptor.configurable = true;
-	    if ("value" in descriptor) descriptor.writable = true;
-	    Object.defineProperty(target, descriptor.key, descriptor);
-	  }
-	}
-
-	function _createClass$1(Constructor, protoProps, staticProps) {
-	  if (protoProps) _defineProperties$1(Constructor.prototype, protoProps);
-	  if (staticProps) _defineProperties$1(Constructor, staticProps);
-	  return Constructor;
-	}
+	StylesControl.prototype.onRemove = function onRemove () {
+	  this.container.parentNode.removeChild(this.container);
+	  this.map = undefined;
+	};
 
 	function iconPointer() {
 	  return (new DOMParser().parseFromString("<svg viewBox=\"0 0 24 24\" width=\"22\" height=\"22\" xmlns=\"http://www.w3.org/2000/svg\">\n    <g fill=\"none\" fill-rule=\"evenodd\">\n        <path d=\"M0 0h24v24H0z\"/>\n        <path fill=\"#f44336\" d=\"M12 3l4 8H8z\"/>\n        <path fill=\"#9E9E9E\" d=\"M12 21l-4-8h8z\"/>\n    </g>\n</svg>", 'image/svg+xml')).firstChild;
@@ -197,76 +135,57 @@
 	 * @param {Boolean} [options.instant=true] - Show compass if bearing is 0
 	 */
 
-	var CompassControl = /*#__PURE__*/function () {
-	  function CompassControl() {
-	    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+	var CompassControl = function CompassControl(options) {
+	  if ( options === void 0 ) options = {};
 
-	    _classCallCheck$1(this, CompassControl);
+	  this.instant = typeof options.instant === 'boolean' ? options.instant : true;
+	  this.onRotate = this.onRotate.bind(this);
+	};
 
-	    this.instant = typeof options.instant === 'boolean' ? options.instant : true;
-	    this.onRotate = this.onRotate.bind(this);
+	CompassControl.prototype.insertControls = function insertControls () {
+	  this.container = document.createElement('div');
+	  this.button = document.createElement('button');
+	  this.button.setAttribute('type', 'button');
+	  this.container.classList.add('mapboxgl-ctrl');
+	  this.container.classList.add('mapboxgl-ctrl-group');
+	  this.container.classList.add('mapboxgl-ctrl-compass');
+	  this.pointer = iconPointer();
+	  if (this.instant) {
+	    this.container.classList.add('-active');
 	  }
+	  this.container.appendChild(this.button);
+	  this.button.appendChild(this.pointer);
+	};
 
-	  _createClass$1(CompassControl, [{
-	    key: "insertControls",
-	    value: function insertControls() {
-	      this.container = document.createElement('div');
-	      this.button = document.createElement('button');
-	      this.button.setAttribute('type', 'button');
-	      this.container.classList.add('mapboxgl-ctrl');
-	      this.container.classList.add('mapboxgl-ctrl-group');
-	      this.container.classList.add('mapboxgl-ctrl-compass');
-	      this.pointer = iconPointer();
+	CompassControl.prototype.onAdd = function onAdd (map) {
+	    var this$1 = this;
 
-	      if (this.instant) {
-	        this.container.classList.add('-active');
-	      }
+	  this.map = map;
+	  this.insertControls();
+	  this.button.addEventListener('click', function () {
+	    this$1.map.easeTo({ bearing: 0, pitch: 0 });
+	  });
+	  this.map.on('rotate', this.onRotate);
+	  this.onRotate();
+	  return this.container;
+	};
 
-	      this.container.appendChild(this.button);
-	      this.button.appendChild(this.pointer);
+	CompassControl.prototype.onRemove = function onRemove () {
+	  this.container.parentNode.removeChild(this.container);
+	  this.map = undefined;
+	};
+
+	CompassControl.prototype.onRotate = function onRotate () {
+	  var angle = this.map.getBearing() * (-1);
+	  if (!this.instant) {
+	    if (angle === 0) {
+	      this.container.classList.remove('-active');
+	    } else {
+	      this.container.classList.add('-active');
 	    }
-	  }, {
-	    key: "onAdd",
-	    value: function onAdd(map) {
-	      var _this = this;
-
-	      this.map = map;
-	      this.insertControls();
-	      this.button.addEventListener('click', function () {
-	        _this.map.easeTo({
-	          bearing: 0,
-	          pitch: 0
-	        });
-	      });
-	      this.map.on('rotate', this.onRotate);
-	      this.onRotate();
-	      return this.container;
-	    }
-	  }, {
-	    key: "onRemove",
-	    value: function onRemove() {
-	      this.container.parentNode.removeChild(this.container);
-	      this.map = undefined;
-	    }
-	  }, {
-	    key: "onRotate",
-	    value: function onRotate() {
-	      var angle = this.map.getBearing() * -1;
-
-	      if (!this.instant) {
-	        if (angle === 0) {
-	          this.container.classList.remove('-active');
-	        } else {
-	          this.container.classList.add('-active');
-	        }
-	      }
-
-	      this.pointer.style.transform = "rotate(".concat(angle, "deg)");
-	    }
-	  }]);
-
-	  return CompassControl;
-	}();
+	  }
+	  this.pointer.style.transform = "rotate(" + angle + "deg)";
+	};
 
 	/**
 	 * @module helpers
@@ -403,28 +322,6 @@
 	    return radiansToLength(2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)), options.units);
 	}
 
-	function _classCallCheck$2(instance, Constructor) {
-	  if (!(instance instanceof Constructor)) {
-	    throw new TypeError("Cannot call a class as a function");
-	  }
-	}
-
-	function _defineProperties$2(target, props) {
-	  for (var i = 0; i < props.length; i++) {
-	    var descriptor = props[i];
-	    descriptor.enumerable = descriptor.enumerable || false;
-	    descriptor.configurable = true;
-	    if ("value" in descriptor) descriptor.writable = true;
-	    Object.defineProperty(target, descriptor.key, descriptor);
-	  }
-	}
-
-	function _createClass$2(Constructor, protoProps, staticProps) {
-	  if (protoProps) _defineProperties$2(Constructor.prototype, protoProps);
-	  if (staticProps) _defineProperties$2(Constructor, staticProps);
-	  return Constructor;
-	}
-
 	function iconRuler() {
 	  return (new DOMParser().parseFromString("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"22\" height=\"12\" viewBox=\"0 0 22 12\" fill=\"#505050\">\n    <path fill-rule=\"evenodd\" fill=\"none\" d=\"M-1-6h24v24H-1z\"/>\n    <path d=\"M20 0H2C.9 0 0 .9 0 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V2c0-1.1-.9-2-2-2zm0 10H2V2h2v4h2V2h2v4h2V2h2v4h2V2h2v4h2V2h2v8z\"/>\n</svg>", 'image/svg+xml')).firstChild;
 	}
@@ -436,279 +333,246 @@
 	var MAIN_COLOR = '#263238';
 	var HALO_COLOR = '#fff';
 
-	function geoLineString() {
-	  var coordinates = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+	function geoLineString(coordinates) {
+	  if ( coordinates === void 0 ) coordinates = [];
+
 	  return {
 	    type: 'Feature',
 	    properties: {},
 	    geometry: {
 	      type: 'LineString',
-	      coordinates: coordinates
-	    }
+	      coordinates: coordinates,
+	    },
 	  };
 	}
 
-	function geoPoint() {
-	  var coordinates = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-	  var labels = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+	function geoPoint(coordinates, labels) {
+	  if ( coordinates === void 0 ) coordinates = [];
+	  if ( labels === void 0 ) labels = [];
+
 	  return {
 	    type: 'FeatureCollection',
-	    features: coordinates.map(function (c, i) {
-	      return {
-	        type: 'Feature',
-	        properties: {
-	          text: labels[i]
-	        },
-	        geometry: {
-	          type: 'Point',
-	          coordinates: c
-	        }
-	      };
-	    })
+	    features: coordinates.map(function (c, i) { return ({
+	      type: 'Feature',
+	      properties: {
+	        text: labels[i],
+	      },
+	      geometry: {
+	        type: 'Point',
+	        coordinates: c,
+	      },
+	    }); }),
 	  };
 	}
 
 	function defaultLabelFormat(number) {
 	  if (number < 1) {
-	    return "".concat((number * 1000).toFixed(), " m");
+	    return (((number * 1000).toFixed()) + " m");
 	  }
-
-	  return "".concat(number.toFixed(2), " km");
+	  return ((number.toFixed(2)) + " km");
 	}
+
+	function safeDefault(value, defaultValue) {
+	  if (typeof value === 'undefined') {
+	    return defaultValue;
+	  }
+	  return value;
+	}
+
 	/**
 	 * Fires map `ruler.on` and `ruler.off`events at the beginning and at the end of measuring.
 	 * @param {Object} options
 	 * @param {String} [options.units='kilometers'] - Any units [@turf/distance](https://github.com/Turfjs/turf/tree/master/packages/turf-distance) supports
-	 * @param {Function} [options.labelFormat] - Accepts number and returns label.
+	 * @param {Function} [options.labelFormat] - Accepts number and returns label
 	 * Can be used to convert value to any measuring units
-	 * @param {Array} [options.font=['Roboto Medium']] - Array of fonts.
-	 * @param {String} [options.mainColor='#263238'] - Color of ruler lines.
-	 * @param {String} [options.secondaryColor='#fff'] - Color of halo and inner marker background.
-	 * @param {String} [options.fontSize='12'] - Label font size
-	 * @param {String} [options.fontHalo='1'] - Label font halo
-	 * @param {Array} [options.textVariableAnchor=['top']] - Array of anchor positions.
+	 * @param {Array} [options.font=['Roboto Medium']] - Array of fonts
+	 * @param {String} [options.mainColor='#263238'] - Color of ruler lines
+	 * @param {String} [options.secondaryColor='#fff'] - Color of halo and inner marker background
+	 * @param {Number} [options.fontSize=12] - Label font size in `px`
+	 * @param {Number} [options.fontHalo=1] - Label font halo
+	 * @param {Array} [options.textVariableAnchor=['top']] - Array of anchor positions
 	 * @param {Boolean} [options.textAllowOverlap=false] - Is allowed to overlap labels
-	 * @param {String} [options.markerNodeWidth='12px'] - Width of the marker
-	 * @param {String} [options.markerNodeHeight='12px'] - Height of the marker
-	 * @param {String} [options.markerNodeBorderWidth='2px'] - Width of the marker's border
+	 * @param {Number} [options.markerNodeSize=12] - Width and Height of the marker in `px`
+	 * @param {Number} [options.markerNodeBorderWidth=2] - Width of the marker's border in `px`
 	 */
 
+	var RulerControl = function RulerControl(options) {
+	  if ( options === void 0 ) options = {};
 
-	var RulerControl = /*#__PURE__*/function () {
-	  function RulerControl() {
-	    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+	  this.isMeasuring = false;
+	  this.markers = [];
+	  this.coordinates = [];
+	  this.labels = [];
+	  this.units = options.units || 'kilometers';
+	  this.font = options.font || ['Roboto Medium'];
+	  this.fontSize = safeDefault(options.fontSize, 12);
+	  this.fontHalo = safeDefault(options.fontHalo, 1);
+	  this.textVariableAnchor = options.textVariableAnchor || ['top'];
+	  this.textAllowOverlap = options.textAllowOverlap || false;
+	  this.markerNodeSize = (safeDefault(options.markerNodeSize, 12)) + "px";
+	  this.markerNodeBorderWidth = (safeDefault(options.markerNodeBorderWidth, 2)) + "px";
+	  this.labelFormat = options.labelFormat || defaultLabelFormat;
+	  this.mainColor = options.mainColor || MAIN_COLOR;
+	  this.secondaryColor = options.secondaryColor || HALO_COLOR;
+	  this.mapClickListener = this.mapClickListener.bind(this);
+	  this.styleLoadListener = this.styleLoadListener.bind(this);
+	};
 
-	    _classCallCheck$2(this, RulerControl);
+	RulerControl.prototype.insertControls = function insertControls () {
+	  this.container = document.createElement('div');
+	  this.container.classList.add('mapboxgl-ctrl');
+	  this.container.classList.add('mapboxgl-ctrl-group');
+	  this.container.classList.add('mapboxgl-ctrl-ruler');
+	  this.button = document.createElement('button');
+	  this.button.setAttribute('type', 'button');
+	  this.button.appendChild(iconRuler());
+	  this.container.appendChild(this.button);
+	};
 
-	    this.isMeasuring = false;
-	    this.markers = [];
-	    this.coordinates = [];
-	    this.labels = [];
-	    this.units = options.units || 'kilometers';
-	    this.font = options.font || ['Roboto Medium'];
-	    this.fontSize = options.fontSize || 12;
-	    this.fontHalo = options.fontHalo || 1;
-	    this.textVariableAnchor = options.textVariableAnchor || ['top'];
-	    this.textAllowOverlap = options.textAllowOverlap || false;
-	    this.markerNodeWidth = options.markerNodeWidth || '12px';
-	    this.markerNodeHeight = options.markerNodeHeight || '12px';
-	    this.markerNodeBorderWidth = options.markerNodeBorderWidth || '2px';
-	    this.labelFormat = options.labelFormat || defaultLabelFormat;
-	    this.mainColor = options.mainColor || MAIN_COLOR;
-	    this.secondaryColor = options.secondaryColor || HALO_COLOR;
-	    this.mapClickListener = this.mapClickListener.bind(this);
-	    this.styleLoadListener = this.styleLoadListener.bind(this);
+	RulerControl.prototype.draw = function draw () {
+	  this.map.addSource(SOURCE_LINE, {
+	    type: 'geojson',
+	    data: geoLineString(this.coordinates),
+	  });
+
+	  this.map.addSource(SOURCE_SYMBOL, {
+	    type: 'geojson',
+	    data: geoPoint(this.coordinates, this.labels),
+	  });
+
+	  this.map.addLayer({
+	    id: LAYER_LINE,
+	    type: 'line',
+	    source: SOURCE_LINE,
+	    paint: {
+	      'line-color': this.mainColor,
+	      'line-width': 2,
+	    },
+	  });
+
+	  this.map.addLayer({
+	    id: LAYER_SYMBOL,
+	    type: 'symbol',
+	    source: SOURCE_SYMBOL,
+	    layout: {
+	      'text-field': '{text}',
+	      'text-font': this.font,
+	      'text-allow-overlap': this.textAllowOverlap,
+	      'text-variable-anchor': this.textVariableAnchor,
+	      'text-size': this.fontSize,
+	      'text-offset': [0, 0.8],
+	    },
+	    paint: {
+	      'text-color': this.mainColor,
+	      'text-halo-color': this.secondaryColor,
+	      'text-halo-width': this.fontHalo,
+	    },
+	  });
+	};
+
+	RulerControl.prototype.measuringOn = function measuringOn () {
+	  this.isMeasuring = true;
+	  this.markers = [];
+	  this.coordinates = [];
+	  this.labels = [];
+	  this.map.getCanvas().style.cursor = 'crosshair';
+	  this.button.classList.add('-active');
+	  this.draw();
+	  this.map.on('click', this.mapClickListener);
+	  this.map.on('style.load', this.styleLoadListener);
+	  this.map.fire('ruler.on');
+	};
+
+	RulerControl.prototype.measuringOff = function measuringOff () {
+	  this.isMeasuring = false;
+	  this.map.getCanvas().style.cursor = '';
+	  this.button.classList.remove('-active');
+	  // remove layers, sources and event listeners
+	  this.map.removeLayer(LAYER_LINE);
+	  this.map.removeLayer(LAYER_SYMBOL);
+	  this.map.removeSource(SOURCE_LINE);
+	  this.map.removeSource(SOURCE_SYMBOL);
+	  this.markers.forEach(function (m) { return m.remove(); });
+	  this.map.off('click', this.mapClickListener);
+	  this.map.off('style.load', this.styleLoadListener);
+	  this.map.fire('ruler.off');
+	};
+
+	RulerControl.prototype.mapClickListener = function mapClickListener (event) {
+	    var this$1 = this;
+
+	  var markerNode = document.createElement('div');
+	  markerNode.style.width = this.markerNodeSize;
+	  markerNode.style.height = this.markerNodeSize;
+	  markerNode.style.borderRadius = '50%';
+	  markerNode.style.background = this.secondaryColor;
+	  markerNode.style.boxSizing = 'border-box';
+	  markerNode.style.border = (this.markerNodeBorderWidth) + " solid " + (this.mainColor);
+	  var marker = new mapboxGl.Marker({
+	    element: markerNode,
+	    draggable: true,
+	  })
+	    .setLngLat(event.lngLat)
+	    .addTo(this.map);
+	  this.coordinates.push([event.lngLat.lng, event.lngLat.lat]);
+	  this.labels = this.coordinatesToLabels();
+	  this.map.getSource(SOURCE_LINE)
+	    .setData(geoLineString(this.coordinates));
+	  this.map.getSource(SOURCE_SYMBOL)
+	    .setData(geoPoint(this.coordinates, this.labels));
+	  this.markers.push(marker);
+	  marker.on('drag', function () {
+	    var index = this$1.markers.indexOf(marker);
+	    var lngLat = marker.getLngLat();
+	    this$1.coordinates[index] = [lngLat.lng, lngLat.lat];
+	    this$1.labels = this$1.coordinatesToLabels();
+	    this$1.map.getSource(SOURCE_LINE)
+	      .setData(geoLineString(this$1.coordinates));
+	    this$1.map.getSource(SOURCE_SYMBOL)
+	      .setData(geoPoint(this$1.coordinates, this$1.labels));
+	  });
+	};
+
+	RulerControl.prototype.coordinatesToLabels = function coordinatesToLabels () {
+	  var ref = this;
+	    var coordinates = ref.coordinates;
+	    var units = ref.units;
+	    var labelFormat = ref.labelFormat;
+	  var sum = 0;
+	  return coordinates.map(function (coordinate, index) {
+	    if (index === 0) { return labelFormat(0); }
+	    sum += distance(coordinates[index - 1], coordinates[index], { units: units });
+	    return labelFormat(sum);
+	  });
+	};
+
+	RulerControl.prototype.styleLoadListener = function styleLoadListener () {
+	  this.draw();
+	};
+
+	RulerControl.prototype.onAdd = function onAdd (map) {
+	    var this$1 = this;
+
+	  this.map = map;
+	  this.insertControls();
+	  this.button.addEventListener('click', function () {
+	    if (this$1.isMeasuring) {
+	      this$1.measuringOff();
+	    } else {
+	      this$1.measuringOn();
+	    }
+	  });
+	  return this.container;
+	};
+
+	RulerControl.prototype.onRemove = function onRemove () {
+	  if (this.isMeasuring) {
+	    this.measuringOff();
 	  }
-
-	  _createClass$2(RulerControl, [{
-	    key: "insertControls",
-	    value: function insertControls() {
-	      this.container = document.createElement('div');
-	      this.container.classList.add('mapboxgl-ctrl');
-	      this.container.classList.add('mapboxgl-ctrl-group');
-	      this.container.classList.add('mapboxgl-ctrl-ruler');
-	      this.button = document.createElement('button');
-	      this.button.setAttribute('type', 'button');
-	      this.button.appendChild(iconRuler());
-	      this.container.appendChild(this.button);
-	    }
-	  }, {
-	    key: "draw",
-	    value: function draw() {
-	      this.map.addSource(SOURCE_LINE, {
-	        type: 'geojson',
-	        data: geoLineString(this.coordinates)
-	      });
-	      this.map.addSource(SOURCE_SYMBOL, {
-	        type: 'geojson',
-	        data: geoPoint(this.coordinates, this.labels)
-	      });
-	      this.map.addLayer({
-	        id: LAYER_LINE,
-	        type: 'line',
-	        source: SOURCE_LINE,
-	        paint: {
-	          'line-color': this.mainColor,
-	          'line-width': 2
-	        }
-	      });
-	      this.map.addLayer({
-	        id: LAYER_SYMBOL,
-	        type: 'symbol',
-	        source: SOURCE_SYMBOL,
-	        layout: {
-	          'text-field': '{text}',
-	          'text-font': this.font,
-	          'text-allow-overlap': this.textAllowOverlap,
-	          'text-variable-anchor': this.textVariableAnchor,
-	          'text-size': this.fontSize,
-	          'text-offset': [0, 0.8]
-	        },
-	        paint: {
-	          'text-color': this.mainColor,
-	          'text-halo-color': this.secondaryColor,
-	          'text-halo-width': this.fontHalo
-	        }
-	      });
-	    }
-	  }, {
-	    key: "measuringOn",
-	    value: function measuringOn() {
-	      this.isMeasuring = true;
-	      this.markers = [];
-	      this.coordinates = [];
-	      this.labels = [];
-	      this.map.getCanvas().style.cursor = 'crosshair';
-	      this.button.classList.add('-active');
-	      this.draw();
-	      this.map.on('click', this.mapClickListener);
-	      this.map.on('style.load', this.styleLoadListener);
-	      this.map.fire('ruler.on');
-	    }
-	  }, {
-	    key: "measuringOff",
-	    value: function measuringOff() {
-	      this.isMeasuring = false;
-	      this.map.getCanvas().style.cursor = '';
-	      this.button.classList.remove('-active'); // remove layers, sources and event listeners
-
-	      this.map.removeLayer(LAYER_LINE);
-	      this.map.removeLayer(LAYER_SYMBOL);
-	      this.map.removeSource(SOURCE_LINE);
-	      this.map.removeSource(SOURCE_SYMBOL);
-	      this.markers.forEach(function (m) {
-	        return m.remove();
-	      });
-	      this.map.off('click', this.mapClickListener);
-	      this.map.off('style.load', this.styleLoadListener);
-	      this.map.fire('ruler.off');
-	    }
-	  }, {
-	    key: "mapClickListener",
-	    value: function mapClickListener(event) {
-	      var _this = this;
-
-	      var markerNode = document.createElement('div');
-	      markerNode.style.width = this.markerNodeWidth;
-	      markerNode.style.height = this.markerNodeHeight;
-	      markerNode.style.borderRadius = '50%';
-	      markerNode.style.background = this.secondaryColor;
-	      markerNode.style.boxSizing = 'border-box';
-	      markerNode.style.border = "".concat(this.markerNodeBorderWidth, " solid ").concat(this.mainColor);
-	      var marker = new mapboxGl.Marker({
-	        element: markerNode,
-	        draggable: true
-	      }).setLngLat(event.lngLat).addTo(this.map);
-	      this.coordinates.push([event.lngLat.lng, event.lngLat.lat]);
-	      this.labels = this.coordinatesToLabels();
-	      this.map.getSource(SOURCE_LINE).setData(geoLineString(this.coordinates));
-	      this.map.getSource(SOURCE_SYMBOL).setData(geoPoint(this.coordinates, this.labels));
-	      this.markers.push(marker);
-	      marker.on('drag', function () {
-	        var index = _this.markers.indexOf(marker);
-
-	        var lngLat = marker.getLngLat();
-	        _this.coordinates[index] = [lngLat.lng, lngLat.lat];
-	        _this.labels = _this.coordinatesToLabels();
-
-	        _this.map.getSource(SOURCE_LINE).setData(geoLineString(_this.coordinates));
-
-	        _this.map.getSource(SOURCE_SYMBOL).setData(geoPoint(_this.coordinates, _this.labels));
-	      });
-	    }
-	  }, {
-	    key: "coordinatesToLabels",
-	    value: function coordinatesToLabels() {
-	      var coordinates = this.coordinates,
-	          units = this.units,
-	          labelFormat = this.labelFormat;
-	      var sum = 0;
-	      return coordinates.map(function (coordinate, index) {
-	        if (index === 0) return labelFormat(0);
-	        sum += distance(coordinates[index - 1], coordinates[index], {
-	          units: units
-	        });
-	        return labelFormat(sum);
-	      });
-	    }
-	  }, {
-	    key: "styleLoadListener",
-	    value: function styleLoadListener() {
-	      this.draw();
-	    }
-	  }, {
-	    key: "onAdd",
-	    value: function onAdd(map) {
-	      var _this2 = this;
-
-	      this.map = map;
-	      this.insertControls();
-	      this.button.addEventListener('click', function () {
-	        if (_this2.isMeasuring) {
-	          _this2.measuringOff();
-	        } else {
-	          _this2.measuringOn();
-	        }
-	      });
-	      return this.container;
-	    }
-	  }, {
-	    key: "onRemove",
-	    value: function onRemove() {
-	      if (this.isMeasuring) {
-	        this.measuringOff();
-	      }
-
-	      this.map.off('click', this.mapClickListener);
-	      this.container.parentNode.removeChild(this.container);
-	      this.map = undefined;
-	    }
-	  }]);
-
-	  return RulerControl;
-	}();
-
-	function _classCallCheck$3(instance, Constructor) {
-	  if (!(instance instanceof Constructor)) {
-	    throw new TypeError("Cannot call a class as a function");
-	  }
-	}
-
-	function _defineProperties$3(target, props) {
-	  for (var i = 0; i < props.length; i++) {
-	    var descriptor = props[i];
-	    descriptor.enumerable = descriptor.enumerable || false;
-	    descriptor.configurable = true;
-	    if ("value" in descriptor) descriptor.writable = true;
-	    Object.defineProperty(target, descriptor.key, descriptor);
-	  }
-	}
-
-	function _createClass$3(Constructor, protoProps, staticProps) {
-	  if (protoProps) _defineProperties$3(Constructor.prototype, protoProps);
-	  if (staticProps) _defineProperties$3(Constructor, staticProps);
-	  return Constructor;
-	}
+	  this.map.off('click', this.mapClickListener);
+	  this.container.parentNode.removeChild(this.container);
+	  this.map = undefined;
+	};
 
 	function iconPlus() {
 	  return (new DOMParser().parseFromString("<svg fill=\"#505050\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n    <path d=\"M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z\"/>\n    <path d=\"M0 0h24v24H0z\" fill=\"none\"/>\n</svg>", 'image/svg+xml')).firstChild;
@@ -721,124 +585,41 @@
 	/**
 	 * Simple zoom control
 	 */
+	var ZoomControl = function ZoomControl () {};
 
-	var ZoomControl = /*#__PURE__*/function () {
-	  function ZoomControl() {
-	    _classCallCheck$3(this, ZoomControl);
-	  }
+	ZoomControl.prototype.insertControls = function insertControls () {
+	  this.container = document.createElement('div');
+	  this.container.classList.add('mapboxgl-ctrl');
+	  this.container.classList.add('mapboxgl-ctrl-group');
+	  this.container.classList.add('mapboxgl-ctrl-zoom');
+	  this.zoomIn = document.createElement('button');
+	  this.zoomIn.setAttribute('type', 'button');
+	  this.zoomIn.appendChild(iconPlus());
+	  this.zoomOut = document.createElement('button');
+	  this.zoomOut.setAttribute('type', 'button');
+	  this.zoomOut.appendChild(iconMinus());
+	  this.container.appendChild(this.zoomIn);
+	  this.container.appendChild(this.zoomOut);
+	};
 
-	  _createClass$3(ZoomControl, [{
-	    key: "insertControls",
-	    value: function insertControls() {
-	      this.container = document.createElement('div');
-	      this.container.classList.add('mapboxgl-ctrl');
-	      this.container.classList.add('mapboxgl-ctrl-group');
-	      this.container.classList.add('mapboxgl-ctrl-zoom');
-	      this.zoomIn = document.createElement('button');
-	      this.zoomIn.setAttribute('type', 'button');
-	      this.zoomIn.appendChild(iconPlus());
-	      this.zoomOut = document.createElement('button');
-	      this.zoomOut.setAttribute('type', 'button');
-	      this.zoomOut.appendChild(iconMinus());
-	      this.container.appendChild(this.zoomIn);
-	      this.container.appendChild(this.zoomOut);
-	    }
-	  }, {
-	    key: "onAdd",
-	    value: function onAdd(map) {
-	      var _this = this;
+	ZoomControl.prototype.onAdd = function onAdd (map) {
+	    var this$1 = this;
 
-	      this.map = map;
-	      this.insertControls();
-	      this.zoomIn.addEventListener('click', function () {
-	        _this.map.zoomIn();
-	      });
-	      this.zoomOut.addEventListener('click', function () {
-	        _this.map.zoomOut();
-	      });
-	      return this.container;
-	    }
-	  }, {
-	    key: "onRemove",
-	    value: function onRemove() {
-	      this.container.parentNode.removeChild(this.container);
-	      this.map = undefined;
-	    }
-	  }]);
+	  this.map = map;
+	  this.insertControls();
+	  this.zoomIn.addEventListener('click', function () {
+	    this$1.map.zoomIn();
+	  });
+	  this.zoomOut.addEventListener('click', function () {
+	    this$1.map.zoomOut();
+	  });
+	  return this.container;
+	};
 
-	  return ZoomControl;
-	}();
-
-	function _classCallCheck$4(instance, Constructor) {
-	  if (!(instance instanceof Constructor)) {
-	    throw new TypeError("Cannot call a class as a function");
-	  }
-	}
-
-	function _defineProperties$4(target, props) {
-	  for (var i = 0; i < props.length; i++) {
-	    var descriptor = props[i];
-	    descriptor.enumerable = descriptor.enumerable || false;
-	    descriptor.configurable = true;
-	    if ("value" in descriptor) descriptor.writable = true;
-	    Object.defineProperty(target, descriptor.key, descriptor);
-	  }
-	}
-
-	function _createClass$4(Constructor, protoProps, staticProps) {
-	  if (protoProps) _defineProperties$4(Constructor.prototype, protoProps);
-	  if (staticProps) _defineProperties$4(Constructor, staticProps);
-	  return Constructor;
-	}
-
-	function _defineProperty(obj, key, value) {
-	  if (key in obj) {
-	    Object.defineProperty(obj, key, {
-	      value: value,
-	      enumerable: true,
-	      configurable: true,
-	      writable: true
-	    });
-	  } else {
-	    obj[key] = value;
-	  }
-
-	  return obj;
-	}
-
-	function ownKeys(object, enumerableOnly) {
-	  var keys = Object.keys(object);
-
-	  if (Object.getOwnPropertySymbols) {
-	    var symbols = Object.getOwnPropertySymbols(object);
-	    if (enumerableOnly) symbols = symbols.filter(function (sym) {
-	      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
-	    });
-	    keys.push.apply(keys, symbols);
-	  }
-
-	  return keys;
-	}
-
-	function _objectSpread2(target) {
-	  for (var i = 1; i < arguments.length; i++) {
-	    var source = arguments[i] != null ? arguments[i] : {};
-
-	    if (i % 2) {
-	      ownKeys(Object(source), true).forEach(function (key) {
-	        _defineProperty(target, key, source[key]);
-	      });
-	    } else if (Object.getOwnPropertyDescriptors) {
-	      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
-	    } else {
-	      ownKeys(Object(source)).forEach(function (key) {
-	        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
-	      });
-	    }
-	  }
-
-	  return target;
-	}
+	ZoomControl.prototype.onRemove = function onRemove () {
+	  this.container.parentNode.removeChild(this.container);
+	  this.map = undefined;
+	};
 
 	var SUPPORTED_LANGUAGES = ['en', 'es', 'fr', 'de', 'ru', 'zh', 'pt', 'ar', 'ja', 'ko', 'mul'];
 
@@ -846,23 +627,29 @@
 	  if (lang === 'mul') {
 	    return 'name';
 	  }
-
-	  return "name_".concat(lang);
+	  return ("name_" + lang);
 	}
 
 	function localizeTextField(field, lang) {
 	  if (typeof field === 'string') {
-	    return field.replace(/{name.*?}/, "{".concat(lang, "}"));
+	    return field.replace(/{name.*?}/, ("{" + lang + "}"));
 	  }
 
 	  var str = JSON.stringify(field);
 
 	  if (Array.isArray(field)) {
-	    return JSON.parse(str.replace(/"coalesce",\["get","name.*?"]/g, "\"coalesce\",[\"get\",\"".concat(lang, "\"]")));
+	    return JSON.parse(str.replace(
+	      /"coalesce",\["get","name.*?"]/g,
+	      ("\"coalesce\",[\"get\",\"" + lang + "\"]")
+	    ));
 	  }
 
-	  return JSON.parse(str.replace(/{name.*?}/g, "{".concat(lang, "}")));
+	  return JSON.parse(str.replace(
+	    /{name.*?}/g,
+	    ("{" + lang + "}")
+	  ));
 	}
+
 	/**
 	 * Localize map. Language can be set dynamically with `.setLanguage(lang)` method.
 	 * @param {Object} options
@@ -873,104 +660,66 @@
 	 * By default fields are `name_LANGUAGE` and `name` for multi language (mul)
 	 */
 
+	var LanguageControl = function LanguageControl(options) {
+	  if ( options === void 0 ) options = {};
 
-	var LanguageControl = /*#__PURE__*/function () {
-	  function LanguageControl() {
-	    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+	  this.container = document.createElement('div');
+	  this.supportedLanguages = options.supportedLanguages || SUPPORTED_LANGUAGES;
+	  this.language = options.language;
+	  this.getLanguageField = options.getLanguageField || getLanguageField;
+	  this.excludedLayerIds = options.excludedLayerIds || [];
+	  this.styleChangeListener = this.styleChangeListener.bind(this);
+	};
 
-	    _classCallCheck$4(this, LanguageControl);
+	LanguageControl.prototype.onAdd = function onAdd (map) {
+	  this.map = map;
+	  this.map.on('styledata', this.styleChangeListener);
+	  return this.container;
+	};
 
-	    this.container = document.createElement('div');
-	    this.supportedLanguages = options.supportedLanguages || SUPPORTED_LANGUAGES;
-	    this.language = options.language;
-	    this.getLanguageField = options.getLanguageField || getLanguageField;
-	    this.excludedLayerIds = options.excludedLayerIds || [];
-	    this.styleChangeListener = this.styleChangeListener.bind(this);
+	LanguageControl.prototype.onRemove = function onRemove () {
+	  this.map.off('styledata', this.styleChangeListener);
+	  this.map = undefined;
+	};
+
+	LanguageControl.prototype.styleChangeListener = function styleChangeListener () {
+	  this.map.off('styledata', this.styleChangeListener);
+	  this.setLanguage(this.language);
+	};
+
+	LanguageControl.prototype.setLanguage = function setLanguage (lang) {
+	    var this$1 = this;
+	    if ( lang === void 0 ) lang = this.browserLanguage();
+
+	  var language = this.supportedLanguages.indexOf(lang) < 0 ? 'mul' : lang;
+	  var style = this.map.getStyle();
+	  var languageField = this.getLanguageField(language);
+	  var layers = style.layers.map(function (layer) {
+	    if (layer.type !== 'symbol') { return layer; }
+	    if (!layer.layout || !layer.layout['text-field']) { return layer; }
+	    if (this$1.excludedLayerIds.indexOf(layer.id) !== -1) { return layer; }
+
+	    var textField = layer.layout['text-field'];
+	    var textFieldLocalized = localizeTextField(textField, languageField);
+
+	    return Object.assign({}, layer,
+	      {layout: Object.assign({}, layer.layout,
+	        {'text-field': textFieldLocalized})});
+	  });
+
+	  this.map.setStyle(Object.assign({}, style,
+	    {layers: layers}));
+	};
+
+	LanguageControl.prototype.browserLanguage = function browserLanguage () {
+	  var language = navigator.languages ? navigator.languages[0] : navigator.language;
+	  var parts = language.split('-');
+	  var languageCode = parts.length > 1 ? parts[0] : language;
+	  if (this.supportedLanguages.indexOf(languageCode) > -1) {
+	    return languageCode;
 	  }
-
-	  _createClass$4(LanguageControl, [{
-	    key: "onAdd",
-	    value: function onAdd(map) {
-	      this.map = map;
-	      this.map.on('styledata', this.styleChangeListener);
-	      return this.container;
-	    }
-	  }, {
-	    key: "onRemove",
-	    value: function onRemove() {
-	      this.map.off('styledata', this.styleChangeListener);
-	      this.map = undefined;
-	    }
-	  }, {
-	    key: "styleChangeListener",
-	    value: function styleChangeListener() {
-	      this.map.off('styledata', this.styleChangeListener);
-	      this.setLanguage(this.language);
-	    }
-	  }, {
-	    key: "setLanguage",
-	    value: function setLanguage() {
-	      var _this = this;
-
-	      var lang = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.browserLanguage();
-	      var language = this.supportedLanguages.indexOf(lang) < 0 ? 'mul' : lang;
-	      var style = this.map.getStyle();
-	      var languageField = this.getLanguageField(language);
-	      var layers = style.layers.map(function (layer) {
-	        if (layer.type !== 'symbol') return layer;
-	        if (!layer.layout || !layer.layout['text-field']) return layer;
-	        if (_this.excludedLayerIds.indexOf(layer.id) !== -1) return layer;
-	        var textField = layer.layout['text-field'];
-	        var textFieldLocalized = localizeTextField(textField, languageField);
-	        return _objectSpread2(_objectSpread2({}, layer), {}, {
-	          layout: _objectSpread2(_objectSpread2({}, layer.layout), {}, {
-	            'text-field': textFieldLocalized
-	          })
-	        });
-	      });
-	      this.map.setStyle(_objectSpread2(_objectSpread2({}, style), {}, {
-	        layers: layers
-	      }));
-	    }
-	  }, {
-	    key: "browserLanguage",
-	    value: function browserLanguage() {
-	      var language = navigator.languages ? navigator.languages[0] : navigator.language;
-	      var parts = language.split('-');
-	      var languageCode = parts.length > 1 ? parts[0] : language;
-
-	      if (this.supportedLanguages.indexOf(languageCode) > -1) {
-	        return languageCode;
-	      }
-
-	      return 'mul';
-	    }
-	  }]);
-
-	  return LanguageControl;
-	}();
-
-	function _classCallCheck$5(instance, Constructor) {
-	  if (!(instance instanceof Constructor)) {
-	    throw new TypeError("Cannot call a class as a function");
-	  }
-	}
-
-	function _defineProperties$5(target, props) {
-	  for (var i = 0; i < props.length; i++) {
-	    var descriptor = props[i];
-	    descriptor.enumerable = descriptor.enumerable || false;
-	    descriptor.configurable = true;
-	    if ("value" in descriptor) descriptor.writable = true;
-	    Object.defineProperty(target, descriptor.key, descriptor);
-	  }
-	}
-
-	function _createClass$5(Constructor, protoProps, staticProps) {
-	  if (protoProps) _defineProperties$5(Constructor.prototype, protoProps);
-	  if (staticProps) _defineProperties$5(Constructor, staticProps);
-	  return Constructor;
-	}
+	  return 'mul';
+	};
 
 	function iconInspect() {
 	  return (new DOMParser().parseFromString("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"#505050\">\n    <path d=\"M0 0h24v24H0z\" fill=\"none\"/>\n    <path d=\"M20 19.59V8l-6-6H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c.45 0 .85-.15 1.19-.4l-4.43-4.43c-.8.52-1.74.83-2.76.83-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5c0 1.02-.31 1.96-.83 2.75L20 19.59zM9 13c0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3-3 1.34-3 3z\"/>\n</svg>", 'image/svg+xml')).firstChild;
@@ -986,25 +735,32 @@
 
 	function featureData(feature) {
 	  var props = feature.properties;
-	  var data = [{
-	    key: '$id',
-	    value: feature.layer.id
-	  }, {
-	    key: '$type',
-	    value: feature.layer.type
-	  }, {
-	    key: 'source',
-	    value: feature.layer.source
-	  }, {
-	    key: 'source-layer',
-	    value: feature.layer['source-layer']
-	  }];
-	  Object.keys(props).forEach(function (key) {
-	    data.push({
-	      key: key,
-	      value: props[key]
+	  var data = [
+	    {
+	      key: '$id',
+	      value: feature.layer.id,
+	    },
+	    {
+	      key: '$type',
+	      value: feature.layer.type,
+	    },
+	    {
+	      key: 'source',
+	      value: feature.layer.source,
+	    },
+	    {
+	      key: 'source-layer',
+	      value: feature.layer['source-layer'],
+	    } ];
+
+	  Object.keys(props)
+	    .forEach(function (key) {
+	      data.push({
+	        key: key,
+	        value: props[key],
+	      });
 	    });
-	  });
+
 	  return data;
 	}
 
@@ -1015,36 +771,32 @@
 	  var content = document.createElement('div');
 	  content.classList.add('mapboxgl-ctrl-inspect-content');
 
-	  var templatePrev = function templatePrev() {
+	  var templatePrev = function () {
 	    var button = document.createElement('div');
 	    button.setAttribute('type', 'button');
 	    button.classList.add('mapboxgl-ctrl-inspect-prev');
 	    button.appendChild(iconLeft());
-	    button.addEventListener('click', function () {
-	      return goTo('-1');
-	    });
+	    button.addEventListener('click', function () { return goTo('-1'); });
 	    return button;
 	  };
 
-	  var templateNext = function templateNext() {
+	  var templateNext = function () {
 	    var button = document.createElement('div');
 	    button.setAttribute('type', 'button');
 	    button.classList.add('mapboxgl-ctrl-inspect-next');
-	    button.appendChild(iconRight());
-	    button.addEventListener('click', function () {
-	      return goTo('+1');
-	    });
+	    button.appendChild((iconRight()));
+	    button.addEventListener('click', function () { return goTo('+1'); });
 	    return button;
 	  };
 
-	  var templateTitle = function templateTitle() {
+	  var templateTitle = function () {
 	    var title = document.createElement('div');
 	    title.classList.add('mapboxgl-ctrl-inspect-current');
-	    title.textContent = "".concat(current + 1, " / ").concat(features.length);
+	    title.textContent = (current + 1) + " / " + (features.length);
 	    return title;
 	  };
 
-	  var templateHeader = function templateHeader() {
+	  var templateHeader = function () {
 	    var header = document.createElement('div');
 	    header.classList.add('mapboxgl-ctrl-inspect-header');
 	    header.appendChild(templatePrev());
@@ -1053,7 +805,7 @@
 	    return header;
 	  };
 
-	  var templateFeature = function templateFeature(feature) {
+	  var templateFeature = function (feature) {
 	    var table = document.createElement('table');
 	    table.classList.add('mapboxgl-ctrl-inspect-feature');
 	    var data = featureData(feature);
@@ -1067,6 +819,7 @@
 	      row.appendChild(value);
 	      table.append(row);
 	    });
+
 	    return table;
 	  };
 
@@ -1090,157 +843,116 @@
 	    if (features.length > 1) {
 	      content.appendChild(templateHeader());
 	    }
-
 	    content.appendChild(templateFeature(features[current]));
 	  }
 
 	  return root;
 	}
+
 	/**
 	 * Inspect control to debug style layers and source
 	 */
+	var InspectControl = function InspectControl () {};
 
+	InspectControl.prototype.insertControls = function insertControls () {
+	  this.container = document.createElement('div');
+	  this.container.classList.add('mapboxgl-ctrl');
+	  this.container.classList.add('mapboxgl-ctrl-group');
+	  this.container.classList.add('mapboxgl-ctrl-inspect');
+	  this.button = document.createElement('button');
+	  this.button.setAttribute('type', 'button');
+	  this.button.appendChild(iconInspect());
+	  this.container.appendChild(this.button);
+	  this.popup = null;
+	  this.lngLat = null;
+	  this.clickListener = this.clickListener.bind(this);
+	  this.updatePosition = this.updatePosition.bind(this);
+	};
 
-	var InspectControl = /*#__PURE__*/function () {
-	  function InspectControl() {
-	    _classCallCheck$5(this, InspectControl);
-	  }
+	InspectControl.prototype.inspectingOn = function inspectingOn () {
+	  this.isInspecting = true;
+	  this.button.classList.add('-active');
+	  this.map.on('click', this.clickListener);
+	  this.map.on('move', this.updatePosition);
+	  this.map.getCanvas().style.cursor = 'pointer';
+	};
 
-	  _createClass$5(InspectControl, [{
-	    key: "insertControls",
-	    value: function insertControls() {
-	      this.container = document.createElement('div');
-	      this.container.classList.add('mapboxgl-ctrl');
-	      this.container.classList.add('mapboxgl-ctrl-group');
-	      this.container.classList.add('mapboxgl-ctrl-inspect');
-	      this.button = document.createElement('button');
-	      this.button.setAttribute('type', 'button');
-	      this.button.appendChild(iconInspect());
-	      this.container.appendChild(this.button);
-	      this.popup = null;
-	      this.lngLat = null;
-	      this.clickListener = this.clickListener.bind(this);
-	      this.updatePosition = this.updatePosition.bind(this);
-	    }
-	  }, {
-	    key: "inspectingOn",
-	    value: function inspectingOn() {
-	      this.isInspecting = true;
-	      this.button.classList.add('-active');
-	      this.map.on('click', this.clickListener);
-	      this.map.on('move', this.updatePosition);
-	      this.map.getCanvas().style.cursor = 'pointer';
-	    }
-	  }, {
-	    key: "inspectingOff",
-	    value: function inspectingOff() {
-	      this.removePopup();
-	      this.isInspecting = false;
-	      this.button.classList.remove('-active');
-	      this.map.off('click', this.clickListener);
-	      this.map.off('move', this.updatePosition);
-	      this.map.getCanvas().style.cursor = '';
-	    }
-	  }, {
-	    key: "getFeatures",
-	    value: function getFeatures(event) {
-	      var selectThreshold = 3;
-	      var queryBox = [[event.point.x - selectThreshold, event.point.y + selectThreshold], // bottom left (SW)
-	      [event.point.x + selectThreshold, event.point.y - selectThreshold] // top right (NE)
-	      ];
-	      return this.map.queryRenderedFeatures(queryBox);
-	    }
-	  }, {
-	    key: "addPopup",
-	    value: function addPopup(features) {
-	      this.popup = popup(features);
-	      this.mapContainer.appendChild(this.popup);
-	      this.updatePosition();
-	    }
-	  }, {
-	    key: "removePopup",
-	    value: function removePopup() {
-	      if (!this.popup) return;
-	      this.mapContainer.removeChild(this.popup);
-	      this.popup = null;
-	    }
-	  }, {
-	    key: "updatePosition",
-	    value: function updatePosition() {
-	      if (!this.lngLat) return;
-	      var canvasRect = this.canvas.getBoundingClientRect();
-	      var pos = this.map.project(this.lngLat);
-	      this.popup.style.left = "".concat(pos.x - canvasRect.left, "px");
-	      this.popup.style.top = "".concat(pos.y - canvasRect.top, "px");
-	    }
-	  }, {
-	    key: "clickListener",
-	    value: function clickListener(event) {
-	      this.lngLat = event.lngLat;
-	      var features = this.getFeatures(event);
-	      this.removePopup();
-	      this.addPopup(features);
-	    }
-	  }, {
-	    key: "onAdd",
-	    value: function onAdd(map) {
-	      var _this = this;
+	InspectControl.prototype.inspectingOff = function inspectingOff () {
+	  this.removePopup();
+	  this.isInspecting = false;
+	  this.button.classList.remove('-active');
+	  this.map.off('click', this.clickListener);
+	  this.map.off('move', this.updatePosition);
+	  this.map.getCanvas().style.cursor = '';
+	};
 
-	      this.map = map;
-	      this.mapContainer = this.map.getContainer();
-	      this.canvas = this.map.getCanvas();
-	      this.isInspecting = false;
-	      this.insertControls();
-	      this.button.addEventListener('click', function () {
-	        if (_this.isInspecting) {
-	          _this.inspectingOff();
-	        } else {
-	          _this.inspectingOn();
-	        }
-	      });
-	      return this.container;
+	InspectControl.prototype.getFeatures = function getFeatures (event) {
+	  var selectThreshold = 3;
+	  var queryBox = [
+	    [event.point.x - selectThreshold, event.point.y + selectThreshold], // bottom left (SW)
+	    [event.point.x + selectThreshold, event.point.y - selectThreshold] ];
+	  return this.map.queryRenderedFeatures(queryBox);
+	};
+
+	InspectControl.prototype.addPopup = function addPopup (features) {
+	  this.popup = popup(features);
+	  this.mapContainer.appendChild(this.popup);
+	  this.updatePosition();
+	};
+
+	InspectControl.prototype.removePopup = function removePopup () {
+	  if (!this.popup) { return; }
+	  this.mapContainer.removeChild(this.popup);
+	  this.popup = null;
+	};
+
+	InspectControl.prototype.updatePosition = function updatePosition () {
+	  if (!this.lngLat) { return; }
+	  var canvasRect = this.canvas.getBoundingClientRect();
+	  var pos = this.map.project(this.lngLat);
+	  this.popup.style.left = (pos.x - canvasRect.left) + "px";
+	  this.popup.style.top = (pos.y - canvasRect.top) + "px";
+	};
+
+	InspectControl.prototype.clickListener = function clickListener (event) {
+	  this.lngLat = event.lngLat;
+	  var features = this.getFeatures(event);
+	  this.removePopup();
+	  this.addPopup(features);
+	};
+
+	InspectControl.prototype.onAdd = function onAdd (map) {
+	    var this$1 = this;
+
+	  this.map = map;
+	  this.mapContainer = this.map.getContainer();
+	  this.canvas = this.map.getCanvas();
+	  this.isInspecting = false;
+	  this.insertControls();
+	  this.button.addEventListener('click', function () {
+	    if (this$1.isInspecting) {
+	      this$1.inspectingOff();
+	    } else {
+	      this$1.inspectingOn();
 	    }
-	  }, {
-	    key: "onRemove",
-	    value: function onRemove() {
-	      this.inspectingOff();
-	      this.container.parentNode.removeChild(this.container);
-	      this.map = undefined;
-	    }
-	  }]);
+	  });
+	  return this.container;
+	};
 
-	  return InspectControl;
-	}();
+	InspectControl.prototype.onRemove = function onRemove () {
+	  this.inspectingOff();
+	  this.container.parentNode.removeChild(this.container);
+	  this.map = undefined;
+	};
 
-	function _classCallCheck$6(instance, Constructor) {
-	  if (!(instance instanceof Constructor)) {
-	    throw new TypeError("Cannot call a class as a function");
-	  }
-	}
-
-	function _defineProperties$6(target, props) {
-	  for (var i = 0; i < props.length; i++) {
-	    var descriptor = props[i];
-	    descriptor.enumerable = descriptor.enumerable || false;
-	    descriptor.configurable = true;
-	    if ("value" in descriptor) descriptor.writable = true;
-	    Object.defineProperty(target, descriptor.key, descriptor);
-	  }
-	}
-
-	function _createClass$6(Constructor, protoProps, staticProps) {
-	  if (protoProps) _defineProperties$6(Constructor.prototype, protoProps);
-	  if (staticProps) _defineProperties$6(Constructor, staticProps);
-	  return Constructor;
-	}
-
-	var defaultGetContent = function defaultGetContent(event) {
+	var defaultGetContent = function (event) {
 	  var coords = event.lngLat;
-	  return "LngLat: ".concat(coords.lng.toFixed(6), ", ").concat(coords.lat.toFixed(6));
+	  return ("LngLat: " + (coords.lng.toFixed(6)) + ", " + (coords.lat.toFixed(6)));
 	};
 
 	var mouseMoveEvent = 'mousemove';
 	var mapMoveEvent = 'move';
+
 	/**
 	 * Shows tooltip on hover on some layer or whole map.
 	 * @param {Object} options
@@ -1250,97 +962,80 @@
 	 * Accepts `event` object
 	 */
 
-	var TooltipControl = /*#__PURE__*/function () {
-	  function TooltipControl() {
-	    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+	var TooltipControl = function TooltipControl(options) {
+	  if ( options === void 0 ) options = {};
 
-	    _classCallCheck$6(this, TooltipControl);
+	  this.layer = options.layer;
+	  this.getContent = options.getContent || defaultGetContent;
+	  this.container = document.createElement('div');
+	  this.eventShow = this.layer ? 'mouseenter' : 'mouseover';
+	  this.eventHide = this.layer ? 'mouseleave' : 'mouseout';
+	  this.node = document.createElement('div');
+	  this.node.classList.add('mapboxgl-ctrl-tooltip');
+	  this.lngLat = null;
+	  this.cursorStyle = '';
+	  this.show = this.show.bind(this);
+	  this.move = this.move.bind(this);
+	  this.hide = this.hide.bind(this);
+	  this.updatePosition = this.updatePosition.bind(this);
+	};
 
-	    this.layer = options.layer;
-	    this.getContent = options.getContent || defaultGetContent;
-	    this.container = document.createElement('div');
-	    this.eventShow = this.layer ? 'mouseenter' : 'mouseover';
-	    this.eventHide = this.layer ? 'mouseleave' : 'mouseout';
-	    this.node = document.createElement('div');
-	    this.node.classList.add('mapboxgl-ctrl-tooltip');
-	    this.lngLat = null;
-	    this.cursorStyle = '';
-	    this.show = this.show.bind(this);
-	    this.move = this.move.bind(this);
-	    this.hide = this.hide.bind(this);
-	    this.updatePosition = this.updatePosition.bind(this);
+	TooltipControl.prototype.show = function show () {
+	  this.mapContainer.appendChild(this.node);
+	  this.cursorStyle = this.canvas.style.cursor;
+	  this.canvas.style.cursor = 'pointer';
+	  this.map.on(mapMoveEvent, this.updatePosition);
+	};
+
+	TooltipControl.prototype.hide = function hide () {
+	  this.node.innerHTML = '';
+	  this.mapContainer.removeChild(this.node);
+	  this.canvas.style.cursor = this.cursorStyle;
+	  this.map.off(mapMoveEvent, this.updatePosition);
+	};
+
+	TooltipControl.prototype.move = function move (event) {
+	  this.node.innerHTML = this.getContent(event);
+	  this.lngLat = event.lngLat;
+	  this.updatePosition();
+	};
+
+	TooltipControl.prototype.updatePosition = function updatePosition () {
+	  if (!this.lngLat) { return; }
+	  var pos = this.map.project(this.lngLat);
+	  this.node.style.left = (pos.x) + "px";
+	  this.node.style.top = (pos.y) + "px";
+	};
+
+	TooltipControl.prototype.onAdd = function onAdd (map) {
+	  this.map = map;
+	  this.mapContainer = this.map.getContainer();
+	  this.canvas = this.map.getCanvas();
+	  if (this.layer) {
+	    this.map.on(this.eventShow, this.layer, this.show);
+	    this.map.on(mouseMoveEvent, this.layer, this.move);
+	    this.map.on(this.eventHide, this.layer, this.hide);
+	  } else {
+	    this.map.on(this.eventShow, this.show);
+	    this.map.on(mouseMoveEvent, this.move);
+	    this.map.on(this.eventHide, this.hide);
 	  }
+	  return this.container;
+	};
 
-	  _createClass$6(TooltipControl, [{
-	    key: "show",
-	    value: function show() {
-	      this.mapContainer.appendChild(this.node);
-	      this.cursorStyle = this.canvas.style.cursor;
-	      this.canvas.style.cursor = 'pointer';
-	      this.map.on(mapMoveEvent, this.updatePosition);
-	    }
-	  }, {
-	    key: "hide",
-	    value: function hide() {
-	      this.node.innerHTML = '';
-	      this.mapContainer.removeChild(this.node);
-	      this.canvas.style.cursor = this.cursorStyle;
-	      this.map.off(mapMoveEvent, this.updatePosition);
-	    }
-	  }, {
-	    key: "move",
-	    value: function move(event) {
-	      this.node.innerHTML = this.getContent(event);
-	      this.lngLat = event.lngLat;
-	      this.updatePosition();
-	    }
-	  }, {
-	    key: "updatePosition",
-	    value: function updatePosition() {
-	      if (!this.lngLat) return;
-	      var pos = this.map.project(this.lngLat);
-	      this.node.style.left = "".concat(pos.x, "px");
-	      this.node.style.top = "".concat(pos.y, "px");
-	    }
-	  }, {
-	    key: "onAdd",
-	    value: function onAdd(map) {
-	      this.map = map;
-	      this.mapContainer = this.map.getContainer();
-	      this.canvas = this.map.getCanvas();
-
-	      if (this.layer) {
-	        this.map.on(this.eventShow, this.layer, this.show);
-	        this.map.on(mouseMoveEvent, this.layer, this.move);
-	        this.map.on(this.eventHide, this.layer, this.hide);
-	      } else {
-	        this.map.on(this.eventShow, this.show);
-	        this.map.on(mouseMoveEvent, this.move);
-	        this.map.on(this.eventHide, this.hide);
-	      }
-
-	      return this.container;
-	    }
-	  }, {
-	    key: "onRemove",
-	    value: function onRemove() {
-	      if (this.layer) {
-	        this.map.off(this.eventShow, this.layer, this.show);
-	        this.map.off(mouseMoveEvent, this.layer, this.move);
-	        this.map.off(this.eventHide, this.layer, this.hide);
-	      } else {
-	        this.map.off(this.eventShow, this.show);
-	        this.map.off(mouseMoveEvent, this.move);
-	        this.map.off(this.eventHide, this.hide);
-	      }
-
-	      this.hide();
-	      this.map = undefined;
-	    }
-	  }]);
-
-	  return TooltipControl;
-	}();
+	TooltipControl.prototype.onRemove = function onRemove () {
+	  if (this.layer) {
+	    this.map.off(this.eventShow, this.layer, this.show);
+	    this.map.off(mouseMoveEvent, this.layer, this.move);
+	    this.map.off(this.eventHide, this.layer, this.hide);
+	  } else {
+	    this.map.off(this.eventShow, this.show);
+	    this.map.off(mouseMoveEvent, this.move);
+	    this.map.off(this.eventHide, this.hide);
+	  }
+	  this.hide();
+	  this.map = undefined;
+	};
 
 	// if ('serviceWorker' in navigator) {
 	//   navigator.serviceWorker.register('./sw.js', {

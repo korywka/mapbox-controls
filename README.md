@@ -152,6 +152,11 @@ Fires map `ruler.on` and `ruler.off`events at the beginning and at the end of me
     -   `options.secondaryColor` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Color of halo and inner marker background. (optional, default `'#fff'`)
     -   `options.fontSize` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Label font size (optional, default `'12'`)
     -   `options.fontHalo` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Label font halo (optional, default `'1'`)
+    -   `options.textVariableAnchor` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)** Array of anchor positions. (optional, default `['top']`)
+    -   `options.textAllowOverlap` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Is allowed to overlap labels (optional, default `false`)
+    -   `options.markerNodeWidth` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Width of the marker (optional, default `'12px'`)
+    -   `options.markerNodeHeight` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Height of the marker (optional, default `'12px'`)
+    -   `options.markerNodeBorderWidth` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Width of the marker's border (optional, default `'2px'`)
 
 #### StylesControl
 

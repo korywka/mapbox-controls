@@ -7,7 +7,7 @@
     "lint": "eslint src --ext .js,.ts",
     "watch": "tsc --watch & sass --watch src/index.scss:lib/controls.css",
     "build": "tsc && sass src/index.scss:lib/controls.css",
-    "docs": "rollup --config docs/rollup.config.js"
+    "docs": "cp lib/controls.css docs && rollup --config docs/rollup.config.js"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^18.0.0",

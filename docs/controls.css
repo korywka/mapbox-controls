@@ -1,0 +1,118 @@
+.mapbox-control button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mapbox-control-inspect-popup {
+  position: absolute;
+  padding-top: 5px;
+  transform: translate(-50%, 0);
+}
+.mapbox-control-inspect-content {
+  position: relative;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-family: sans-serif;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+}
+.mapbox-control-inspect-content:before {
+  content: "";
+  width: 0;
+  height: 0;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translate(-50%, 0);
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid #fff;
+}
+.mapbox-control-inspect-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  white-space: nowrap;
+  user-select: none;
+}
+.mapbox-control-inspect-prev, .mapbox-control-inspect-next {
+  padding: 2px 12px;
+  border-radius: 4px;
+}
+.mapbox-control-inspect-prev:hover, .mapbox-control-inspect-next:hover {
+  background: rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+}
+.mapbox-control-inspect-prev:hover svg, .mapbox-control-inspect-next:hover svg {
+  fill: #4264fb;
+}
+.mapbox-control-inspect-prev svg, .mapbox-control-inspect-next svg {
+  vertical-align: top;
+}
+.mapbox-control-inspect-prev {
+  margin-right: 6px;
+}
+.mapbox-control-inspect-next {
+  margin-left: 6px;
+}
+.mapbox-control-inspect-feature {
+  width: 100%;
+  min-width: 200px;
+  border-collapse: collapse;
+}
+.mapbox-control-inspect-feature th, .mapbox-control-inspect-feature td {
+  padding: 5px;
+  white-space: nowrap;
+}
+.mapbox-control-inspect-feature th {
+  text-align: right;
+}
+.mapbox-control-inspect-feature tr:not(:last-child) td, .mapbox-control-inspect-feature tr:not(:last-child) th {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+.mapbox-control-inspect button.-active svg {
+  fill: #4264fb;
+}
+
+.mapbox-control-ruler button.-active svg {
+  fill: #4264fb;
+}
+
+.mapbox-control-styles {
+  display: flex;
+  overflow: hidden;
+}
+.mapbox-control-styles button {
+  width: auto;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+}
+.mapbox-control-styles button + button {
+  border: none;
+}
+.mapbox-control-styles button.-active {
+  background: #f5f5f5;
+}
+
+.mapbox-control-tooltip {
+  padding: 5px 7px;
+  background: #fff;
+  border-radius: 2px;
+  position: absolute;
+  transform: translate(-50%, 0);
+  margin-top: 24px;
+  font-size: 14px;
+  white-space: nowrap;
+  z-index: 3;
+  /* show tooltip over controls buttons with z-index 2 */
+}
+.mapbox-control-tooltip:empty {
+  display: none;
+}
+
+/*# sourceMappingURL=controls.css.map */

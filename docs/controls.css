@@ -110,6 +110,8 @@
   white-space: nowrap;
   z-index: 3;
   /* show tooltip over controls buttons with z-index 2 */
+  pointer-events: none;
+  /* do not block map scrolling */
 }
 .mapbox-control-tooltip:empty {
   display: none;

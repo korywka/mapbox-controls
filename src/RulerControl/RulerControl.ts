@@ -41,9 +41,6 @@ interface RulerControlOptions {
   markerNodeBorderWidth?: number
 }
 
-/**
- * Fires map `ruler.on` and `ruler.off`events at the beginning and at the end of measuring.
- */
 export default class RulerControl extends Base {
   isMeasuring: boolean
   markers: Marker[]

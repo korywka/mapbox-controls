@@ -3,9 +3,6 @@ import Button from '../Button/Button';
 import iconPlus from '../icons/plus';
 import iconMinus from '../icons/minus';
 
-/**
- * Zoom control
- */
 export default class ZoomControl extends Base {
   zoomIn: Button
   zoomOut: Button

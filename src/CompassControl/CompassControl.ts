@@ -7,9 +7,6 @@ interface CompassControlOptions {
   instant?: boolean
 }
 
-/**
- * Compass control
- */
 export default class CompassControl extends Base {
   button: Button
   instant: boolean

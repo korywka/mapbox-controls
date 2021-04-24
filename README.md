@@ -28,6 +28,8 @@ map.addControl(new RulerControl({
 
 ### Styles Control [[options](https://github.com/bravecow/mapbox-gl-controls/blob/master/src/StylesControl/StylesControl.ts#L5)]
 
+Adds style switcher similar to Google Maps.
+
 ```javascript
 import { StylesControl } from 'mapbox-gl-controls';
 
@@ -69,6 +71,8 @@ map.addControl(new ZoomControl(), 'top-right');
 
 ### Language Control [[options](https://github.com/bravecow/mapbox-gl-controls/blob/master/src/LanguageControl/LanguageControl.ts#L7)]
 
+Localize map. Language can be set dynamically with `.setLanguage(lang)` method.
+
 ```javascript
 import { LanguageControl } from 'mapbox-gl-controls';
 
@@ -87,6 +91,10 @@ languageControl.setLanguage('mul');
 
 ### Inspect Control
 
+Inspect control to debug style layers and source
+
+![Inspect Control](./docs/inspect.png)
+
 ```javascript
 import { InspectControl } from 'mapbox-gl-controls';
 
@@ -94,6 +102,10 @@ map.addControl(new InspectControl(), 'bottom-right');
 ```
 
 ### Tooltip Control [[options](https://github.com/bravecow/mapbox-gl-controls/blob/master/src/TooltipControl/TooltipControl.ts#L4)]
+
+Shows tooltip on hover on some layer or whole map.
+
+![Tooltip Control](./docs/tooltip.gif)
 
 ```javascript
 import { TooltipControl } from 'mapbox-gl-controls';

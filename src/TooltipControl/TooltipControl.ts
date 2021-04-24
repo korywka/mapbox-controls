@@ -8,9 +8,6 @@ interface TooltipControlOptions {
   getContent: (event: MapMouseEvent) => string;
 }
 
-/**
- * Shows tooltip on hover on some layer or whole map.
- */
 export default class TooltipControl extends Base {
   layer: string
   getContent: (event: MapMouseEvent) => string

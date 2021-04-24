@@ -15,9 +15,6 @@ interface LanguageControlOptions {
   excludedLayerIds?: string[]
 }
 
-/**
- * Localize map. Language can be set dynamically with `.setLanguage(lang)` method.
- */
 export default class LanguageControl extends Base {
   supportedLanguages: string[]
   language: string

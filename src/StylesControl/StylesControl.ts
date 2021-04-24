@@ -9,7 +9,6 @@ interface StylesControlOptions {
   onChange?: (StyleOption) => void
 }
 
-/** Adds style switcher similar to Google Maps. */
 export default class StylesControl extends Base {
   styles: StyleOption[]
   onChange: (StyleOption) => void

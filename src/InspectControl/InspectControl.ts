@@ -4,9 +4,6 @@ import Button from '../Button/Button';
 import popupTemplate from './popupTemplate';
 import iconInspect from '../icons/inspect';
 
-/**
- * Inspect control to debug style layers and source
- */
 export default class InspectControl extends Base {
   popupNode: HTMLDivElement
   lngLat: LngLat

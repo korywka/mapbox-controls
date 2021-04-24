@@ -31,5 +31,6 @@
   },
   "homepage": "https://bravecow.github.io/mapbox-gl-controls/",
   "repository": "bravecow/mapbox-gl-controls",
+  "keywords": ["mapbox"],
   "license": "MIT"
 }

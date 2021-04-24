@@ -105,7 +105,7 @@ map.addControl(new InspectControl(), 'bottom-right');
 
 Shows tooltip on hover on some layer or whole map.
 
-![Tooltip Control](./docs/tooltip.gif)
+![Tooltip Control](./docs/tooltip.png)
 
 ```javascript
 import { TooltipControl } from 'mapbox-gl-controls';

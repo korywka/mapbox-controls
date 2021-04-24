@@ -1,24 +1,13 @@
 import mapboxgl from 'mapbox-gl';
-import StylesControl from '../lib/styles';
-import CompassControl from '../lib/compass';
-import RulerControl from '../lib/ruler';
-import ZoomControl from '../lib/zoom';
-import LanguageControl from '../lib/language';
-import InspectControl from '../lib/inspect';
-import TooltipControl from '../lib/tooltip';
-
-// if ('serviceWorker' in navigator) {
-//   navigator.serviceWorker.register('./sw.js', {
-//     scope: '/',
-//     origins: ['*'],
-//   })
-//     .then(function (registration) {
-//       console.log('Registration successful, scope is:', registration.scope);
-//     })
-//     .catch(function (error) {
-//       console.log('Service worker registration failed, error:', error);
-//     });
-// }
+import {
+  CompassControl,
+  InspectControl,
+  LanguageControl,
+  RulerControl,
+  StylesControl,
+  ZoomControl,
+  TooltipControl,
+} from '../lib'
 
 mapboxgl.accessToken = 'pk.eyJ1Ijoia29yeXdrYSIsImEiOiJja2p1ajdlOWozMnF2MzBtajRvOTVzZDRpIn0.nnlX7TDuZ3zuGkZGr_oA3A';
 
@@ -29,7 +18,8 @@ const map = new mapboxgl.Map({
   zoom: 14,
   center: [30.5234, 50.4501],
 });
-const geoJSON = {
+
+const polygon = {
   type: 'Feature',
   geometry: {
     type: 'Polygon',
@@ -69,43 +59,31 @@ map.addControl(new InspectControl(), 'bottom-right');
 /* Compass */
 map.addControl(new CompassControl(), 'bottom-right');
 
-map.on('load', () => {
+/* Tooltip */
+map.addControl(new TooltipControl({
+  layer: '$fill',
+  getContent: (event) => {
+    const coords = event.lngLat;
+    return `Tooltip Example: ${coords.lng.toFixed(6)}, ${coords.lat.toFixed(6)}`;
+  },
+}));
+
+map.on('style.load', () => {
   map.addLayer({
     id: '$fill',
     type: 'fill',
-    source: {
-      type: 'geojson',
-      data: geoJSON,
-    },
-    paint: {
-      'fill-opacity': 0.3,
-      'fill-color': '#4264fb',
-    },
+    source: { type: 'geojson', data: polygon },
+    paint: { 'fill-opacity': 0.3, 'fill-color': '#4264fb' },
   });
   map.addLayer({
     id: '$line',
     type: 'line',
-    source: {
-      type: 'geojson',
-      data: geoJSON,
-    },
-    paint: {
-      'line-width': 2,
-      'line-color': '#4264fb',
-    },
+    source: { type: 'geojson', data: polygon },
+    paint: { 'line-width': 2, 'line-color': '#4264fb' },
   });
-  map.addControl(new TooltipControl({
-    layer: '$fill',
-  }));
 });
 
 /* Example for mapbox issue: https://github.com/mapbox/mapbox-gl-js/issues/8765 */
-map.on('load', () => {
-  console.log('load');
-});
-map.on('style.load', () => {
-  console.log('style.load');
-});
-map.on('styledata', () => {
-  console.log('styledata');
-});
+map.on('load', () => console.log('load'));
+map.on('style.load', () => console.log('style.load'));
+map.on('styledata', () => console.log('styledata'));

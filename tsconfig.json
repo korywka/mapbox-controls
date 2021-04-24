@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "ESNext",
+    "sourceMap": true,
+    "declaration": true,
+    "moduleResolution": "Node",
+    "allowSyntheticDefaultImports": true,
+    "outDir": "lib",
+  },
+  "include": ["src"]
+}

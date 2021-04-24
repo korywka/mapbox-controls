@@ -1,16 +1,14 @@
 {
-  "extends": "eslint-config-xxx",
+  "extends": ["eslint-config-xxx", "plugin:@typescript-eslint/recommended"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
   "env": {
     "browser": true
   },
+  "parserOptions": {
+    "ecmaVersion": 2020
+  },
   "rules": {
-    "no-use-before-define": [
-      "error",
-      {
-        "functions": false,
-        "classes": true,
-        "variables": true
-      }
-    ]
+    "@typescript-eslint/explicit-module-boundary-types": 0
   }
 }

@@ -31,6 +31,14 @@ interface RulerControlOptions {
   mainColor?: string
   /** Color of halo and inner marker background. */
   secondaryColor?: string
+  /** Array of anchor positions */
+  textVariableAnchor?: string[]
+  /** Is allowed to overlap labels */
+  textAllowOverlap?: boolean
+  /** Width and Height of the marker in `px` */
+  markerNodeSize?: number
+  /** Width of the marker's border in `px` */
+  markerNodeBorderWidth?: number
 }
 
 /**
@@ -45,6 +53,10 @@ export default class RulerControl extends Base {
   font: string[]
   fontSize: number
   fontHalo: number
+  textVariableAnchor: string[]
+  textAllowOverlap: boolean
+  markerNodeSize: string
+  markerNodeBorderWidth: string
   labelFormat: (n: number) => string
   mainColor: string
   secondaryColor: string
@@ -60,6 +72,10 @@ export default class RulerControl extends Base {
     this.font = options?.font ?? ['Roboto Medium'];
     this.fontSize = options?.fontSize ?? 12;
     this.fontHalo = options?.fontHalo ?? 1;
+    this.textVariableAnchor = options?.textVariableAnchor || ['top'];
+    this.textAllowOverlap = options?.textAllowOverlap || false;
+    this.markerNodeSize = `${options?.markerNodeSize ?? 12}px`;
+    this.markerNodeBorderWidth = `${options?.markerNodeBorderWidth ?? 2}px`;
     this.labelFormat = options?.labelFormat ?? labelFormat;
     this.mainColor = options?.mainColor ?? MAIN_COLOR;
     this.secondaryColor = options?.secondaryColor ?? HALO_COLOR;

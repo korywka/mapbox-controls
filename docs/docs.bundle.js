@@ -626,7 +626,7 @@
 	 */
 	class RulerControl extends Base {
 	    constructor(options) {
-	        var _a, _b, _c, _d, _e, _f, _g;
+	        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
 	        super();
 	        this.isMeasuring = false;
 	        this.markers = [];
@@ -636,9 +636,13 @@
 	        this.font = (_b = options === null || options === void 0 ? void 0 : options.font) !== null && _b !== void 0 ? _b : ['Roboto Medium'];
 	        this.fontSize = (_c = options === null || options === void 0 ? void 0 : options.fontSize) !== null && _c !== void 0 ? _c : 12;
 	        this.fontHalo = (_d = options === null || options === void 0 ? void 0 : options.fontHalo) !== null && _d !== void 0 ? _d : 1;
-	        this.labelFormat = (_e = options === null || options === void 0 ? void 0 : options.labelFormat) !== null && _e !== void 0 ? _e : labelFormat;
-	        this.mainColor = (_f = options === null || options === void 0 ? void 0 : options.mainColor) !== null && _f !== void 0 ? _f : MAIN_COLOR;
-	        this.secondaryColor = (_g = options === null || options === void 0 ? void 0 : options.secondaryColor) !== null && _g !== void 0 ? _g : HALO_COLOR;
+	        this.textVariableAnchor = (options === null || options === void 0 ? void 0 : options.textVariableAnchor) || ['top'];
+	        this.textAllowOverlap = (options === null || options === void 0 ? void 0 : options.textAllowOverlap) || false;
+	        this.markerNodeSize = `${(_e = options === null || options === void 0 ? void 0 : options.markerNodeSize) !== null && _e !== void 0 ? _e : 12}px`;
+	        this.markerNodeBorderWidth = `${(_f = options === null || options === void 0 ? void 0 : options.markerNodeBorderWidth) !== null && _f !== void 0 ? _f : 2}px`;
+	        this.labelFormat = (_g = options === null || options === void 0 ? void 0 : options.labelFormat) !== null && _g !== void 0 ? _g : labelFormat;
+	        this.mainColor = (_h = options === null || options === void 0 ? void 0 : options.mainColor) !== null && _h !== void 0 ? _h : MAIN_COLOR;
+	        this.secondaryColor = (_j = options === null || options === void 0 ? void 0 : options.secondaryColor) !== null && _j !== void 0 ? _j : HALO_COLOR;
 	        this.button = new Button();
 	        this.mapClickListener = this.mapClickListener.bind(this);
 	        this.styleLoadListener = this.styleLoadListener.bind(this);

@@ -10,7 +10,7 @@ npm install mapbox-gl-controls
 
 Include styles from package: `mapbox-gl-controls/lib/controls.css`
 
-### Ruler Control
+### Ruler Control [[options](https://github.com/bravecow/mapbox-gl-controls/blob/master/src/RulerControl/RulerControl.ts#L19)]
 
 ```javascript
 import { RulerControl } from 'mapbox-gl-controls';
@@ -26,7 +26,7 @@ map.addControl(new RulerControl({
 }), 'top-right');
 ```
 
-### Styles Control
+### Styles Control [[options](https://github.com/bravecow/mapbox-gl-controls/blob/master/src/StylesControl/StylesControl.ts#L5)]
 
 ```javascript
 import { StylesControl } from 'mapbox-gl-controls';
@@ -51,7 +51,7 @@ map.addControl(new StylesControl({
 }), 'top-left');
 ```
 
-### Compass Control
+### Compass Control [[options](https://github.com/bravecow/mapbox-gl-controls/blob/master/src/CompassControl/CompassControl.ts#L5)]
 
 ```javascript
 import { CompassControl } from 'mapbox-gl-controls';
@@ -67,7 +67,7 @@ import { ZoomControl } from 'mapbox-gl-controls';
 map.addControl(new ZoomControl(), 'top-right');
 ```
 
-### Language Control
+### Language Control [[options](https://github.com/bravecow/mapbox-gl-controls/blob/master/src/LanguageControl/LanguageControl.ts#L7)]
 
 ```javascript
 import { LanguageControl } from 'mapbox-gl-controls';
@@ -93,7 +93,7 @@ import { InspectControl } from 'mapbox-gl-controls';
 map.addControl(new InspectControl(), 'bottom-right');
 ```
 
-### Tooltip Control
+### Tooltip Control [[options](https://github.com/bravecow/mapbox-gl-controls/blob/master/src/TooltipControl/TooltipControl.ts#L4)]
 
 ```javascript
 import { TooltipControl } from 'mapbox-gl-controls';

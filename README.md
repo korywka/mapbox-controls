@@ -110,5 +110,12 @@ Shows tooltip on hover on some layer or whole map.
 ```javascript
 import { TooltipControl } from 'mapbox-gl-controls';
 
+map.addLayer({
+  id: '$fill',
+  type: 'fill',
+  source: { type: 'geojson', data: polygon },
+  paint: { 'fill-opacity': 0.3, 'fill-color': '#4264fb' },
+});
+
 map.addControl(new TooltipControl({ layer: '$fill' }));
 ```

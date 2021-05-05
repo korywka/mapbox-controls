@@ -14,7 +14,7 @@ export default class StylesControl extends Base {
   onChange: (StyleOption) => void
   buttons: Button[]
 
-  constructor(options: StylesControlOptions) {
+  constructor(options?: StylesControlOptions) {
     super();
     this.styles = options?.styles ?? defaultStyleOptions;
     this.onChange = options?.onChange;

@@ -59,7 +59,7 @@ export default class RulerControl extends Base {
   secondaryColor: string
   button: Button
 
-  constructor(options: RulerControlOptions) {
+  constructor(options?: RulerControlOptions) {
     super();
     this.isMeasuring = false;
     this.markers = [];

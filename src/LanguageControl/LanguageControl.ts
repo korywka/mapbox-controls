@@ -21,7 +21,7 @@ export default class LanguageControl extends Base {
   getLanguageField: (language: string) => string
   excludedLayerIds: string[]
 
-  constructor(options: LanguageControlOptions) {
+  constructor(options?: LanguageControlOptions) {
     super();
     this.supportedLanguages = options?.supportedLanguages ?? SUPPORTED_LANGUAGES;
     this.language = options?.language;

@@ -29,8 +29,8 @@
   "peerDependencies": {
     "mapbox-gl": ">=1.0.0 <3.0.0"
   },
-  "homepage": "https://bravecow.github.io/mapbox-gl-controls/",
-  "repository": "bravecow/mapbox-gl-controls",
+  "homepage": "https://korywka.github.io/mapbox-gl-controls/",
+  "repository": "korywka/mapbox-gl-controls",
   "keywords": ["mapbox"],
   "license": "MIT"
 }

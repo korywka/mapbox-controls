@@ -53,7 +53,7 @@
 	//# sourceMappingURL=mapbox-gl.js.map
 	});
 
-	const svg$6 = `
+	const svg$7 = `
 <svg viewBox="0 0 24 24" width="22" height="22" xmlns="http://www.w3.org/2000/svg">
     <g fill="none" fill-rule="evenodd">
         <path d="M0 0h24v24H0z"/>
@@ -63,7 +63,7 @@
 </svg>
 `;
 	function iconPointer () {
-	    return (new DOMParser().parseFromString(svg$6, 'image/svg+xml')).firstChild;
+	    return (new DOMParser().parseFromString(svg$7, 'image/svg+xml')).firstChild;
 	}
 
 	class Base {
@@ -124,9 +124,6 @@
 	    }
 	}
 
-	/**
-	 * Compass control
-	 */
 	class CompassControl extends Base {
 	    constructor(options) {
 	        var _a;
@@ -156,6 +153,245 @@
 	            this.node.hidden = angle === 0;
 	        }
 	        this.button.icon.style.transform = `rotate(${angle}deg)`;
+	    }
+	}
+
+	const svg$6 = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="#505050">
+  <path d="M0 0h24v24H0V0z" fill="none"/>
+  <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14 6 17h12l-3.86-5.14z"/>
+</svg>
+`;
+	function iconImage () {
+	    return (new DOMParser().parseFromString(svg$6, 'image/svg+xml')).firstChild;
+	}
+
+	class IImage {
+	    load(file) {
+	        return new Promise(((resolve, reject) => {
+	            this.file = file;
+	            const reader = new FileReader();
+	            const node = new Image();
+	            reader.addEventListener('load', () => {
+	                const imageUrl = reader.result;
+	                node.onload = () => {
+	                    this.id = this.file.name;
+	                    this.url = imageUrl;
+	                    this.width = node.width;
+	                    this.height = node.height;
+	                    resolve(this);
+	                };
+	                node.onerror = reject;
+	                node.src = imageUrl;
+	            }, false);
+	            reader.readAsDataURL(this.file);
+	        }));
+	    }
+	    setInitialPosition(map) {
+	        if (!this.width || !this.height)
+	            throw Error('image is not loaded');
+	        const padding = 20;
+	        const mapCanvas = map.getCanvas();
+	        const canvasWidth = mapCanvas.offsetWidth;
+	        const canvasHeight = mapCanvas.offsetHeight;
+	        const maxWidth = canvasWidth - padding * 2;
+	        const maxHeight = canvasHeight - padding * 2;
+	        const ratio = Math.min(maxWidth / this.width, maxHeight / this.height);
+	        const resizeWidth = this.width * ratio;
+	        const resizeHeight = this.height * ratio;
+	        const result = [
+	            [canvasWidth / 2 - resizeWidth / 2, canvasHeight / 2 - resizeHeight / 2],
+	            [canvasWidth / 2 + resizeWidth / 2, canvasHeight / 2 - resizeHeight / 2],
+	            [canvasWidth / 2 + resizeWidth / 2, canvasHeight / 2 + resizeHeight / 2],
+	            [canvasWidth / 2 - resizeWidth / 2, canvasHeight / 2 + resizeHeight / 2], // left bottom
+	        ];
+	        map.setPitch(0); // reset pitch for correct projection
+	        this.position = result.map(point => map.unproject(point).toArray());
+	    }
+	    get asPolygon() {
+	        return {
+	            type: 'FeatureCollection',
+	            features: [
+	                {
+	                    type: 'Feature',
+	                    properties: { id: this.id },
+	                    geometry: { type: 'Polygon', coordinates: [[...this.position, this.position[0]]] },
+	                },
+	            ],
+	        };
+	    }
+	    get imageSource() {
+	        return {
+	            id: `${this.id}-raster`,
+	            source: { type: 'image', url: this.url, coordinates: this.position },
+	        };
+	    }
+	    get vectorSource() {
+	        return {
+	            id: `${this.id}-polygon`,
+	            source: { type: 'geojson', data: this.asPolygon },
+	        };
+	    }
+	    get rasterLayer() {
+	        return {
+	            id: this.id,
+	            type: 'raster',
+	            source: this.imageSource.id,
+	            paint: { 'raster-fade-duration': 0, 'raster-opacity': 0.5 },
+	        };
+	    }
+	    get contourLayer() {
+	        return ({
+	            id: `${this.id}-contour`,
+	            type: 'line',
+	            source: this.vectorSource.id,
+	            paint: { 'line-color': '#4264fb', 'line-width': 3, 'line-opacity': 0 },
+	        });
+	    }
+	    get fillLayer() {
+	        return ({
+	            id: `${this.id}-fill`,
+	            type: 'fill',
+	            source: this.vectorSource.id,
+	            paint: { 'fill-opacity': 0 },
+	        });
+	    }
+	}
+
+	var __awaiter = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
+	    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+	    return new (P || (P = Promise))(function (resolve, reject) {
+	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+	        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+	        step((generator = generator.apply(thisArg, _arguments || [])).next());
+	    });
+	};
+	var Cursor;
+	(function (Cursor) {
+	    Cursor["Default"] = "";
+	    Cursor["Move"] = "move";
+	    Cursor["Grabbing"] = "grabbing";
+	})(Cursor || (Cursor = {}));
+	class ImageControl extends Base {
+	    constructor() {
+	        super();
+	        this.button = new Button();
+	        this.fileInput = document.createElement('input');
+	        this.fileInput.type = 'file';
+	        this.fileInput.accept = '.jpg, .jpeg, .png';
+	        this.images = [];
+	        this.selectedImageId = null;
+	        this.onMapClick = this.onMapClick.bind(this);
+	        this.onFileInputChange = this.onFileInputChange.bind(this);
+	    }
+	    insert() {
+	        this.addClassName('mapbox-control-image');
+	        this.button.setIcon(iconImage());
+	        this.addButton(this.button);
+	        this.node.appendChild(this.fileInput);
+	        this.button.onClick(() => this.fileInput.click());
+	        this.fileInput.addEventListener('change', this.onFileInputChange);
+	    }
+	    onFileInputChange() {
+	        const files = this.fileInput.files;
+	        Array.from(files).forEach((file) => __awaiter(this, void 0, void 0, function* () {
+	            const image = new IImage();
+	            yield image.load(file);
+	            image.setInitialPosition(this.map);
+	            this.images.push(image);
+	            this.drawImage(image);
+	        }));
+	    }
+	    drawImage(image) {
+	        this.map.addSource(image.imageSource.id, image.imageSource.source);
+	        this.map.addSource(image.vectorSource.id, image.vectorSource.source);
+	        this.map.addLayer(image.rasterLayer);
+	        this.map.addLayer(image.fillLayer);
+	        this.map.addLayer(image.contourLayer);
+	    }
+	    onMapClick(event) {
+	        const contourLayersId = this.images.map(i => i.fillLayer.id);
+	        const features = this.map.queryRenderedFeatures(event.point, { layers: contourLayersId });
+	        if (features.length) {
+	            this.selectImage(features[0].properties.id);
+	        }
+	        else {
+	            this.deselectImage();
+	        }
+	    }
+	    enableDragging(id) {
+	        const image = this.images.find(i => i.id === id);
+	        let startPosition = null;
+	        this.mapCanvas.style.cursor = Cursor.Move;
+	        const onPointerMove = (event) => {
+	            const currentPosition = event.lngLat;
+	            this.mapCanvas.style.cursor = Cursor.Grabbing;
+	            const deltaLng = startPosition.lng - currentPosition.lng;
+	            const deltaLat = startPosition.lat - currentPosition.lat;
+	            image.position = image.position.map(coords => [coords[0] - deltaLng, coords[1] - deltaLat]);
+	            this.applyTransform(image);
+	            startPosition = currentPosition;
+	        };
+	        const onPointerUp = () => {
+	            this.mapCanvas.style.cursor = Cursor.Move;
+	            this.map.off('mousemove', onPointerMove);
+	            this.map.setPaintProperty(image.contourLayer.id, 'line-opacity', 1);
+	        };
+	        const onPointerDown = (event) => {
+	            event.preventDefault();
+	            this.mapCanvas.style.cursor = Cursor.Grabbing;
+	            startPosition = event.lngLat;
+	            this.map.on('mousemove', onPointerMove);
+	            this.map.once('mouseup', onPointerUp);
+	            this.map.setPaintProperty(image.contourLayer.id, 'line-opacity', 0);
+	        };
+	        const onPointerEnter = () => {
+	            this.mapCanvas.style.cursor = Cursor.Move;
+	        };
+	        const onPointerLeave = () => {
+	            this.mapCanvas.style.cursor = Cursor.Default;
+	        };
+	        this.map.on('mouseenter', image.fillLayer.id, onPointerEnter);
+	        this.map.on('mouseleave', image.fillLayer.id, onPointerLeave);
+	        this.map.on('mousedown', image.fillLayer.id, onPointerDown);
+	        this.disableDragging = () => {
+	            this.map.off('mouseenter', image.fillLayer.id, onPointerEnter);
+	            this.map.off('mouseleave', image.fillLayer.id, onPointerLeave);
+	            this.map.off('mousedown', image.fillLayer.id, onPointerDown);
+	        };
+	    }
+	    selectImage(id) {
+	        if (this.selectedImageId === id)
+	            return;
+	        if (this.selectedImageId)
+	            this.deselectImage();
+	        const image = this.images.find(i => i.id === id);
+	        this.map.setPaintProperty(image.contourLayer.id, 'line-opacity', 1);
+	        this.enableDragging(id);
+	        this.selectedImageId = id;
+	    }
+	    deselectImage() {
+	        if (!this.selectedImageId)
+	            return;
+	        const image = this.images.find(i => i.id === this.selectedImageId);
+	        this.map.setPaintProperty(image.contourLayer.id, 'line-opacity', 0);
+	        this.disableDragging();
+	        this.selectedImageId = null;
+	    }
+	    applyTransform(image) {
+	        const imageSource = this.map.getSource(image.imageSource.id);
+	        const vectorSource = this.map.getSource(image.vectorSource.id);
+	        imageSource.setCoordinates(image.position);
+	        vectorSource.setData(image.asPolygon);
+	    }
+	    onAddControl() {
+	        this.insert();
+	        // if (this.map.isStyleLoaded()) this.draw();
+	        // this.map.on('style.load', this.draw);
+	        this.mapContainer = this.map.getContainer();
+	        this.mapCanvas = this.map.getCanvas();
+	        this.map.on('click', this.onMapClick);
 	    }
 	}
 
@@ -283,9 +519,6 @@
 	    return (new DOMParser().parseFromString(svg$3, 'image/svg+xml')).firstChild;
 	}
 
-	/**
-	 * Inspect control to debug style layers and source
-	 */
 	class InspectControl extends Base {
 	    constructor() {
 	        super();
@@ -386,9 +619,6 @@
 	}
 
 	const SUPPORTED_LANGUAGES = ['en', 'es', 'fr', 'de', 'ru', 'zh', 'pt', 'ar', 'ja', 'ko', 'mul'];
-	/**
-	 * Localize map. Language can be set dynamically with `.setLanguage(lang)` method.
-	 */
 	class LanguageControl extends Base {
 	    constructor(options) {
 	        var _a, _b, _c;
@@ -621,9 +851,6 @@
 	const SOURCE_SYMBOL = 'controls-source-symbol';
 	const MAIN_COLOR = '#263238';
 	const HALO_COLOR = '#fff';
-	/**
-	 * Fires map `ruler.on` and `ruler.off`events at the beginning and at the end of measuring.
-	 */
 	class RulerControl extends Base {
 	    constructor(options) {
 	        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
@@ -788,7 +1015,6 @@
 	    },
 	];
 
-	/** Adds style switcher similar to Google Maps. */
 	class StylesControl extends Base {
 	    constructor(options) {
 	        var _a;
@@ -829,9 +1055,6 @@
 	    }
 	}
 
-	/**
-	 * Shows tooltip on hover on some layer or whole map.
-	 */
 	class TooltipControl extends Base {
 	    constructor(options) {
 	        super();
@@ -925,9 +1148,6 @@
 	    return (new DOMParser().parseFromString(svg, 'image/svg+xml')).firstChild;
 	}
 
-	/**
-	 * Zoom control
-	 */
 	class ZoomControl extends Base {
 	    constructor() {
 	        super();
@@ -997,6 +1217,9 @@
 
 	/* Compass */
 	map.addControl(new CompassControl(), 'bottom-right');
+
+	/* Image */
+	map.addControl(new ImageControl(), 'bottom-right');
 
 	/* Tooltip */
 	map.addControl(new TooltipControl({

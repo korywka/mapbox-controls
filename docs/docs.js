@@ -1,6 +1,7 @@
 import mapboxgl from 'mapbox-gl';
 import {
   CompassControl,
+  ImageControl,
   InspectControl,
   LanguageControl,
   RulerControl,
@@ -58,6 +59,9 @@ map.addControl(new InspectControl(), 'bottom-right');
 
 /* Compass */
 map.addControl(new CompassControl(), 'bottom-right');
+
+/* Image */
+map.addControl(new ImageControl(), 'bottom-right');
 
 /* Tooltip */
 map.addControl(new TooltipControl({

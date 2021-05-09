@@ -9,6 +9,7 @@ export default [
       format: 'iife',
       sourcemap: true,
     },
+    context: 'window',
     plugins: [
       resolve(),
       commonjs({ sourceMap: false }),

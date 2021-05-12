@@ -52,6 +52,12 @@ map.addControl(new ZoomControl(), 'bottom-right');
 
 /* Ruler */
 map.addControl(new RulerControl(), 'bottom-right');
+map.on('ruler.on', () => console.log('%cruler.on', 'color: #3D5AFE', 'event fired') );
+map.on('ruler.off', () => console.log('%cruler.off', 'color: #3D5AFE', 'event fired') );
+map.on('ruler.change', (params) => {
+  console.log('%cruler.change', 'color: #3D5AFE', 'event fired with coordinates:');
+  console.table(params.coordinates);
+});
 
 /* Inspect */
 map.addControl(new InspectControl(), 'bottom-right');

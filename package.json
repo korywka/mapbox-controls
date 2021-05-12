@@ -1,6 +1,6 @@
 {
   "name": "mapbox-gl-controls",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "main": "./lib/index.js",
   "description": "Controls for mapbox-gl",
   "scripts": {

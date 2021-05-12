@@ -124,9 +124,6 @@
 	    }
 	}
 
-	/**
-	 * Compass control
-	 */
 	class CompassControl extends Base {
 	    constructor(options) {
 	        var _a;
@@ -283,9 +280,6 @@
 	    return (new DOMParser().parseFromString(svg$3, 'image/svg+xml')).firstChild;
 	}
 
-	/**
-	 * Inspect control to debug style layers and source
-	 */
 	class InspectControl extends Base {
 	    constructor() {
 	        super();
@@ -386,9 +380,6 @@
 	}
 
 	const SUPPORTED_LANGUAGES = ['en', 'es', 'fr', 'de', 'ru', 'zh', 'pt', 'ar', 'ja', 'ko', 'mul'];
-	/**
-	 * Localize map. Language can be set dynamically with `.setLanguage(lang)` method.
-	 */
 	class LanguageControl extends Base {
 	    constructor(options) {
 	        var _a, _b, _c;
@@ -621,9 +612,6 @@
 	const SOURCE_SYMBOL = 'controls-source-symbol';
 	const MAIN_COLOR = '#263238';
 	const HALO_COLOR = '#fff';
-	/**
-	 * Fires map `ruler.on` and `ruler.off`events at the beginning and at the end of measuring.
-	 */
 	class RulerControl extends Base {
 	    constructor(options) {
 	        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
@@ -729,7 +717,9 @@
 	        const marker = new mapboxGl.Marker({ element: markerNode, draggable: true })
 	            .setLngLat(event.lngLat)
 	            .addTo(this.map);
-	        this.coordinates.push([event.lngLat.lng, event.lngLat.lat]);
+	        const newCoordinate = [event.lngLat.lng, event.lngLat.lat];
+	        this.coordinates.push(newCoordinate);
+	        this.map.fire('ruler.change', { coordinates: this.coordinates });
 	        this.updateLabels();
 	        lineSource.setData(lineStringFeature(this.coordinates));
 	        symbolSource.setData(pointFeatureCollection(this.coordinates, this.labels));
@@ -788,7 +778,6 @@
 	    },
 	];
 
-	/** Adds style switcher similar to Google Maps. */
 	class StylesControl extends Base {
 	    constructor(options) {
 	        var _a;
@@ -829,9 +818,6 @@
 	    }
 	}
 
-	/**
-	 * Shows tooltip on hover on some layer or whole map.
-	 */
 	class TooltipControl extends Base {
 	    constructor(options) {
 	        super();
@@ -925,9 +911,6 @@
 	    return (new DOMParser().parseFromString(svg, 'image/svg+xml')).firstChild;
 	}
 
-	/**
-	 * Zoom control
-	 */
 	class ZoomControl extends Base {
 	    constructor() {
 	        super();
@@ -991,6 +974,12 @@
 
 	/* Ruler */
 	map.addControl(new RulerControl(), 'bottom-right');
+	map.on('ruler.on', () => console.log('%cruler.on', 'color: #3D5AFE', 'event fired') );
+	map.on('ruler.off', () => console.log('%cruler.off', 'color: #3D5AFE', 'event fired') );
+	map.on('ruler.change', (params) => {
+	  console.log('%cruler.change', 'color: #3D5AFE', 'event fired with coordinates:');
+	  console.table(params.coordinates);
+	});
 
 	/* Inspect */
 	map.addControl(new InspectControl(), 'bottom-right');

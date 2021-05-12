@@ -166,6 +166,95 @@
 	    return (new DOMParser().parseFromString(svg$6, 'image/svg+xml')).firstChild;
 	}
 
+	const highlightLayerId = '$highlight';
+	const resizeLayerId = '$resize';
+	const highlightLayer = function (image) {
+	    return ({
+	        id: highlightLayerId,
+	        type: 'line',
+	        source: image.polygonSource.id,
+	        layout: {
+	            'line-cap': 'round',
+	            'line-join': 'round',
+	        },
+	        paint: {
+	            'line-dasharray': [0.2, 2],
+	            'line-color': '#3D5AFE',
+	            'line-width': 2,
+	        },
+	    });
+	};
+	const resizeLayer = function (image) {
+	    return ({
+	        id: resizeLayerId,
+	        type: 'circle',
+	        source: image.pointsSource.id,
+	        paint: {
+	            'circle-radius': 5,
+	            'circle-color': '#3D5AFE',
+	            'circle-stroke-width': 3,
+	            'circle-stroke-color': '#fff',
+	        }
+	    });
+	};
+
+	var Cursor;
+	(function (Cursor) {
+	    Cursor["Default"] = "";
+	    Cursor["Move"] = "move";
+	    Cursor["Grabbing"] = "grabbing";
+	    Cursor["NESWResize"] = "nesw-resize";
+	    Cursor["NWSEResize"] = "nwse-resize";
+	})(Cursor || (Cursor = {}));
+	var EditMode;
+	(function (EditMode) {
+	    EditMode["Move"] = "move";
+	    EditMode["Transform"] = "transform";
+	})(EditMode || (EditMode = {}));
+
+	function draggableLayer(map, layerId, options) {
+	    const { onStart, onMove, onEnd, getHoverCursor } = options;
+	    const mapCanvas = map.getCanvas();
+	    let hoverCursor = Cursor.Move;
+	    const onPointerMove = (event) => {
+	        mapCanvas.style.cursor = Cursor.Grabbing;
+	        onMove(event);
+	    };
+	    const onPointerUp = (event) => {
+	        mapCanvas.style.cursor = hoverCursor;
+	        map.off('mousemove', onPointerMove);
+	        if (onEnd)
+	            onEnd(event);
+	    };
+	    const onPointerDown = (event) => {
+	        event.preventDefault();
+	        mapCanvas.style.cursor = Cursor.Grabbing;
+	        map.on('mousemove', onPointerMove);
+	        map.once('mouseup', onPointerUp);
+	        if (onStart)
+	            onStart(event);
+	    };
+	    const onPointerEnter = (event) => {
+	        if (getHoverCursor) {
+	            hoverCursor = getHoverCursor(event);
+	        }
+	        mapCanvas.style.cursor = hoverCursor;
+	    };
+	    const onPointerLeave = () => {
+	        mapCanvas.style.cursor = Cursor.Default;
+	    };
+	    map.on('mouseenter', layerId, onPointerEnter);
+	    map.on('mouseleave', layerId, onPointerLeave);
+	    map.on('mousedown', layerId, onPointerDown);
+	    return () => {
+	        mapCanvas.style.cursor = Cursor.Default;
+	        map.off('mouseenter', layerId, onPointerEnter);
+	        map.off('mouseleave', layerId, onPointerLeave);
+	        map.off('mousedown', layerId, onPointerDown);
+	        map.off('mousemove', onPointerMove);
+	    };
+	}
+
 	class IImage {
 	    load(file) {
 	        return new Promise(((resolve, reject) => {
@@ -220,39 +309,47 @@
 	            ],
 	        };
 	    }
+	    get asPoints() {
+	        return {
+	            type: 'FeatureCollection',
+	            features: this.position.map((point, i) => ({
+	                type: 'Feature',
+	                properties: { index: i },
+	                geometry: { type: 'Point', coordinates: point },
+	            })),
+	        };
+	    }
 	    get imageSource() {
 	        return {
 	            id: `${this.id}-raster`,
 	            source: { type: 'image', url: this.url, coordinates: this.position },
 	        };
 	    }
-	    get vectorSource() {
+	    get polygonSource() {
 	        return {
 	            id: `${this.id}-polygon`,
 	            source: { type: 'geojson', data: this.asPolygon },
 	        };
 	    }
+	    get pointsSource() {
+	        return {
+	            id: `${this.id}-points`,
+	            source: { type: 'geojson', data: this.asPoints },
+	        };
+	    }
 	    get rasterLayer() {
 	        return {
-	            id: this.id,
+	            id: `${this.id}-raster`,
 	            type: 'raster',
 	            source: this.imageSource.id,
 	            paint: { 'raster-fade-duration': 0, 'raster-opacity': 0.5 },
 	        };
 	    }
-	    get contourLayer() {
+	    get eventCaptureLayer() {
 	        return ({
-	            id: `${this.id}-contour`,
-	            type: 'line',
-	            source: this.vectorSource.id,
-	            paint: { 'line-color': '#4264fb', 'line-width': 3, 'line-opacity': 0 },
-	        });
-	    }
-	    get fillLayer() {
-	        return ({
-	            id: `${this.id}-fill`,
+	            id: `${this.id}-event-capture`,
 	            type: 'fill',
-	            source: this.vectorSource.id,
+	            source: this.polygonSource.id,
 	            paint: { 'fill-opacity': 0 },
 	        });
 	    }
@@ -267,12 +364,6 @@
 	        step((generator = generator.apply(thisArg, _arguments || [])).next());
 	    });
 	};
-	var Cursor;
-	(function (Cursor) {
-	    Cursor["Default"] = "";
-	    Cursor["Move"] = "move";
-	    Cursor["Grabbing"] = "grabbing";
-	})(Cursor || (Cursor = {}));
 	class ImageControl extends Base {
 	    constructor() {
 	        super();
@@ -281,7 +372,8 @@
 	        this.fileInput.type = 'file';
 	        this.fileInput.accept = '.jpg, .jpeg, .png';
 	        this.images = [];
-	        this.selectedImageId = null;
+	        this.editMode = null;
+	        this.selectedImage = null;
 	        this.onMapClick = this.onMapClick.bind(this);
 	        this.onFileInputChange = this.onFileInputChange.bind(this);
 	    }
@@ -294,24 +386,24 @@
 	        this.fileInput.addEventListener('change', this.onFileInputChange);
 	    }
 	    onFileInputChange() {
-	        const files = this.fileInput.files;
-	        Array.from(files).forEach((file) => __awaiter(this, void 0, void 0, function* () {
+	        Array.from(this.fileInput.files).forEach((file) => __awaiter(this, void 0, void 0, function* () {
 	            const image = new IImage();
 	            yield image.load(file);
 	            image.setInitialPosition(this.map);
 	            this.images.push(image);
 	            this.drawImage(image);
+	            this.selectImage(image.id);
 	        }));
 	    }
 	    drawImage(image) {
 	        this.map.addSource(image.imageSource.id, image.imageSource.source);
-	        this.map.addSource(image.vectorSource.id, image.vectorSource.source);
+	        this.map.addSource(image.polygonSource.id, image.polygonSource.source);
+	        this.map.addSource(image.pointsSource.id, image.pointsSource.source);
 	        this.map.addLayer(image.rasterLayer);
-	        this.map.addLayer(image.fillLayer);
-	        this.map.addLayer(image.contourLayer);
+	        this.map.addLayer(image.eventCaptureLayer);
 	    }
 	    onMapClick(event) {
-	        const contourLayersId = this.images.map(i => i.fillLayer.id);
+	        const contourLayersId = this.images.map(i => i.eventCaptureLayer.id);
 	        const features = this.map.queryRenderedFeatures(event.point, { layers: contourLayersId });
 	        if (features.length) {
 	            this.selectImage(features[0].properties.id);
@@ -320,75 +412,116 @@
 	            this.deselectImage();
 	        }
 	    }
-	    enableDragging(id) {
-	        const image = this.images.find(i => i.id === id);
+	    enableMoving() {
 	        let startPosition = null;
+	        const selectedImage = this.selectedImage;
+	        const eventCaptureLayerId = selectedImage.eventCaptureLayer.id;
+	        const dragCleanup = draggableLayer(this.map, eventCaptureLayerId, {
+	            onStart: (event) => {
+	                startPosition = event.lngLat;
+	                this.map.removeLayer(highlightLayerId);
+	            },
+	            onMove: (event) => {
+	                const currentPosition = event.lngLat;
+	                const deltaLng = startPosition.lng - currentPosition.lng;
+	                const deltaLat = startPosition.lat - currentPosition.lat;
+	                selectedImage.position = selectedImage.position.map(coords => [coords[0] - deltaLng, coords[1] - deltaLat]);
+	                this.updateSource();
+	                startPosition = currentPosition;
+	            },
+	            onEnd: () => {
+	                this.map.addLayer(highlightLayer(this.selectedImage));
+	            },
+	        });
 	        this.mapCanvas.style.cursor = Cursor.Move;
-	        const onPointerMove = (event) => {
-	            const currentPosition = event.lngLat;
-	            this.mapCanvas.style.cursor = Cursor.Grabbing;
-	            const deltaLng = startPosition.lng - currentPosition.lng;
-	            const deltaLat = startPosition.lat - currentPosition.lat;
-	            image.position = image.position.map(coords => [coords[0] - deltaLng, coords[1] - deltaLat]);
-	            this.applyTransform(image);
-	            startPosition = currentPosition;
+	        this.map.addLayer(highlightLayer(this.selectedImage));
+	        this.disableMoving = () => {
+	            dragCleanup();
+	            this.map.removeLayer(highlightLayerId);
 	        };
-	        const onPointerUp = () => {
-	            this.mapCanvas.style.cursor = Cursor.Move;
-	            this.map.off('mousemove', onPointerMove);
-	            this.map.setPaintProperty(image.contourLayer.id, 'line-opacity', 1);
-	        };
-	        const onPointerDown = (event) => {
-	            event.preventDefault();
-	            this.mapCanvas.style.cursor = Cursor.Grabbing;
-	            startPosition = event.lngLat;
-	            this.map.on('mousemove', onPointerMove);
-	            this.map.once('mouseup', onPointerUp);
-	            this.map.setPaintProperty(image.contourLayer.id, 'line-opacity', 0);
-	        };
-	        const onPointerEnter = () => {
-	            this.mapCanvas.style.cursor = Cursor.Move;
-	        };
-	        const onPointerLeave = () => {
-	            this.mapCanvas.style.cursor = Cursor.Default;
-	        };
-	        this.map.on('mouseenter', image.fillLayer.id, onPointerEnter);
-	        this.map.on('mouseleave', image.fillLayer.id, onPointerLeave);
-	        this.map.on('mousedown', image.fillLayer.id, onPointerDown);
-	        this.disableDragging = () => {
-	            this.map.off('mouseenter', image.fillLayer.id, onPointerEnter);
-	            this.map.off('mouseleave', image.fillLayer.id, onPointerLeave);
-	            this.map.off('mousedown', image.fillLayer.id, onPointerDown);
+	    }
+	    enableResizing() {
+	        let currentIndex;
+	        const selectedImage = this.selectedImage;
+	        const dragCleanup = draggableLayer(this.map, resizeLayerId, {
+	            onStart: (event) => {
+	                currentIndex = event.features[0].properties.index;
+	                this.map.removeLayer(highlightLayerId);
+	                this.map.removeLayer(resizeLayerId);
+	            },
+	            onMove: (event) => {
+	                const currentPosition = event.lngLat;
+	                selectedImage.position[currentIndex] = [currentPosition.lng, currentPosition.lat];
+	                if (currentIndex === 0) {
+	                    selectedImage.position[1] = [selectedImage.position[1][0], currentPosition.lat];
+	                    selectedImage.position[3] = [currentPosition.lng, selectedImage.position[3][1]];
+	                }
+	                else if (currentIndex === 1) {
+	                    selectedImage.position[0] = [selectedImage.position[0][0], currentPosition.lat];
+	                    selectedImage.position[2] = [currentPosition.lng, selectedImage.position[2][1]];
+	                }
+	                else if (currentIndex === 2) {
+	                    selectedImage.position[1] = [currentPosition.lng, selectedImage.position[1][1]];
+	                    selectedImage.position[3] = [selectedImage.position[3][0], currentPosition.lat];
+	                }
+	                else if (currentIndex === 3) {
+	                    selectedImage.position[2] = [selectedImage.position[2][0], currentPosition.lat];
+	                    selectedImage.position[0] = [currentPosition.lng, selectedImage.position[0][1]];
+	                }
+	                this.updateSource();
+	            },
+	            onEnd: () => {
+	                currentIndex = null;
+	                this.map.addLayer(highlightLayer(this.selectedImage));
+	                this.map.addLayer(resizeLayer(this.selectedImage));
+	            },
+	            getHoverCursor: (event) => {
+	                const index = event.features[0].properties.index;
+	                return [1, 3].includes(index) ? Cursor.NESWResize : Cursor.NWSEResize;
+	            },
+	        });
+	        this.map.addLayer(highlightLayer(this.selectedImage));
+	        this.map.addLayer(resizeLayer(this.selectedImage));
+	        this.disableResizing = () => {
+	            dragCleanup();
+	            this.map.removeLayer(resizeLayerId);
+	            this.map.removeLayer(highlightLayerId);
 	        };
 	    }
 	    selectImage(id) {
-	        if (this.selectedImageId === id)
-	            return;
-	        if (this.selectedImageId)
+	        if (this.selectedImage && this.selectedImage.id !== id)
 	            this.deselectImage();
-	        const image = this.images.find(i => i.id === id);
-	        this.map.setPaintProperty(image.contourLayer.id, 'line-opacity', 1);
-	        this.enableDragging(id);
-	        this.selectedImageId = id;
+	        this.selectedImage = this.images.find(i => i.id === id);
+	        if (!this.editMode) {
+	            this.editMode = EditMode.Move;
+	            this.enableMoving();
+	        }
+	        else if (this.editMode === EditMode.Move) {
+	            this.editMode = EditMode.Transform;
+	            this.disableMoving();
+	            this.enableResizing();
+	        }
 	    }
 	    deselectImage() {
-	        if (!this.selectedImageId)
+	        if (!this.selectedImage)
 	            return;
-	        const image = this.images.find(i => i.id === this.selectedImageId);
-	        this.map.setPaintProperty(image.contourLayer.id, 'line-opacity', 0);
-	        this.disableDragging();
-	        this.selectedImageId = null;
+	        if (this.editMode === EditMode.Move) {
+	            this.disableMoving();
+	        }
+	        else if (this.editMode === EditMode.Transform) {
+	            this.disableResizing();
+	        }
+	        this.selectedImage = null;
+	        this.editMode = null;
 	    }
-	    applyTransform(image) {
-	        const imageSource = this.map.getSource(image.imageSource.id);
-	        const vectorSource = this.map.getSource(image.vectorSource.id);
-	        imageSource.setCoordinates(image.position);
-	        vectorSource.setData(image.asPolygon);
+	    updateSource() {
+	        const selectedImage = this.selectedImage;
+	        this.map.getSource(selectedImage.imageSource.id).setCoordinates(selectedImage.position);
+	        this.map.getSource(selectedImage.polygonSource.id).setData(selectedImage.asPolygon);
+	        this.map.getSource(selectedImage.pointsSource.id).setData(selectedImage.asPoints);
 	    }
 	    onAddControl() {
 	        this.insert();
-	        // if (this.map.isStyleLoaded()) this.draw();
-	        // this.map.on('style.load', this.draw);
 	        this.mapContainer = this.map.getContainer();
 	        this.mapCanvas = this.map.getCanvas();
 	        this.map.on('click', this.onMapClick);

@@ -1,14 +1,5 @@
-import {
-  FillLayer,
-  GeoJSONSource,
-  GeoJSONSourceRaw,
-  ImageSource,
-  ImageSourceRaw,
-  LineLayer,
-  Map,
-  RasterLayer
-} from 'mapbox-gl';
-import { Feature, FeatureCollection, Position } from 'geojson';
+import { FillLayer, GeoJSONSourceRaw, ImageSourceRaw, Map, RasterLayer } from 'mapbox-gl';
+import { FeatureCollection, Position } from 'geojson';
 
 class IImage {
   id: string
@@ -16,7 +7,7 @@ class IImage {
   url: string
   width: number
   height: number
-  position: Position[]
+  position: Position[] /* [lng, lat] or [y, x] */
 
   load(file: File) {
     return new Promise(((resolve, reject) => {
@@ -78,6 +69,17 @@ class IImage {
     };
   }
 
+  get asPoints(): FeatureCollection {
+    return {
+      type: 'FeatureCollection',
+      features: this.position.map((point, i) => ({
+        type: 'Feature',
+        properties: { index: i },
+        geometry: { type: 'Point', coordinates: point },
+      })),
+    };
+  }
+
   get imageSource(): { id: string, source: ImageSourceRaw } {
     return {
       id: `${this.id}-raster`,
@@ -85,36 +87,34 @@ class IImage {
     };
   }
 
-  get vectorSource(): { id: string, source: GeoJSONSourceRaw } {
+  get polygonSource(): { id: string, source: GeoJSONSourceRaw } {
     return {
       id: `${this.id}-polygon`,
       source: { type: 'geojson', data: this.asPolygon },
     };
   }
 
+  get pointsSource(): { id: string, source: GeoJSONSourceRaw } {
+    return {
+      id: `${this.id}-points`,
+      source: { type: 'geojson', data: this.asPoints },
+    };
+  }
+
   get rasterLayer(): RasterLayer {
     return {
-      id: this.id,
+      id: `${this.id}-raster`,
       type: 'raster',
       source: this.imageSource.id,
       paint: { 'raster-fade-duration': 0, 'raster-opacity': 0.5 },
     };
   }
 
-  get contourLayer(): LineLayer {
+  get eventCaptureLayer(): FillLayer {
     return ({
-      id: `${this.id}-contour`,
-      type: 'line',
-      source: this.vectorSource.id,
-      paint: { 'line-color': '#4264fb', 'line-width': 3, 'line-opacity': 0 },
-    });
-  }
-
-  get fillLayer(): FillLayer {
-    return ({
-      id: `${this.id}-fill`,
+      id: `${this.id}-event-capture`,
       type: 'fill',
-      source: this.vectorSource.id,
+      source: this.polygonSource.id,
       paint: { 'fill-opacity': 0 },
     });
   }

@@ -2,10 +2,11 @@ import { GeoJSONSource, ImageSource, LngLat, MapLayerMouseEvent, MapMouseEvent }
 import Base from '../Base/Base';
 import Button from '../Button/Button';
 import iconImage from '../icons/image';
-import { highlightLayer, highlightLayerId, resizeLayer, resizeLayerId } from './controlLayers';
-import draggableLayer from './draggableLayer';
-import { EditMode, Cursor } from './types';
 import IImage from './IImage';
+import { getClosestPoint, getVectorLength } from './math';
+import draggableLayer from './draggableLayer';
+import { EditMode, Cursor, ImagePosition } from './types';
+import { highlightLayer, highlightLayerId, resizeLayer, resizeLayerId } from './controlLayers';
 
 export default class ImageControl extends Base {
   button: Button
@@ -82,8 +83,8 @@ export default class ImageControl extends Base {
         const currentPosition = event.lngLat;
         const deltaLng = startPosition.lng - currentPosition.lng;
         const deltaLat = startPosition.lat - currentPosition.lat;
-        selectedImage.position = selectedImage.position.map(coords => [coords[0] - deltaLng, coords[1] - deltaLat]);
-        this.updateSource();
+        const movedPosition = selectedImage.position.map(p => new LngLat(p.lng - deltaLng, p.lat - deltaLat));
+        this.updateImageSource(movedPosition as ImagePosition);
         startPosition = currentPosition;
       },
       onEnd: () => {
@@ -110,22 +111,42 @@ export default class ImageControl extends Base {
         this.map.removeLayer(resizeLayerId);
       },
       onMove: (event: MapMouseEvent) => {
-        const currentPosition = event.lngLat;
-        selectedImage.position[currentIndex] = [currentPosition.lng, currentPosition.lat];
+        const pointA = this.map.project(selectedImage.position[currentIndex]);
+        const pointB = this.map.project(selectedImage.position[selectedImage.getDiagonalCornerIndex(currentIndex)]);
+        const pointP = this.map.project(event.lngLat);
+        const closestPoint = getClosestPoint([pointA.x, pointA.y], [pointB.x, pointB.y], [pointP.x, pointP.y]);
+        const scaledDiagonal = getVectorLength(closestPoint, [pointB.x, pointB.y]);
+        const scaledHeight = Math.sqrt(scaledDiagonal ** 2 / (selectedImage.ratio ** 2 + 1));
+        const scaledWidth = scaledHeight * selectedImage.ratio;
+        const scaledPosition = selectedImage.position;
+
         if (currentIndex === 0) {
-          selectedImage.position[1] = [selectedImage.position[1][0], currentPosition.lat];
-          selectedImage.position[3] = [currentPosition.lng, selectedImage.position[3][1]];
-        } else if (currentIndex === 1) {
-          selectedImage.position[0] = [selectedImage.position[0][0], currentPosition.lat];
-          selectedImage.position[2] = [currentPosition.lng, selectedImage.position[2][1]];
-        } else if (currentIndex === 2) {
-          selectedImage.position[1] = [currentPosition.lng, selectedImage.position[1][1]];
-          selectedImage.position[3] = [selectedImage.position[3][0], currentPosition.lat];
-        } else if (currentIndex === 3) {
-          selectedImage.position[2] = [selectedImage.position[2][0], currentPosition.lat];
-          selectedImage.position[0] = [currentPosition.lng, selectedImage.position[0][1]];
+          const lngLat0 = this.map.unproject(closestPoint);
+          // scaledPosition[0] = [lngLat0.lng, lngLat0.lat];
+          // selectedImage[1] =
+          // selectedImage[3] =
         }
-        this.updateSource();
+
+        console.log(scaledDiagonal);
+        console.log(scaledHeight);
+        console.log(scaledHeight);
+
+
+        // selectedImage.position[currentIndex] = [currentPosition.lng, currentPosition.lat];
+        // if (currentIndex === 0) {
+        //   selectedImage.position[1] = [selectedImage.position[1][0], currentPosition.lat];
+        //   selectedImage.position[3] = [currentPosition.lng, selectedImage.position[3][1]];
+        // } else if (currentIndex === 1) {
+        //   selectedImage.position[0] = [selectedImage.position[0][0], currentPosition.lat];
+        //   selectedImage.position[2] = [currentPosition.lng, selectedImage.position[2][1]];
+        // } else if (currentIndex === 2) {
+        //   selectedImage.position[1] = [currentPosition.lng, selectedImage.position[1][1]];
+        //   selectedImage.position[3] = [selectedImage.position[3][0], currentPosition.lat];
+        // } else if (currentIndex === 3) {
+        //   selectedImage.position[2] = [selectedImage.position[2][0], currentPosition.lat];
+        //   selectedImage.position[0] = [currentPosition.lng, selectedImage.position[0][1]];
+        // }
+        this.updateImageSource(scaledPosition);
       },
       onEnd: () => {
         currentIndex = null;
@@ -172,9 +193,10 @@ export default class ImageControl extends Base {
     this.editMode = null;
   }
 
-  updateSource() {
+  updateImageSource(position: ImagePosition) {
     const selectedImage = this.selectedImage;
-    (this.map.getSource(selectedImage.imageSource.id) as ImageSource).setCoordinates(selectedImage.position);
+    selectedImage.position = position;
+    (this.map.getSource(selectedImage.imageSource.id) as ImageSource).setCoordinates(selectedImage.coordinates);
     (this.map.getSource(selectedImage.polygonSource.id) as GeoJSONSource).setData(selectedImage.asPolygon);
     (this.map.getSource(selectedImage.pointsSource.id) as GeoJSONSource).setData(selectedImage.asPoints);
   }

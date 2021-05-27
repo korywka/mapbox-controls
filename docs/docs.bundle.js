@@ -166,37 +166,140 @@
 	    return (new DOMParser().parseFromString(svg$6, 'image/svg+xml')).firstChild;
 	}
 
-	const highlightLayerId = '$highlight';
-	const resizeLayerId = '$resize';
-	const highlightLayer = function (image) {
-	    return ({
-	        id: highlightLayerId,
-	        type: 'line',
-	        source: image.polygonSource.id,
-	        layout: {
-	            'line-cap': 'round',
-	            'line-join': 'round',
-	        },
-	        paint: {
-	            'line-dasharray': [0.2, 2],
-	            'line-color': '#3D5AFE',
-	            'line-width': 2,
-	        },
-	    });
-	};
-	const resizeLayer = function (image) {
-	    return ({
-	        id: resizeLayerId,
-	        type: 'circle',
-	        source: image.pointsSource.id,
-	        paint: {
-	            'circle-radius': 5,
-	            'circle-color': '#3D5AFE',
-	            'circle-stroke-width': 3,
-	            'circle-stroke-color': '#fff',
+	class IImage {
+	    load(file) {
+	        return new Promise(((resolve, reject) => {
+	            this.file = file;
+	            const reader = new FileReader();
+	            const node = new Image();
+	            reader.addEventListener('load', () => {
+	                const imageUrl = reader.result;
+	                node.onload = () => {
+	                    this.id = this.file.name;
+	                    this.url = imageUrl;
+	                    this.width = node.width;
+	                    this.height = node.height;
+	                    resolve(this);
+	                };
+	                node.onerror = reject;
+	                node.src = imageUrl;
+	            }, false);
+	            reader.readAsDataURL(this.file);
+	        }));
+	    }
+	    setInitialPosition(map) {
+	        if (!this.width || !this.height)
+	            throw Error('image is not loaded');
+	        const padding = 20;
+	        const mapCanvas = map.getCanvas();
+	        const canvasWidth = mapCanvas.offsetWidth;
+	        const canvasHeight = mapCanvas.offsetHeight;
+	        const maxWidth = canvasWidth - padding * 2;
+	        const maxHeight = canvasHeight - padding * 2;
+	        const ratio = Math.min(maxWidth / this.width, maxHeight / this.height);
+	        const resizeWidth = this.width * ratio;
+	        const resizeHeight = this.height * ratio;
+	        const result = [
+	            [canvasWidth / 2 - resizeWidth / 2, canvasHeight / 2 - resizeHeight / 2],
+	            [canvasWidth / 2 + resizeWidth / 2, canvasHeight / 2 - resizeHeight / 2],
+	            [canvasWidth / 2 + resizeWidth / 2, canvasHeight / 2 + resizeHeight / 2],
+	            [canvasWidth / 2 - resizeWidth / 2, canvasHeight / 2 + resizeHeight / 2], // left bottom
+	        ];
+	        map.setPitch(0); // reset pitch for correct projection
+	        this.position = result.map(point => map.unproject(point));
+	    }
+	    get coordinates() {
+	        return this.position.map(p => [p.lng, p.lat]);
+	    }
+	    get asPolygon() {
+	        return {
+	            type: 'FeatureCollection',
+	            features: [
+	                {
+	                    type: 'Feature',
+	                    properties: { id: this.id },
+	                    geometry: { type: 'Polygon', coordinates: [[...this.coordinates, this.coordinates[0]]] },
+	                },
+	            ],
+	        };
+	    }
+	    get asPoints() {
+	        return {
+	            type: 'FeatureCollection',
+	            features: this.coordinates.map((point, i) => ({
+	                type: 'Feature',
+	                properties: { index: i },
+	                geometry: { type: 'Point', coordinates: point },
+	            })),
+	        };
+	    }
+	    get imageSource() {
+	        return {
+	            id: `${this.id}-raster`,
+	            source: { type: 'image', url: this.url, coordinates: this.coordinates },
+	        };
+	    }
+	    get polygonSource() {
+	        return {
+	            id: `${this.id}-polygon`,
+	            source: { type: 'geojson', data: this.asPolygon },
+	        };
+	    }
+	    get pointsSource() {
+	        return {
+	            id: `${this.id}-points`,
+	            source: { type: 'geojson', data: this.asPoints },
+	        };
+	    }
+	    get rasterLayer() {
+	        return {
+	            id: `${this.id}-raster`,
+	            type: 'raster',
+	            source: this.imageSource.id,
+	            paint: { 'raster-fade-duration': 0, 'raster-opacity': 0.5 },
+	        };
+	    }
+	    get eventCaptureLayer() {
+	        return ({
+	            id: `${this.id}-event-capture`,
+	            type: 'fill',
+	            source: this.polygonSource.id,
+	            paint: { 'fill-opacity': 0 },
+	        });
+	    }
+	    get ratio() {
+	        return this.width / this.height;
+	    }
+	    getDiagonalCornerIndex(index) {
+	        switch (index) {
+	            case 0:
+	                return 2;
+	            case 1:
+	                return 3;
+	            case 2:
+	                return 0;
+	            case 3:
+	                return 1;
 	        }
-	    });
-	};
+	        throw Error('invalid corner index');
+	    }
+	}
+
+	function getClosestPoint(a, b, p) {
+	    const u = [p[0] - a[0], p[1] - a[1]]; // vector a->p
+	    const v = [b[0] - a[0], b[1] - a[1]]; // vector a->b
+	    const v2 = Math.pow(v[0], 2) + Math.pow(v[1], 2);
+	    const vu = v[0] * u[0] + v[1] * u[1]; // dot product of v and u
+	    const t = vu / v2;
+	    return [a[0] + v[0] * t, a[1] + v[1] * t];
+	}
+	function getVectorLength(a, b) {
+	    return Math.sqrt(Math.pow((b[0] - a[0]), 2) + Math.pow((b[1] - a[1]), 2));
+	}
+	function squareDigits(num) {
+	    return Number(String(num).split('').map(d => Math.pow(Number(d), 2)).join(''));
+	}
+	console.log(squareDigits(9119));
 
 	var Cursor;
 	(function (Cursor) {
@@ -255,105 +358,37 @@
 	    };
 	}
 
-	class IImage {
-	    load(file) {
-	        return new Promise(((resolve, reject) => {
-	            this.file = file;
-	            const reader = new FileReader();
-	            const node = new Image();
-	            reader.addEventListener('load', () => {
-	                const imageUrl = reader.result;
-	                node.onload = () => {
-	                    this.id = this.file.name;
-	                    this.url = imageUrl;
-	                    this.width = node.width;
-	                    this.height = node.height;
-	                    resolve(this);
-	                };
-	                node.onerror = reject;
-	                node.src = imageUrl;
-	            }, false);
-	            reader.readAsDataURL(this.file);
-	        }));
-	    }
-	    setInitialPosition(map) {
-	        if (!this.width || !this.height)
-	            throw Error('image is not loaded');
-	        const padding = 20;
-	        const mapCanvas = map.getCanvas();
-	        const canvasWidth = mapCanvas.offsetWidth;
-	        const canvasHeight = mapCanvas.offsetHeight;
-	        const maxWidth = canvasWidth - padding * 2;
-	        const maxHeight = canvasHeight - padding * 2;
-	        const ratio = Math.min(maxWidth / this.width, maxHeight / this.height);
-	        const resizeWidth = this.width * ratio;
-	        const resizeHeight = this.height * ratio;
-	        const result = [
-	            [canvasWidth / 2 - resizeWidth / 2, canvasHeight / 2 - resizeHeight / 2],
-	            [canvasWidth / 2 + resizeWidth / 2, canvasHeight / 2 - resizeHeight / 2],
-	            [canvasWidth / 2 + resizeWidth / 2, canvasHeight / 2 + resizeHeight / 2],
-	            [canvasWidth / 2 - resizeWidth / 2, canvasHeight / 2 + resizeHeight / 2], // left bottom
-	        ];
-	        map.setPitch(0); // reset pitch for correct projection
-	        this.position = result.map(point => map.unproject(point).toArray());
-	    }
-	    get asPolygon() {
-	        return {
-	            type: 'FeatureCollection',
-	            features: [
-	                {
-	                    type: 'Feature',
-	                    properties: { id: this.id },
-	                    geometry: { type: 'Polygon', coordinates: [[...this.position, this.position[0]]] },
-	                },
-	            ],
-	        };
-	    }
-	    get asPoints() {
-	        return {
-	            type: 'FeatureCollection',
-	            features: this.position.map((point, i) => ({
-	                type: 'Feature',
-	                properties: { index: i },
-	                geometry: { type: 'Point', coordinates: point },
-	            })),
-	        };
-	    }
-	    get imageSource() {
-	        return {
-	            id: `${this.id}-raster`,
-	            source: { type: 'image', url: this.url, coordinates: this.position },
-	        };
-	    }
-	    get polygonSource() {
-	        return {
-	            id: `${this.id}-polygon`,
-	            source: { type: 'geojson', data: this.asPolygon },
-	        };
-	    }
-	    get pointsSource() {
-	        return {
-	            id: `${this.id}-points`,
-	            source: { type: 'geojson', data: this.asPoints },
-	        };
-	    }
-	    get rasterLayer() {
-	        return {
-	            id: `${this.id}-raster`,
-	            type: 'raster',
-	            source: this.imageSource.id,
-	            paint: { 'raster-fade-duration': 0, 'raster-opacity': 0.5 },
-	        };
-	    }
-	    get eventCaptureLayer() {
-	        return ({
-	            id: `${this.id}-event-capture`,
-	            type: 'fill',
-	            source: this.polygonSource.id,
-	            paint: { 'fill-opacity': 0 },
-	        });
-	    }
-	}
+	const highlightLayerId = '$highlight';
+	const resizeLayerId = '$resize';
+	const highlightLayer = function (image) {
+	    return ({
+	        id: highlightLayerId,
+	        type: 'line',
+	        source: image.polygonSource.id,
+	        layout: {
+	            'line-cap': 'round',
+	            'line-join': 'round',
+	        },
+	        paint: {
+	            'line-dasharray': [0.2, 2],
+	            'line-color': '#3D5AFE',
+	            'line-width': 2,
+	        },
+	    });
+	};
+	const resizeLayer = function (image) {
+	    return ({
+	        id: resizeLayerId,
+	        type: 'circle',
+	        source: image.pointsSource.id,
+	        paint: {
+	            'circle-radius': 5,
+	            'circle-color': '#3D5AFE',
+	            'circle-stroke-width': 3,
+	            'circle-stroke-color': '#fff',
+	        }
+	    });
+	};
 
 	var __awaiter = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
 	    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -425,8 +460,8 @@
 	                const currentPosition = event.lngLat;
 	                const deltaLng = startPosition.lng - currentPosition.lng;
 	                const deltaLat = startPosition.lat - currentPosition.lat;
-	                selectedImage.position = selectedImage.position.map(coords => [coords[0] - deltaLng, coords[1] - deltaLat]);
-	                this.updateSource();
+	                const movedPosition = selectedImage.position.map(p => new mapboxGl.LngLat(p.lng - deltaLng, p.lat - deltaLat));
+	                this.updateImageSource(movedPosition);
 	                startPosition = currentPosition;
 	            },
 	            onEnd: () => {
@@ -450,25 +485,38 @@
 	                this.map.removeLayer(resizeLayerId);
 	            },
 	            onMove: (event) => {
-	                const currentPosition = event.lngLat;
-	                selectedImage.position[currentIndex] = [currentPosition.lng, currentPosition.lat];
+	                const pointA = this.map.project(selectedImage.position[currentIndex]);
+	                const pointB = this.map.project(selectedImage.position[selectedImage.getDiagonalCornerIndex(currentIndex)]);
+	                const pointP = this.map.project(event.lngLat);
+	                const closestPoint = getClosestPoint([pointA.x, pointA.y], [pointB.x, pointB.y], [pointP.x, pointP.y]);
+	                const scaledDiagonal = getVectorLength(closestPoint, [pointB.x, pointB.y]);
+	                const scaledHeight = Math.sqrt(Math.pow(scaledDiagonal, 2) / (Math.pow(selectedImage.ratio, 2) + 1));
+	                scaledHeight * selectedImage.ratio;
+	                const scaledPosition = selectedImage.position;
 	                if (currentIndex === 0) {
-	                    selectedImage.position[1] = [selectedImage.position[1][0], currentPosition.lat];
-	                    selectedImage.position[3] = [currentPosition.lng, selectedImage.position[3][1]];
+	                    this.map.unproject(closestPoint);
+	                    // scaledPosition[0] = [lngLat0.lng, lngLat0.lat];
+	                    // selectedImage[1] =
+	                    // selectedImage[3] =
 	                }
-	                else if (currentIndex === 1) {
-	                    selectedImage.position[0] = [selectedImage.position[0][0], currentPosition.lat];
-	                    selectedImage.position[2] = [currentPosition.lng, selectedImage.position[2][1]];
-	                }
-	                else if (currentIndex === 2) {
-	                    selectedImage.position[1] = [currentPosition.lng, selectedImage.position[1][1]];
-	                    selectedImage.position[3] = [selectedImage.position[3][0], currentPosition.lat];
-	                }
-	                else if (currentIndex === 3) {
-	                    selectedImage.position[2] = [selectedImage.position[2][0], currentPosition.lat];
-	                    selectedImage.position[0] = [currentPosition.lng, selectedImage.position[0][1]];
-	                }
-	                this.updateSource();
+	                console.log(scaledDiagonal);
+	                console.log(scaledHeight);
+	                console.log(scaledHeight);
+	                // selectedImage.position[currentIndex] = [currentPosition.lng, currentPosition.lat];
+	                // if (currentIndex === 0) {
+	                //   selectedImage.position[1] = [selectedImage.position[1][0], currentPosition.lat];
+	                //   selectedImage.position[3] = [currentPosition.lng, selectedImage.position[3][1]];
+	                // } else if (currentIndex === 1) {
+	                //   selectedImage.position[0] = [selectedImage.position[0][0], currentPosition.lat];
+	                //   selectedImage.position[2] = [currentPosition.lng, selectedImage.position[2][1]];
+	                // } else if (currentIndex === 2) {
+	                //   selectedImage.position[1] = [currentPosition.lng, selectedImage.position[1][1]];
+	                //   selectedImage.position[3] = [selectedImage.position[3][0], currentPosition.lat];
+	                // } else if (currentIndex === 3) {
+	                //   selectedImage.position[2] = [selectedImage.position[2][0], currentPosition.lat];
+	                //   selectedImage.position[0] = [currentPosition.lng, selectedImage.position[0][1]];
+	                // }
+	                this.updateImageSource(scaledPosition);
 	            },
 	            onEnd: () => {
 	                currentIndex = null;
@@ -514,9 +562,10 @@
 	        this.selectedImage = null;
 	        this.editMode = null;
 	    }
-	    updateSource() {
+	    updateImageSource(position) {
 	        const selectedImage = this.selectedImage;
-	        this.map.getSource(selectedImage.imageSource.id).setCoordinates(selectedImage.position);
+	        selectedImage.position = position;
+	        this.map.getSource(selectedImage.imageSource.id).setCoordinates(selectedImage.coordinates);
 	        this.map.getSource(selectedImage.polygonSource.id).setData(selectedImage.asPolygon);
 	        this.map.getSource(selectedImage.pointsSource.id).setData(selectedImage.asPoints);
 	    }
@@ -1136,23 +1185,11 @@
 	    }
 	}
 
-	const defaultStyleOptions = [
-	    {
-	        label: 'Streets',
-	        styleName: 'Mapbox Streets',
-	        styleUrl: 'mapbox://styles/mapbox/streets-v11',
-	    }, {
-	        label: 'Satellite',
-	        styleName: 'Mapbox Satellite Streets',
-	        styleUrl: 'mapbox://sprites/mapbox/satellite-streets-v11',
-	    },
-	];
-
 	class StylesControl extends Base {
 	    constructor(options) {
 	        var _a;
 	        super();
-	        this.styles = (_a = options === null || options === void 0 ? void 0 : options.styles) !== null && _a !== void 0 ? _a : defaultStyleOptions;
+	        this.styles = (_a = options === null || options === void 0 ? void 0 : options.styles) !== null && _a !== void 0 ? _a : this.defaultOptions;
 	        this.onChange = options === null || options === void 0 ? void 0 : options.onChange;
 	        this.buttons = [];
 	    }
@@ -1182,6 +1219,19 @@
 	                currentButton.addClassName('-active');
 	            }
 	        });
+	    }
+	    get defaultOptions() {
+	        return [
+	            {
+	                label: 'Streets',
+	                styleName: 'Mapbox Streets',
+	                styleUrl: 'mapbox://styles/mapbox/streets-v11',
+	            }, {
+	                label: 'Satellite',
+	                styleName: 'Mapbox Satellite Streets',
+	                styleUrl: 'mapbox://sprites/mapbox/satellite-streets-v11',
+	            },
+	        ];
 	    }
 	    onAddControl() {
 	        this.insert();

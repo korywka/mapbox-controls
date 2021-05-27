@@ -1,3 +1,7 @@
+import { LngLat } from 'mapbox-gl';
+
+export type ImagePosition = [LngLat, LngLat, LngLat, LngLat]
+
 export enum Cursor {
   Default = '',
   Move = 'move',

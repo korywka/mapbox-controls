@@ -1,5 +1,6 @@
-import { FillLayer, GeoJSONSourceRaw, ImageSourceRaw, Map, RasterLayer } from 'mapbox-gl';
-import { FeatureCollection, Position } from 'geojson';
+import { FillLayer, GeoJSONSourceRaw, ImageSourceRaw, LngLat, Map, RasterLayer } from 'mapbox-gl';
+import { FeatureCollection } from 'geojson';
+import { ImagePosition } from './types';
 
 class IImage {
   id: string
@@ -7,7 +8,7 @@ class IImage {
   url: string
   width: number
   height: number
-  position: Position[] /* [lng, lat] or [y, x] */
+  position: ImagePosition /* LngLat: y, x */
 
   load(file: File) {
     return new Promise(((resolve, reject) => {
@@ -53,7 +54,11 @@ class IImage {
       [canvasWidth / 2 - resizeWidth / 2, canvasHeight / 2 + resizeHeight / 2], // left bottom
     ];
     map.setPitch(0); // reset pitch for correct projection
-    this.position = result.map(point => map.unproject(point).toArray());
+    this.position = result.map(point => map.unproject(point)) as ImagePosition;
+  }
+
+  get coordinates() {
+    return this.position.map(p => [p.lng, p.lat]);
   }
 
   get asPolygon(): FeatureCollection {
@@ -63,7 +68,7 @@ class IImage {
         {
           type: 'Feature',
           properties: { id: this.id },
-          geometry: { type: 'Polygon', coordinates: [[...this.position, this.position[0]]] },
+          geometry: { type: 'Polygon', coordinates: [[...this.coordinates, this.coordinates[0]]] },
         },
       ],
     };
@@ -72,7 +77,7 @@ class IImage {
   get asPoints(): FeatureCollection {
     return {
       type: 'FeatureCollection',
-      features: this.position.map((point, i) => ({
+      features: this.coordinates.map((point, i) => ({
         type: 'Feature',
         properties: { index: i },
         geometry: { type: 'Point', coordinates: point },
@@ -83,7 +88,7 @@ class IImage {
   get imageSource(): { id: string, source: ImageSourceRaw } {
     return {
       id: `${this.id}-raster`,
-      source: { type: 'image', url: this.url, coordinates: this.position },
+      source: { type: 'image', url: this.url, coordinates: this.coordinates },
     };
   }
 
@@ -117,6 +122,25 @@ class IImage {
       source: this.polygonSource.id,
       paint: { 'fill-opacity': 0 },
     });
+  }
+
+  get ratio() {
+    return this.width / this.height;
+  }
+
+  getDiagonalCornerIndex(index: number): number {
+    switch (index) {
+    case 0:
+      return 2;
+    case 1:
+      return 3;
+    case 2:
+      return 0;
+    case 3:
+      return 1;
+    }
+
+    throw Error('invalid corner index');
   }
 }
 

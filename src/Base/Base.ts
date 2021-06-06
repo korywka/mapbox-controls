@@ -27,8 +27,19 @@ class Base {
   onAddControl() {
     // extend
   }
+
   onRemoveControl() {
     // extend
+  }
+
+  ifStyleLoaded(callback) {
+    if (this.map.isStyleLoaded()) {
+      callback();
+    } else {
+      this.map.on('style.load', () => {
+        callback();
+      });
+    }
   }
 
   private onAdd(map: Map) {

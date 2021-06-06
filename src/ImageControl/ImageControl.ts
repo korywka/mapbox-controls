@@ -3,9 +3,9 @@ import Base from '../Base/Base';
 import Button from '../Button/Button';
 import iconImage from '../icons/image';
 import IImage from './IImage';
-import { getClosestPoint, getVectorLength } from './math';
+import getClosestPoint from './getClosestPoint';
 import draggableLayer from './draggableLayer';
-import { EditMode, Cursor, ImagePosition } from './types';
+import { EditMode, Cursor, ImagePosition, Visibility } from './types';
 import { highlightLayer, highlightLayerId, resizeLayer, resizeLayerId } from './controlLayers';
 
 export default class ImageControl extends Base {
@@ -16,8 +16,8 @@ export default class ImageControl extends Base {
   images: IImage[]
   editMode?: EditMode
   selectedImage?: IImage
-  disableMoving?: () => void
-  disableResizing?: () => void
+  modeMovingOff?: () => void
+  modeResizingOff?: () => void
 
   constructor() {
     super();
@@ -54,8 +54,8 @@ export default class ImageControl extends Base {
 
   drawImage(image: IImage) {
     this.map.addSource(image.imageSource.id, image.imageSource.source);
-    this.map.addSource(image.polygonSource.id, image.polygonSource.source);
-    this.map.addSource(image.pointsSource.id, image.pointsSource.source);
+    this.map.addSource(image.shapeSource.id, image.shapeSource.source);
+    this.map.addSource(image.cornersSource.id, image.cornersSource.source);
     this.map.addLayer(image.rasterLayer);
     this.map.addLayer(image.eventCaptureLayer);
   }
@@ -70,14 +70,15 @@ export default class ImageControl extends Base {
     }
   }
 
-  enableMoving() {
+  modeMovingOn() {
     let startPosition: LngLat = null;
     const selectedImage = this.selectedImage;
     const eventCaptureLayerId = selectedImage.eventCaptureLayer.id;
-    const dragCleanup = draggableLayer(this.map, eventCaptureLayerId, {
+    const draggableLayerCleanup = draggableLayer(this.map, eventCaptureLayerId, {
       onStart: (event: MapLayerMouseEvent) => {
         startPosition = event.lngLat;
-        this.map.removeLayer(highlightLayerId);
+        this.map.setLayoutProperty(highlightLayerId, 'visibility', Visibility.None);
+        this.mapCanvas.style.cursor = Cursor.Grabbing;
       },
       onMove: (event: MapMouseEvent) => {
         const currentPosition = event.lngLat;
@@ -88,84 +89,80 @@ export default class ImageControl extends Base {
         startPosition = currentPosition;
       },
       onEnd: () => {
-        this.map.addLayer(highlightLayer(this.selectedImage));
+        this.map.setLayoutProperty(highlightLayerId, 'visibility', Visibility.Visible);
+        this.mapCanvas.style.cursor = Cursor.Move;
+      },
+      onPointerEnter: () => {
+        this.mapCanvas.style.cursor = Cursor.Move;
+      },
+      onPointerLeave: () => {
+        this.mapCanvas.style.cursor = '';
       },
     });
 
-    this.mapCanvas.style.cursor = Cursor.Move;
     this.map.addLayer(highlightLayer(this.selectedImage));
 
-    this.disableMoving = () => {
-      dragCleanup();
+    this.modeMovingOff = () => {
+      draggableLayerCleanup();
       this.map.removeLayer(highlightLayerId);
+      this.mapCanvas.style.cursor = '';
     };
   }
 
-  enableResizing() {
-    let currentIndex;
+  moveResizingOn() {
+    let currentIndex: number;
     const selectedImage = this.selectedImage;
-    const dragCleanup = draggableLayer(this.map, resizeLayerId, {
+    const draggableLayerCleanup = draggableLayer(this.map, resizeLayerId, {
       onStart: (event: MapLayerMouseEvent) => {
-        currentIndex = event.features[0].properties.index as number;
-        this.map.removeLayer(highlightLayerId);
-        this.map.removeLayer(resizeLayerId);
+        currentIndex = event.features[0].properties.index;
+        this.map.setLayoutProperty(highlightLayerId, 'visibility', Visibility.None);
+        this.map.setLayoutProperty(resizeLayerId, 'visibility', Visibility.None);
       },
       onMove: (event: MapMouseEvent) => {
         const pointA = this.map.project(selectedImage.position[currentIndex]);
-        const pointB = this.map.project(selectedImage.position[selectedImage.getDiagonalCornerIndex(currentIndex)]);
+        const pointB = this.map.project(selectedImage.position[selectedImage.getOppositePoint(currentIndex)]);
         const pointP = this.map.project(event.lngLat);
         const closestPoint = getClosestPoint([pointA.x, pointA.y], [pointB.x, pointB.y], [pointP.x, pointP.y]);
-        const scaledDiagonal = getVectorLength(closestPoint, [pointB.x, pointB.y]);
-        const scaledHeight = Math.sqrt(scaledDiagonal ** 2 / (selectedImage.ratio ** 2 + 1));
-        const scaledWidth = scaledHeight * selectedImage.ratio;
+        const closestLngLat = this.map.unproject(closestPoint);
         const scaledPosition = selectedImage.position;
 
+        scaledPosition[currentIndex] = new LngLat(closestLngLat.lng, closestLngLat.lat);
+
         if (currentIndex === 0) {
-          const lngLat0 = this.map.unproject(closestPoint);
-          // scaledPosition[0] = [lngLat0.lng, lngLat0.lat];
-          // selectedImage[1] =
-          // selectedImage[3] =
+          scaledPosition[1] = new LngLat(scaledPosition[1].lng, closestLngLat.lat);
+          scaledPosition[3] = new LngLat(closestLngLat.lng, scaledPosition[3].lat);
+        } else if (currentIndex === 1) {
+          scaledPosition[0] = new LngLat(scaledPosition[0].lng, closestLngLat.lat);
+          scaledPosition[2] = new LngLat(closestLngLat.lng, scaledPosition[2].lat);
+        } else if (currentIndex === 2) {
+          scaledPosition[3] = new LngLat(scaledPosition[3].lng, closestLngLat.lat);
+          scaledPosition[1] = new LngLat(closestLngLat.lng, scaledPosition[1].lat);
+        } else if (currentIndex === 3) {
+          scaledPosition[2] = new LngLat(scaledPosition[2].lng, closestLngLat.lat);
+          scaledPosition[0] = new LngLat(closestLngLat.lng, scaledPosition[0].lat);
         }
 
-        console.log(scaledDiagonal);
-        console.log(scaledHeight);
-        console.log(scaledHeight);
-
-
-        // selectedImage.position[currentIndex] = [currentPosition.lng, currentPosition.lat];
-        // if (currentIndex === 0) {
-        //   selectedImage.position[1] = [selectedImage.position[1][0], currentPosition.lat];
-        //   selectedImage.position[3] = [currentPosition.lng, selectedImage.position[3][1]];
-        // } else if (currentIndex === 1) {
-        //   selectedImage.position[0] = [selectedImage.position[0][0], currentPosition.lat];
-        //   selectedImage.position[2] = [currentPosition.lng, selectedImage.position[2][1]];
-        // } else if (currentIndex === 2) {
-        //   selectedImage.position[1] = [currentPosition.lng, selectedImage.position[1][1]];
-        //   selectedImage.position[3] = [selectedImage.position[3][0], currentPosition.lat];
-        // } else if (currentIndex === 3) {
-        //   selectedImage.position[2] = [selectedImage.position[2][0], currentPosition.lat];
-        //   selectedImage.position[0] = [currentPosition.lng, selectedImage.position[0][1]];
-        // }
         this.updateImageSource(scaledPosition);
       },
       onEnd: () => {
         currentIndex = null;
-        this.map.addLayer(highlightLayer(this.selectedImage));
-        this.map.addLayer(resizeLayer(this.selectedImage));
+        this.map.setLayoutProperty(highlightLayerId, 'visibility', Visibility.Visible);
+        this.map.setLayoutProperty(resizeLayerId, 'visibility', Visibility.Visible);
       },
-      getHoverCursor: (event: MapLayerMouseEvent) => {
-        const index = event.features[0].properties.index as number;
-        return [1, 3].includes(index) ? Cursor.NESWResize : Cursor.NWSEResize;
-      },
+      // customCursor: (event: MapLayerMouseEvent) => {
+      //   const index = event.features[0].properties.index as number;
+      //   return [1, 3].includes(index) ? Cursor.NESWResize : Cursor.NWSEResize;
+      // },
     });
 
     this.map.addLayer(highlightLayer(this.selectedImage));
     this.map.addLayer(resizeLayer(this.selectedImage));
 
-    this.disableResizing = () => {
-      dragCleanup();
+    this.modeResizingOff = () => {
+      draggableLayerCleanup();
       this.map.removeLayer(resizeLayerId);
       this.map.removeLayer(highlightLayerId);
+      this.mapCanvas.style.cursor = '';
     };
   }
 
@@ -174,20 +171,20 @@ export default class ImageControl extends Base {
     this.selectedImage = this.images.find(i => i.id === id);
     if (!this.editMode) {
       this.editMode = EditMode.Move;
-      this.enableMoving();
+      this.modeMovingOn();
     } else if (this.editMode === EditMode.Move) {
       this.editMode = EditMode.Transform;
-      this.disableMoving();
-      this.enableResizing();
+      this.modeMovingOff();
+      this.moveResizingOn();
     }
   }
 
   deselectImage() {
     if (!this.selectedImage) return;
     if (this.editMode === EditMode.Move) {
-      this.disableMoving();
+      this.modeMovingOff();
     } else if (this.editMode === EditMode.Transform) {
-      this.disableResizing();
+      this.modeResizingOff();
     }
     this.selectedImage = null;
     this.editMode = null;
@@ -197,12 +194,14 @@ export default class ImageControl extends Base {
     const selectedImage = this.selectedImage;
     selectedImage.position = position;
     (this.map.getSource(selectedImage.imageSource.id) as ImageSource).setCoordinates(selectedImage.coordinates);
-    (this.map.getSource(selectedImage.polygonSource.id) as GeoJSONSource).setData(selectedImage.asPolygon);
-    (this.map.getSource(selectedImage.pointsSource.id) as GeoJSONSource).setData(selectedImage.asPoints);
+    (this.map.getSource(selectedImage.shapeSource.id) as GeoJSONSource).setData(selectedImage.asPolygon);
+    (this.map.getSource(selectedImage.cornersSource.id) as GeoJSONSource).setData(selectedImage.asPoints);
   }
 
   onAddControl() {
-    this.insert();
+    this.ifStyleLoaded(() => {
+      this.insert();
+    });
     this.mapContainer = this.map.getContainer();
     this.mapCanvas = this.map.getCanvas();
     this.map.on('click', this.onMapClick);

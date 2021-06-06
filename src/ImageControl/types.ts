@@ -14,3 +14,8 @@ export enum EditMode {
   Move= 'move',
   Transform = 'transform',
 }
+
+export enum Visibility {
+  Visible= 'visible',
+  None = 'none',
+}

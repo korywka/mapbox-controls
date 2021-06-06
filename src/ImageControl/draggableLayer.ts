@@ -1,57 +1,46 @@
 import { Map, MapLayerMouseEvent, MapMouseEvent } from 'mapbox-gl';
-import { Cursor } from './types';
 
 interface Options {
   onMove: (MapMouseEvent) => void
   onStart?: (MapLayerMouseEvent) => void
   onEnd?: (MapMouseEvent) => void
-  getHoverCursor?: (MapLayerMouseEvent) => Cursor
+  onPointerEnter?: (MapLayerMouseEvent) => void
+  onPointerLeave?: () => void
 }
 
 export default function draggableLayer(map: Map, layerId: string, options: Options) {
-  const { onStart, onMove, onEnd, getHoverCursor } = options;
-  const mapCanvas = map.getCanvas();
-  let hoverCursor = Cursor.Move;
+  const { onStart, onMove, onEnd, onPointerEnter, onPointerLeave } = options;
 
-  const onPointerMove = (event: MapMouseEvent) => {
-    mapCanvas.style.cursor = Cursor.Grabbing;
-    onMove(event);
-  };
+  const pointerMoveListener = (event: MapMouseEvent) => onMove(event);
 
-  const onPointerUp = (event: MapMouseEvent) => {
-    mapCanvas.style.cursor = hoverCursor;
-    map.off('mousemove', onPointerMove);
+  const pointerUpListener = (event: MapMouseEvent) => {
+    map.off('mousemove', pointerMoveListener);
     if (onEnd) onEnd(event);
   };
 
-  const onPointerDown = (event: MapLayerMouseEvent) => {
+  const onPointerDownListener = (event: MapLayerMouseEvent) => {
     event.preventDefault();
-    mapCanvas.style.cursor = Cursor.Grabbing;
-    map.on('mousemove', onPointerMove);
-    map.once('mouseup', onPointerUp);
+    map.on('mousemove', pointerMoveListener);
+    map.once('mouseup', pointerUpListener);
     if (onStart) onStart(event);
   };
 
-  const onPointerEnter = (event: MapLayerMouseEvent) => {
-    if (getHoverCursor) {
-      hoverCursor = getHoverCursor(event);
-    }
-    mapCanvas.style.cursor = hoverCursor;
+  const pointerEnterListener = (event: MapLayerMouseEvent) => {
+    if (onPointerEnter) onPointerEnter(event);
   };
 
-  const onPointerLeave = () => {
-    mapCanvas.style.cursor = Cursor.Default;
+  const pointerLeaveListener = () => {
+    if (onPointerLeave) onPointerLeave();
   };
 
-  map.on('mouseenter', layerId, onPointerEnter);
-  map.on('mouseleave', layerId, onPointerLeave);
-  map.on('mousedown', layerId, onPointerDown);
+  map.on('mouseenter', layerId, pointerEnterListener);
+  map.on('mouseleave', layerId, pointerLeaveListener);
+  map.on('mousedown', layerId, onPointerDownListener);
 
   return () => {
-    mapCanvas.style.cursor = Cursor.Default;
-    map.off('mouseenter', layerId, onPointerEnter);
-    map.off('mouseleave', layerId, onPointerLeave);
-    map.off('mousedown', layerId, onPointerDown);
-    map.off('mousemove', onPointerMove);
+    map.off('mouseenter', layerId, pointerEnterListener);
+    map.off('mouseleave', layerId, pointerLeaveListener);
+    map.off('mousedown', layerId, onPointerDownListener);
+    map.off('mousemove', pointerMoveListener);
   };
 }

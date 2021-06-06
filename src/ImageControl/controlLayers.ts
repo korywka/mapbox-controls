@@ -8,7 +8,7 @@ export const highlightLayer = function (image: IImage): LineLayer {
   return ({
     id: highlightLayerId,
     type: 'line',
-    source: image.polygonSource.id,
+    source: image.shapeSource.id,
     layout: {
       'line-cap': 'round',
       'line-join': 'round',
@@ -25,7 +25,7 @@ export const resizeLayer = function (image: IImage): CircleLayer {
   return ({
     id: resizeLayerId,
     type: 'circle',
-    source: image.pointsSource.id,
+    source: image.cornersSource.id,
     paint: {
       'circle-radius': 5,
       'circle-color': '#3D5AFE',

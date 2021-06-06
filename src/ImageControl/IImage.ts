@@ -1,19 +1,16 @@
-import { FillLayer, GeoJSONSourceRaw, ImageSourceRaw, LngLat, Map, RasterLayer } from 'mapbox-gl';
+import { FillLayer, GeoJSONSourceRaw, ImageSourceRaw, Map, RasterLayer } from 'mapbox-gl';
 import { FeatureCollection } from 'geojson';
 import { ImagePosition } from './types';
 
 class IImage {
   id: string
-  file: File
   url: string
   width: number
   height: number
-  position: ImagePosition /* LngLat: y, x */
+  position: ImagePosition
 
   load(file: File) {
     return new Promise(((resolve, reject) => {
-      this.file = file;
-
       const reader = new FileReader();
       const node = new Image();
 
@@ -21,7 +18,7 @@ class IImage {
         const imageUrl = reader.result as string;
 
         node.onload = () => {
-          this.id = this.file.name;
+          this.id = file.name;
           this.url = imageUrl;
           this.width = node.width;
           this.height = node.height;
@@ -32,7 +29,7 @@ class IImage {
         node.src = imageUrl;
       }, false);
 
-      reader.readAsDataURL(this.file);
+      reader.readAsDataURL(file);
     }));
   }
 
@@ -92,16 +89,16 @@ class IImage {
     };
   }
 
-  get polygonSource(): { id: string, source: GeoJSONSourceRaw } {
+  get shapeSource(): { id: string, source: GeoJSONSourceRaw } {
     return {
-      id: `${this.id}-polygon`,
+      id: `${this.id}-shape`,
       source: { type: 'geojson', data: this.asPolygon },
     };
   }
 
-  get pointsSource(): { id: string, source: GeoJSONSourceRaw } {
+  get cornersSource(): { id: string, source: GeoJSONSourceRaw } {
     return {
-      id: `${this.id}-points`,
+      id: `${this.id}-corners`,
       source: { type: 'geojson', data: this.asPoints },
     };
   }
@@ -119,7 +116,7 @@ class IImage {
     return ({
       id: `${this.id}-event-capture`,
       type: 'fill',
-      source: this.polygonSource.id,
+      source: this.shapeSource.id,
       paint: { 'fill-opacity': 0 },
     });
   }
@@ -128,18 +125,11 @@ class IImage {
     return this.width / this.height;
   }
 
-  getDiagonalCornerIndex(index: number): number {
-    switch (index) {
-    case 0:
-      return 2;
-    case 1:
-      return 3;
-    case 2:
-      return 0;
-    case 3:
-      return 1;
-    }
-
+  getOppositePoint(index: number): number {
+    if (index === 0) return 2;
+    if (index === 1) return 3;
+    if (index === 2) return 0;
+    if (index === 3) return 1;
     throw Error('invalid corner index');
   }
 }

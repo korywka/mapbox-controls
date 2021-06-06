@@ -292,49 +292,6 @@
 	    }
 	}
 
-	function getClosestPoint(a, b, p) {
-	    const u = [p[0] - a[0], p[1] - a[1]]; // vector a->p
-	    const v = [b[0] - a[0], b[1] - a[1]]; // vector a->b
-	    const v2 = Math.pow(v[0], 2) + Math.pow(v[1], 2);
-	    const vu = v[0] * u[0] + v[1] * u[1]; // dot product of v and u
-	    const t = vu / v2;
-	    return [a[0] + v[0] * t, a[1] + v[1] * t];
-	}
-
-	function draggableLayer(map, layerId, options) {
-	    const { onStart, onMove, onEnd, onPointerEnter, onPointerLeave } = options;
-	    const pointerMoveListener = (event) => onMove(event);
-	    const pointerUpListener = (event) => {
-	        map.off('mousemove', pointerMoveListener);
-	        if (onEnd)
-	            onEnd(event);
-	    };
-	    const onPointerDownListener = (event) => {
-	        event.preventDefault();
-	        map.on('mousemove', pointerMoveListener);
-	        map.once('mouseup', pointerUpListener);
-	        if (onStart)
-	            onStart(event);
-	    };
-	    const pointerEnterListener = (event) => {
-	        if (onPointerEnter)
-	            onPointerEnter(event);
-	    };
-	    const pointerLeaveListener = () => {
-	        if (onPointerLeave)
-	            onPointerLeave();
-	    };
-	    map.on('mouseenter', layerId, pointerEnterListener);
-	    map.on('mouseleave', layerId, pointerLeaveListener);
-	    map.on('mousedown', layerId, onPointerDownListener);
-	    return () => {
-	        map.off('mouseenter', layerId, pointerEnterListener);
-	        map.off('mouseleave', layerId, pointerLeaveListener);
-	        map.off('mousedown', layerId, onPointerDownListener);
-	        map.off('mousemove', pointerMoveListener);
-	    };
-	}
-
 	var Cursor;
 	(function (Cursor) {
 	    Cursor["Default"] = "";
@@ -354,37 +311,150 @@
 	    Visibility["None"] = "none";
 	})(Visibility || (Visibility = {}));
 
-	const highlightLayerId = '$highlight';
-	const resizeLayerId = '$resize';
-	const highlightLayer = function (image) {
-	    return ({
-	        id: highlightLayerId,
-	        type: 'line',
-	        source: image.shapeSource.id,
-	        layout: {
-	            'line-cap': 'round',
-	            'line-join': 'round',
-	        },
-	        paint: {
-	            'line-dasharray': [0.2, 2],
-	            'line-color': '#3D5AFE',
-	            'line-width': 2,
-	        },
-	    });
+	const contourLayer = {
+	    id: '$contourLayerId',
+	    type: 'line',
+	    layout: {
+	        'line-cap': 'round',
+	        'line-join': 'round',
+	    },
+	    paint: {
+	        'line-dasharray': [0.2, 2],
+	        'line-color': '#3d5afe',
+	        'line-width': 2,
+	    },
 	};
-	const resizeLayer = function (image) {
-	    return ({
-	        id: resizeLayerId,
-	        type: 'circle',
-	        source: image.cornersSource.id,
-	        paint: {
-	            'circle-radius': 5,
-	            'circle-color': '#3D5AFE',
-	            'circle-stroke-width': 3,
-	            'circle-stroke-color': '#fff',
+	const shadowLayer = {
+	    id: '$shadowLayerId',
+	    type: 'fill',
+	    paint: { 'fill-opacity': 0 },
+	};
+	const cornersLayer = {
+	    id: '$cornersLayer',
+	    type: 'circle',
+	    paint: {
+	        'circle-radius': 5,
+	        'circle-color': '#3d5afe',
+	        'circle-stroke-width': 3,
+	        'circle-stroke-color': '#fff',
+	    }
+	};
+
+	function moveable(map, image, onUpdate) {
+	    const mapCanvas = map.getCanvas();
+	    let startPosition = null;
+	    map.addLayer(Object.assign(Object.assign({}, contourLayer), { source: image.shapeSource.id }));
+	    map.addLayer(Object.assign(Object.assign({}, shadowLayer), { source: image.shapeSource.id }));
+	    function onPointerMove(event) {
+	        const currentPosition = event.lngLat;
+	        const deltaLng = startPosition.lng - currentPosition.lng;
+	        const deltaLat = startPosition.lat - currentPosition.lat;
+	        onUpdate(image.position.map(p => new mapboxGl.LngLat(p.lng - deltaLng, p.lat - deltaLat)));
+	        startPosition = currentPosition;
+	    }
+	    function onPointerUp() {
+	        mapCanvas.style.cursor = Cursor.Move;
+	        map.off('mousemove', onPointerMove);
+	        map.setLayoutProperty(contourLayer.id, 'visibility', Visibility.Visible);
+	    }
+	    function onPointerDown(event) {
+	        event.preventDefault();
+	        startPosition = event.lngLat;
+	        mapCanvas.style.cursor = Cursor.Grabbing;
+	        map.once('mouseup', onPointerUp);
+	        map.on('mousemove', onPointerMove);
+	        map.setLayoutProperty(contourLayer.id, 'visibility', Visibility.None);
+	    }
+	    function onPointerEnter() {
+	        mapCanvas.style.cursor = Cursor.Move;
+	    }
+	    function onPointerLeave() {
+	        mapCanvas.style.cursor = '';
+	    }
+	    map.on('mouseenter', shadowLayer.id, onPointerEnter);
+	    map.on('mouseleave', shadowLayer.id, onPointerLeave);
+	    map.on('mousedown', shadowLayer.id, onPointerDown);
+	    return () => {
+	        mapCanvas.style.cursor = '';
+	        map.off('mousemove', onPointerMove);
+	        map.off('mouseenter', shadowLayer.id, onPointerEnter);
+	        map.off('mouseleave', shadowLayer.id, onPointerLeave);
+	        map.off('mousedown', shadowLayer.id, onPointerDown);
+	        map.removeLayer(shadowLayer.id);
+	        map.removeLayer(contourLayer.id);
+	    };
+	}
+
+	function getClosestPoint(a, b, p) {
+	    const u = [p[0] - a[0], p[1] - a[1]]; // vector a->p
+	    const v = [b[0] - a[0], b[1] - a[1]]; // vector a->b
+	    const v2 = Math.pow(v[0], 2) + Math.pow(v[1], 2);
+	    const vu = v[0] * u[0] + v[1] * u[1]; // dot product of v and u
+	    const t = vu / v2;
+	    return [a[0] + v[0] * t, a[1] + v[1] * t];
+	}
+	function resizeable(map, image, onUpdate) {
+	    let currentIndex;
+	    map.addLayer(Object.assign(Object.assign({}, contourLayer), { source: image.shapeSource.id }));
+	    map.addLayer(Object.assign(Object.assign({}, cornersLayer), { source: image.cornersSource.id }));
+	    function onPointerMove(event) {
+	        const pointA = map.project(image.position[currentIndex]);
+	        const pointB = map.project(image.position[image.getOppositePoint(currentIndex)]);
+	        const pointP = map.project(event.lngLat);
+	        const closestPoint = getClosestPoint([pointA.x, pointA.y], [pointB.x, pointB.y], [pointP.x, pointP.y]);
+	        const closestLngLat = map.unproject(closestPoint);
+	        const scaledPosition = image.position;
+	        scaledPosition[currentIndex] = new mapboxGl.LngLat(closestLngLat.lng, closestLngLat.lat);
+	        if (currentIndex === 0) {
+	            scaledPosition[1] = new mapboxGl.LngLat(scaledPosition[1].lng, closestLngLat.lat);
+	            scaledPosition[3] = new mapboxGl.LngLat(closestLngLat.lng, scaledPosition[3].lat);
 	        }
-	    });
-	};
+	        else if (currentIndex === 1) {
+	            scaledPosition[0] = new mapboxGl.LngLat(scaledPosition[0].lng, closestLngLat.lat);
+	            scaledPosition[2] = new mapboxGl.LngLat(closestLngLat.lng, scaledPosition[2].lat);
+	        }
+	        else if (currentIndex === 2) {
+	            scaledPosition[3] = new mapboxGl.LngLat(scaledPosition[3].lng, closestLngLat.lat);
+	            scaledPosition[1] = new mapboxGl.LngLat(closestLngLat.lng, scaledPosition[1].lat);
+	        }
+	        else if (currentIndex === 3) {
+	            scaledPosition[2] = new mapboxGl.LngLat(scaledPosition[2].lng, closestLngLat.lat);
+	            scaledPosition[0] = new mapboxGl.LngLat(closestLngLat.lng, scaledPosition[0].lat);
+	        }
+	        onUpdate(scaledPosition);
+	    }
+	    function onPointerUp() {
+	        currentIndex = null;
+	        map.off('mousemove', onPointerMove);
+	        map.setLayoutProperty(cornersLayer.id, 'visibility', Visibility.Visible);
+	        map.setLayoutProperty(contourLayer.id, 'visibility', Visibility.Visible);
+	    }
+	    function onPointerDown(event) {
+	        event.preventDefault();
+	        currentIndex = event.features[0].properties.index;
+	        map.once('mouseup', onPointerUp);
+	        map.on('mousemove', onPointerMove);
+	        map.setLayoutProperty(cornersLayer.id, 'visibility', Visibility.None);
+	        map.setLayoutProperty(contourLayer.id, 'visibility', Visibility.None);
+	    }
+	    function onPointerEnter() {
+	        //
+	    }
+	    function onPointerLeave() {
+	        //
+	    }
+	    map.on('mouseenter', cornersLayer.id, onPointerEnter);
+	    map.on('mouseleave', cornersLayer.id, onPointerLeave);
+	    map.on('mousedown', cornersLayer.id, onPointerDown);
+	    return () => {
+	        map.off('mousemove', onPointerMove);
+	        map.off('mouseenter', cornersLayer.id, onPointerEnter);
+	        map.off('mouseleave', cornersLayer.id, onPointerLeave);
+	        map.off('mousedown', cornersLayer.id, onPointerDown);
+	        map.removeLayer(cornersLayer.id);
+	        map.removeLayer(contourLayer.id);
+	    };
+	}
 
 	var __awaiter = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
 	    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -443,95 +513,15 @@
 	            this.deselectImage();
 	        }
 	    }
-	    modeMovingOn() {
-	        let startPosition = null;
-	        const selectedImage = this.selectedImage;
-	        const eventCaptureLayerId = selectedImage.eventCaptureLayer.id;
-	        const draggableLayerCleanup = draggableLayer(this.map, eventCaptureLayerId, {
-	            onStart: (event) => {
-	                startPosition = event.lngLat;
-	                this.map.setLayoutProperty(highlightLayerId, 'visibility', Visibility.None);
-	                this.mapCanvas.style.cursor = Cursor.Grabbing;
-	            },
-	            onMove: (event) => {
-	                const currentPosition = event.lngLat;
-	                const deltaLng = startPosition.lng - currentPosition.lng;
-	                const deltaLat = startPosition.lat - currentPosition.lat;
-	                const movedPosition = selectedImage.position.map(p => new mapboxGl.LngLat(p.lng - deltaLng, p.lat - deltaLat));
-	                this.updateImageSource(movedPosition);
-	                startPosition = currentPosition;
-	            },
-	            onEnd: () => {
-	                this.map.setLayoutProperty(highlightLayerId, 'visibility', Visibility.Visible);
-	                this.mapCanvas.style.cursor = Cursor.Move;
-	            },
-	            onPointerEnter: () => {
-	                this.mapCanvas.style.cursor = Cursor.Move;
-	            },
-	            onPointerLeave: () => {
-	                this.mapCanvas.style.cursor = '';
-	            },
-	        });
-	        this.map.addLayer(highlightLayer(this.selectedImage));
-	        this.modeMovingOff = () => {
-	            draggableLayerCleanup();
-	            this.map.removeLayer(highlightLayerId);
-	            this.mapCanvas.style.cursor = '';
-	        };
+	    movingOn() {
+	        this.movingOff = moveable(this.map, this.selectedImage, ((position) => {
+	            this.updateImageSource(position);
+	        }));
 	    }
-	    moveResizingOn() {
-	        let currentIndex;
-	        const selectedImage = this.selectedImage;
-	        const draggableLayerCleanup = draggableLayer(this.map, resizeLayerId, {
-	            onStart: (event) => {
-	                currentIndex = event.features[0].properties.index;
-	                this.map.setLayoutProperty(highlightLayerId, 'visibility', Visibility.None);
-	                this.map.setLayoutProperty(resizeLayerId, 'visibility', Visibility.None);
-	            },
-	            onMove: (event) => {
-	                const pointA = this.map.project(selectedImage.position[currentIndex]);
-	                const pointB = this.map.project(selectedImage.position[selectedImage.getOppositePoint(currentIndex)]);
-	                const pointP = this.map.project(event.lngLat);
-	                const closestPoint = getClosestPoint([pointA.x, pointA.y], [pointB.x, pointB.y], [pointP.x, pointP.y]);
-	                const closestLngLat = this.map.unproject(closestPoint);
-	                const scaledPosition = selectedImage.position;
-	                scaledPosition[currentIndex] = new mapboxGl.LngLat(closestLngLat.lng, closestLngLat.lat);
-	                if (currentIndex === 0) {
-	                    scaledPosition[1] = new mapboxGl.LngLat(scaledPosition[1].lng, closestLngLat.lat);
-	                    scaledPosition[3] = new mapboxGl.LngLat(closestLngLat.lng, scaledPosition[3].lat);
-	                }
-	                else if (currentIndex === 1) {
-	                    scaledPosition[0] = new mapboxGl.LngLat(scaledPosition[0].lng, closestLngLat.lat);
-	                    scaledPosition[2] = new mapboxGl.LngLat(closestLngLat.lng, scaledPosition[2].lat);
-	                }
-	                else if (currentIndex === 2) {
-	                    scaledPosition[3] = new mapboxGl.LngLat(scaledPosition[3].lng, closestLngLat.lat);
-	                    scaledPosition[1] = new mapboxGl.LngLat(closestLngLat.lng, scaledPosition[1].lat);
-	                }
-	                else if (currentIndex === 3) {
-	                    scaledPosition[2] = new mapboxGl.LngLat(scaledPosition[2].lng, closestLngLat.lat);
-	                    scaledPosition[0] = new mapboxGl.LngLat(closestLngLat.lng, scaledPosition[0].lat);
-	                }
-	                this.updateImageSource(scaledPosition);
-	            },
-	            onEnd: () => {
-	                currentIndex = null;
-	                this.map.setLayoutProperty(highlightLayerId, 'visibility', Visibility.Visible);
-	                this.map.setLayoutProperty(resizeLayerId, 'visibility', Visibility.Visible);
-	            },
-	            // customCursor: (event: MapLayerMouseEvent) => {
-	            //   const index = event.features[0].properties.index as number;
-	            //   return [1, 3].includes(index) ? Cursor.NESWResize : Cursor.NWSEResize;
-	            // },
-	        });
-	        this.map.addLayer(highlightLayer(this.selectedImage));
-	        this.map.addLayer(resizeLayer(this.selectedImage));
-	        this.modeResizingOff = () => {
-	            draggableLayerCleanup();
-	            this.map.removeLayer(resizeLayerId);
-	            this.map.removeLayer(highlightLayerId);
-	            this.mapCanvas.style.cursor = '';
-	        };
+	    transformOn() {
+	        this.transformOff = resizeable(this.map, this.selectedImage, ((position) => {
+	            this.updateImageSource(position);
+	        }));
 	    }
 	    selectImage(id) {
 	        if (this.selectedImage && this.selectedImage.id !== id)
@@ -539,22 +529,22 @@
 	        this.selectedImage = this.images.find(i => i.id === id);
 	        if (!this.editMode) {
 	            this.editMode = EditMode.Move;
-	            this.modeMovingOn();
+	            this.movingOn();
 	        }
 	        else if (this.editMode === EditMode.Move) {
 	            this.editMode = EditMode.Transform;
-	            this.modeMovingOff();
-	            this.moveResizingOn();
+	            this.movingOff();
+	            this.transformOn();
 	        }
 	    }
 	    deselectImage() {
 	        if (!this.selectedImage)
 	            return;
 	        if (this.editMode === EditMode.Move) {
-	            this.modeMovingOff();
+	            this.movingOff();
 	        }
 	        else if (this.editMode === EditMode.Transform) {
-	            this.modeResizingOff();
+	            this.transformOff();
 	        }
 	        this.selectedImage = null;
 	        this.editMode = null;
@@ -571,7 +561,6 @@
 	            this.insert();
 	        });
 	        this.mapContainer = this.map.getContainer();
-	        this.mapCanvas = this.map.getCanvas();
 	        this.map.on('click', this.onMapClick);
 	    }
 	}

@@ -1,23 +1,21 @@
-import { GeoJSONSource, ImageSource, LngLat, MapLayerMouseEvent, MapMouseEvent } from 'mapbox-gl';
+import { GeoJSONSource, ImageSource, MapMouseEvent } from 'mapbox-gl';
 import Base from '../Base/Base';
 import Button from '../Button/Button';
 import iconImage from '../icons/image';
 import IImage from './IImage';
-import getClosestPoint from './getClosestPoint';
-import draggableLayer from './draggableLayer';
-import { EditMode, Cursor, ImagePosition, Visibility } from './types';
-import { highlightLayer, highlightLayerId, resizeLayer, resizeLayerId } from './controlLayers';
+import { EditMode, ImagePosition } from './types';
+import moveable from './moveable';
+import resizeable from './resizeable';
 
 export default class ImageControl extends Base {
   button: Button
-  mapCanvas: HTMLCanvasElement
   mapContainer: HTMLElement
   fileInput: HTMLInputElement
   images: IImage[]
   editMode?: EditMode
   selectedImage?: IImage
-  modeMovingOff?: () => void
-  modeResizingOff?: () => void
+  movingOff?: () => void
+  transformOff?: () => void
 
   constructor() {
     super();
@@ -70,100 +68,16 @@ export default class ImageControl extends Base {
     }
   }
 
-  modeMovingOn() {
-    let startPosition: LngLat = null;
-    const selectedImage = this.selectedImage;
-    const eventCaptureLayerId = selectedImage.eventCaptureLayer.id;
-    const draggableLayerCleanup = draggableLayer(this.map, eventCaptureLayerId, {
-      onStart: (event: MapLayerMouseEvent) => {
-        startPosition = event.lngLat;
-        this.map.setLayoutProperty(highlightLayerId, 'visibility', Visibility.None);
-        this.mapCanvas.style.cursor = Cursor.Grabbing;
-      },
-      onMove: (event: MapMouseEvent) => {
-        const currentPosition = event.lngLat;
-        const deltaLng = startPosition.lng - currentPosition.lng;
-        const deltaLat = startPosition.lat - currentPosition.lat;
-        const movedPosition = selectedImage.position.map(p => new LngLat(p.lng - deltaLng, p.lat - deltaLat));
-        this.updateImageSource(movedPosition as ImagePosition);
-        startPosition = currentPosition;
-      },
-      onEnd: () => {
-        this.map.setLayoutProperty(highlightLayerId, 'visibility', Visibility.Visible);
-        this.mapCanvas.style.cursor = Cursor.Move;
-      },
-      onPointerEnter: () => {
-        this.mapCanvas.style.cursor = Cursor.Move;
-      },
-      onPointerLeave: () => {
-        this.mapCanvas.style.cursor = '';
-      },
-    });
-
-    this.map.addLayer(highlightLayer(this.selectedImage));
-
-    this.modeMovingOff = () => {
-      draggableLayerCleanup();
-      this.map.removeLayer(highlightLayerId);
-      this.mapCanvas.style.cursor = '';
-    };
+  movingOn() {
+    this.movingOff = moveable(this.map, this.selectedImage, ((position) => {
+      this.updateImageSource(position as ImagePosition);
+    }));
   }
 
-  moveResizingOn() {
-    let currentIndex: number;
-    const selectedImage = this.selectedImage;
-    const draggableLayerCleanup = draggableLayer(this.map, resizeLayerId, {
-      onStart: (event: MapLayerMouseEvent) => {
-        currentIndex = event.features[0].properties.index;
-        this.map.setLayoutProperty(highlightLayerId, 'visibility', Visibility.None);
-        this.map.setLayoutProperty(resizeLayerId, 'visibility', Visibility.None);
-      },
-      onMove: (event: MapMouseEvent) => {
-        const pointA = this.map.project(selectedImage.position[currentIndex]);
-        const pointB = this.map.project(selectedImage.position[selectedImage.getOppositePoint(currentIndex)]);
-        const pointP = this.map.project(event.lngLat);
-        const closestPoint = getClosestPoint([pointA.x, pointA.y], [pointB.x, pointB.y], [pointP.x, pointP.y]);
-        const closestLngLat = this.map.unproject(closestPoint);
-        const scaledPosition = selectedImage.position;
-
-        scaledPosition[currentIndex] = new LngLat(closestLngLat.lng, closestLngLat.lat);
-
-        if (currentIndex === 0) {
-          scaledPosition[1] = new LngLat(scaledPosition[1].lng, closestLngLat.lat);
-          scaledPosition[3] = new LngLat(closestLngLat.lng, scaledPosition[3].lat);
-        } else if (currentIndex === 1) {
-          scaledPosition[0] = new LngLat(scaledPosition[0].lng, closestLngLat.lat);
-          scaledPosition[2] = new LngLat(closestLngLat.lng, scaledPosition[2].lat);
-        } else if (currentIndex === 2) {
-          scaledPosition[3] = new LngLat(scaledPosition[3].lng, closestLngLat.lat);
-          scaledPosition[1] = new LngLat(closestLngLat.lng, scaledPosition[1].lat);
-        } else if (currentIndex === 3) {
-          scaledPosition[2] = new LngLat(scaledPosition[2].lng, closestLngLat.lat);
-          scaledPosition[0] = new LngLat(closestLngLat.lng, scaledPosition[0].lat);
-        }
-
-        this.updateImageSource(scaledPosition);
-      },
-      onEnd: () => {
-        currentIndex = null;
-        this.map.setLayoutProperty(highlightLayerId, 'visibility', Visibility.Visible);
-        this.map.setLayoutProperty(resizeLayerId, 'visibility', Visibility.Visible);
-      },
-      // customCursor: (event: MapLayerMouseEvent) => {
-      //   const index = event.features[0].properties.index as number;
-      //   return [1, 3].includes(index) ? Cursor.NESWResize : Cursor.NWSEResize;
-      // },
-    });
-
-    this.map.addLayer(highlightLayer(this.selectedImage));
-    this.map.addLayer(resizeLayer(this.selectedImage));
-
-    this.modeResizingOff = () => {
-      draggableLayerCleanup();
-      this.map.removeLayer(resizeLayerId);
-      this.map.removeLayer(highlightLayerId);
-      this.mapCanvas.style.cursor = '';
-    };
+  transformOn() {
+    this.transformOff = resizeable(this.map, this.selectedImage, ((position) => {
+      this.updateImageSource(position as ImagePosition);
+    }));
   }
 
   selectImage(id: string) {
@@ -171,20 +85,20 @@ export default class ImageControl extends Base {
     this.selectedImage = this.images.find(i => i.id === id);
     if (!this.editMode) {
       this.editMode = EditMode.Move;
-      this.modeMovingOn();
+      this.movingOn();
     } else if (this.editMode === EditMode.Move) {
       this.editMode = EditMode.Transform;
-      this.modeMovingOff();
-      this.moveResizingOn();
+      this.movingOff();
+      this.transformOn();
     }
   }
 
   deselectImage() {
     if (!this.selectedImage) return;
     if (this.editMode === EditMode.Move) {
-      this.modeMovingOff();
+      this.movingOff();
     } else if (this.editMode === EditMode.Transform) {
-      this.modeResizingOff();
+      this.transformOff();
     }
     this.selectedImage = null;
     this.editMode = null;
@@ -203,7 +117,6 @@ export default class ImageControl extends Base {
       this.insert();
     });
     this.mapContainer = this.map.getContainer();
-    this.mapCanvas = this.map.getCanvas();
     this.map.on('click', this.onMapClick);
   }
 }

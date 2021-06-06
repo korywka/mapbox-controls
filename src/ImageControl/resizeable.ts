@@ -1,10 +1,13 @@
 import { LngLat, Map, MapLayerMouseEvent, MapMouseEvent } from 'mapbox-gl';
-import { contourLayer, cornersLayer, shadowLayer } from './layers';
-import { ImagePosition, Visibility } from './types';
+import { contourLayer, cornersLayer } from './layers';
+import { ImagePosition, Visibility, Cursor } from './types';
 import IImage from './IImage';
 
 type P = [number, number];
 
+/**
+ * Find the closest point on the line AB from the point P
+ */
 function getClosestPoint(a: P, b: P, p: P): P {
   const u = [p[0] - a[0], p[1] - a[1]]; // vector a->p
   const v = [b[0] - a[0], b[1] - a[1]]; // vector a->b
@@ -16,6 +19,7 @@ function getClosestPoint(a: P, b: P, p: P): P {
 }
 
 export default function resizeable(map: Map, image: IImage, onUpdate: (position: ImagePosition) => void): () => void {
+  const mapCanvas = map.getCanvas();
   let currentIndex: number;
 
   map.addLayer({ ...contourLayer, source: image.shapeSource.id });
@@ -30,6 +34,7 @@ export default function resizeable(map: Map, image: IImage, onUpdate: (position:
     const scaledPosition = image.position;
 
     scaledPosition[currentIndex] = new LngLat(closestLngLat.lng, closestLngLat.lat);
+    setResizeCursor(currentIndex);
 
     if (currentIndex === 0) {
       scaledPosition[1] = new LngLat(scaledPosition[1].lng, closestLngLat.lat);
@@ -50,6 +55,7 @@ export default function resizeable(map: Map, image: IImage, onUpdate: (position:
 
   function onPointerUp() {
     currentIndex = null;
+    mapCanvas.style.cursor = '';
     map.off('mousemove', onPointerMove);
     map.setLayoutProperty(cornersLayer.id, 'visibility', Visibility.Visible);
     map.setLayoutProperty(contourLayer.id, 'visibility', Visibility.Visible);
@@ -64,12 +70,16 @@ export default function resizeable(map: Map, image: IImage, onUpdate: (position:
     document.addEventListener('pointerup', onPointerUp, { once: true });
   }
 
-  function onPointerEnter() {
-    //
+  function onPointerEnter(event: MapLayerMouseEvent) {
+    setResizeCursor(event.features[0].properties.index as number);
   }
 
   function onPointerLeave() {
-    //
+    mapCanvas.style.cursor = '';
+  }
+
+  function setResizeCursor(index: number) {
+    mapCanvas.style.cursor = [1, 3].includes(index) ? Cursor.NESWResize : Cursor.NWSEResize;
   }
 
   map.on('mouseenter', cornersLayer.id, onPointerEnter);

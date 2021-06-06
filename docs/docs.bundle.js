@@ -88,16 +88,6 @@
 	    onRemoveControl() {
 	        // extend
 	    }
-	    ifStyleLoaded(callback) {
-	        if (this.map.isStyleLoaded()) {
-	            callback();
-	        }
-	        else {
-	            this.map.on('style.load', () => {
-	                callback();
-	            });
-	        }
-	    }
 	    onAdd(map) {
 	        this.map = map;
 	        this.onAddControl();
@@ -268,9 +258,9 @@
 	            paint: { 'raster-fade-duration': 0, 'raster-opacity': 0.5 },
 	        };
 	    }
-	    get eventCaptureLayer() {
+	    get fillLayer() {
 	        return ({
-	            id: `${this.id}-event-capture`,
+	            id: `${this.id}-fill`,
 	            type: 'fill',
 	            source: this.shapeSource.id,
 	            paint: { 'fill-opacity': 0 },
@@ -361,9 +351,9 @@
 	        event.preventDefault();
 	        startPosition = event.lngLat;
 	        mapCanvas.style.cursor = Cursor.Grabbing;
-	        map.once('mouseup', onPointerUp);
 	        map.on('mousemove', onPointerMove);
 	        map.setLayoutProperty(contourLayer.id, 'visibility', Visibility.None);
+	        document.addEventListener('pointerup', onPointerUp, { once: true });
 	    }
 	    function onPointerEnter() {
 	        mapCanvas.style.cursor = Cursor.Move;
@@ -380,11 +370,17 @@
 	        map.off('mouseenter', shadowLayer.id, onPointerEnter);
 	        map.off('mouseleave', shadowLayer.id, onPointerLeave);
 	        map.off('mousedown', shadowLayer.id, onPointerDown);
-	        map.removeLayer(shadowLayer.id);
-	        map.removeLayer(contourLayer.id);
+	        document.removeEventListener('pointerup', onPointerUp);
+	        if (map.getLayer(shadowLayer.id))
+	            map.removeLayer(shadowLayer.id);
+	        if (map.getLayer(contourLayer.id))
+	            map.removeLayer(contourLayer.id);
 	    };
 	}
 
+	/**
+	 * Find the closest point on the line AB from the point P
+	 */
 	function getClosestPoint(a, b, p) {
 	    const u = [p[0] - a[0], p[1] - a[1]]; // vector a->p
 	    const v = [b[0] - a[0], b[1] - a[1]]; // vector a->b
@@ -394,6 +390,7 @@
 	    return [a[0] + v[0] * t, a[1] + v[1] * t];
 	}
 	function resizeable(map, image, onUpdate) {
+	    const mapCanvas = map.getCanvas();
 	    let currentIndex;
 	    map.addLayer(Object.assign(Object.assign({}, contourLayer), { source: image.shapeSource.id }));
 	    map.addLayer(Object.assign(Object.assign({}, cornersLayer), { source: image.cornersSource.id }));
@@ -405,6 +402,7 @@
 	        const closestLngLat = map.unproject(closestPoint);
 	        const scaledPosition = image.position;
 	        scaledPosition[currentIndex] = new mapboxGl.LngLat(closestLngLat.lng, closestLngLat.lat);
+	        setResizeCursor(currentIndex);
 	        if (currentIndex === 0) {
 	            scaledPosition[1] = new mapboxGl.LngLat(scaledPosition[1].lng, closestLngLat.lat);
 	            scaledPosition[3] = new mapboxGl.LngLat(closestLngLat.lng, scaledPosition[3].lat);
@@ -425,6 +423,7 @@
 	    }
 	    function onPointerUp() {
 	        currentIndex = null;
+	        mapCanvas.style.cursor = '';
 	        map.off('mousemove', onPointerMove);
 	        map.setLayoutProperty(cornersLayer.id, 'visibility', Visibility.Visible);
 	        map.setLayoutProperty(contourLayer.id, 'visibility', Visibility.Visible);
@@ -432,16 +431,19 @@
 	    function onPointerDown(event) {
 	        event.preventDefault();
 	        currentIndex = event.features[0].properties.index;
-	        map.once('mouseup', onPointerUp);
 	        map.on('mousemove', onPointerMove);
 	        map.setLayoutProperty(cornersLayer.id, 'visibility', Visibility.None);
 	        map.setLayoutProperty(contourLayer.id, 'visibility', Visibility.None);
+	        document.addEventListener('pointerup', onPointerUp, { once: true });
 	    }
-	    function onPointerEnter() {
-	        //
+	    function onPointerEnter(event) {
+	        setResizeCursor(event.features[0].properties.index);
 	    }
 	    function onPointerLeave() {
-	        //
+	        mapCanvas.style.cursor = '';
+	    }
+	    function setResizeCursor(index) {
+	        mapCanvas.style.cursor = [1, 3].includes(index) ? Cursor.NESWResize : Cursor.NWSEResize;
 	    }
 	    map.on('mouseenter', cornersLayer.id, onPointerEnter);
 	    map.on('mouseleave', cornersLayer.id, onPointerLeave);
@@ -451,8 +453,11 @@
 	        map.off('mouseenter', cornersLayer.id, onPointerEnter);
 	        map.off('mouseleave', cornersLayer.id, onPointerLeave);
 	        map.off('mousedown', cornersLayer.id, onPointerDown);
-	        map.removeLayer(cornersLayer.id);
-	        map.removeLayer(contourLayer.id);
+	        document.removeEventListener('pointerup', onPointerUp);
+	        if (map.getLayer(cornersLayer.id))
+	            map.removeLayer(cornersLayer.id);
+	        if (map.getLayer(contourLayer.id))
+	            map.removeLayer(contourLayer.id);
 	    };
 	}
 
@@ -501,11 +506,20 @@
 	        this.map.addSource(image.shapeSource.id, image.shapeSource.source);
 	        this.map.addSource(image.cornersSource.id, image.cornersSource.source);
 	        this.map.addLayer(image.rasterLayer);
-	        this.map.addLayer(image.eventCaptureLayer);
+	        this.map.addLayer(image.fillLayer);
+	    }
+	    redraw() {
+	        this.images.forEach(image => this.drawImage(image));
+	        if (this.movingOff) {
+	            this.movingOff();
+	        }
+	        if (this.transformOff) {
+	            this.transformOff();
+	        }
 	    }
 	    onMapClick(event) {
-	        const contourLayersId = this.images.map(i => i.eventCaptureLayer.id);
-	        const features = this.map.queryRenderedFeatures(event.point, { layers: contourLayersId });
+	        const imageFillLayersId = this.images.map(i => i.fillLayer.id);
+	        const features = this.map.queryRenderedFeatures(event.point, { layers: imageFillLayersId });
 	        if (features.length) {
 	            this.selectImage(features[0].properties.id);
 	        }
@@ -557,9 +571,13 @@
 	        this.map.getSource(selectedImage.cornersSource.id).setData(selectedImage.asPoints);
 	    }
 	    onAddControl() {
-	        this.ifStyleLoaded(() => {
+	        if (this.map.isStyleLoaded()) {
 	            this.insert();
-	        });
+	        }
+	        else {
+	            this.map.once('style.load', () => this.insert());
+	        }
+	        this.map.on('style.load', () => this.redraw());
 	        this.mapContainer = this.map.getContainer();
 	        this.map.on('click', this.onMapClick);
 	    }

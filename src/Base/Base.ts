@@ -32,16 +32,6 @@ class Base {
     // extend
   }
 
-  ifStyleLoaded(callback) {
-    if (this.map.isStyleLoaded()) {
-      callback();
-    } else {
-      this.map.on('style.load', () => {
-        callback();
-      });
-    }
-  }
-
   private onAdd(map: Map) {
     this.map = map;
     this.onAddControl();

@@ -28,9 +28,9 @@ export default function moveable(map: Map, image: IImage, onUpdate: (position: I
     event.preventDefault();
     startPosition = event.lngLat;
     mapCanvas.style.cursor = Cursor.Grabbing;
-    map.once('mouseup', onPointerUp);
     map.on('mousemove', onPointerMove);
     map.setLayoutProperty(contourLayer.id, 'visibility', Visibility.None);
+    document.addEventListener('pointerup', onPointerUp, { once: true });
   }
 
   function onPointerEnter() {
@@ -51,7 +51,9 @@ export default function moveable(map: Map, image: IImage, onUpdate: (position: I
     map.off('mouseenter', shadowLayer.id, onPointerEnter);
     map.off('mouseleave', shadowLayer.id, onPointerLeave);
     map.off('mousedown', shadowLayer.id, onPointerDown);
-    map.removeLayer(shadowLayer.id);
-    map.removeLayer(contourLayer.id);
+    document.removeEventListener('pointerup', onPointerUp);
+
+    if (map.getLayer(shadowLayer.id)) map.removeLayer(shadowLayer.id);
+    if (map.getLayer(contourLayer.id)) map.removeLayer(contourLayer.id);
   };
 }

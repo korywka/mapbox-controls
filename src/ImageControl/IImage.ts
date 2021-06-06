@@ -112,9 +112,9 @@ class IImage {
     };
   }
 
-  get eventCaptureLayer(): FillLayer {
+  get fillLayer(): FillLayer {
     return ({
-      id: `${this.id}-event-capture`,
+      id: `${this.id}-fill`,
       type: 'fill',
       source: this.shapeSource.id,
       paint: { 'fill-opacity': 0 },

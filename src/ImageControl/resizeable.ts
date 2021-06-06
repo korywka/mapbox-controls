@@ -1,5 +1,5 @@
 import { LngLat, Map, MapLayerMouseEvent, MapMouseEvent } from 'mapbox-gl';
-import { contourLayer, cornersLayer } from './layers';
+import { contourLayer, cornersLayer, shadowLayer } from './layers';
 import { ImagePosition, Visibility } from './types';
 import IImage from './IImage';
 
@@ -58,10 +58,10 @@ export default function resizeable(map: Map, image: IImage, onUpdate: (position:
   function onPointerDown(event: MapLayerMouseEvent) {
     event.preventDefault();
     currentIndex = event.features[0].properties.index;
-    map.once('mouseup', onPointerUp);
     map.on('mousemove', onPointerMove);
     map.setLayoutProperty(cornersLayer.id, 'visibility', Visibility.None);
     map.setLayoutProperty(contourLayer.id, 'visibility', Visibility.None);
+    document.addEventListener('pointerup', onPointerUp, { once: true });
   }
 
   function onPointerEnter() {
@@ -81,7 +81,9 @@ export default function resizeable(map: Map, image: IImage, onUpdate: (position:
     map.off('mouseenter', cornersLayer.id, onPointerEnter);
     map.off('mouseleave', cornersLayer.id, onPointerLeave);
     map.off('mousedown', cornersLayer.id, onPointerDown);
-    map.removeLayer(cornersLayer.id);
-    map.removeLayer(contourLayer.id);
+    document.removeEventListener('pointerup', onPointerUp);
+
+    if (map.getLayer(cornersLayer.id)) map.removeLayer(cornersLayer.id);
+    if (map.getLayer(contourLayer.id)) map.removeLayer(contourLayer.id);
   };
 }

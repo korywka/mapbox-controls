@@ -55,12 +55,22 @@ export default class ImageControl extends Base {
     this.map.addSource(image.shapeSource.id, image.shapeSource.source);
     this.map.addSource(image.cornersSource.id, image.cornersSource.source);
     this.map.addLayer(image.rasterLayer);
-    this.map.addLayer(image.eventCaptureLayer);
+    this.map.addLayer(image.fillLayer);
+  }
+
+  redraw() {
+    this.images.forEach(image => this.drawImage(image));
+    if (this.movingOff) {
+      this.movingOff();
+    }
+    if (this.transformOff) {
+      this.transformOff();
+    }
   }
 
   onMapClick(event: MapMouseEvent) {
-    const contourLayersId = this.images.map(i => i.eventCaptureLayer.id);
-    const features = this.map.queryRenderedFeatures(event.point, { layers: contourLayersId });
+    const imageFillLayersId = this.images.map(i => i.fillLayer.id);
+    const features = this.map.queryRenderedFeatures(event.point, { layers: imageFillLayersId });
     if (features.length) {
       this.selectImage(features[0].properties.id as string);
     } else {
@@ -113,9 +123,12 @@ export default class ImageControl extends Base {
   }
 
   onAddControl() {
-    this.ifStyleLoaded(() => {
+    if (this.map.isStyleLoaded()) {
       this.insert();
-    });
+    } else {
+      this.map.once('style.load', () => this.insert());
+    }
+    this.map.on('style.load', () => this.redraw());
     this.mapContainer = this.map.getContainer();
     this.map.on('click', this.onMapClick);
   }

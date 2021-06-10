@@ -477,6 +477,7 @@
 	        this.fileInput = document.createElement('input');
 	        this.fileInput.type = 'file';
 	        this.fileInput.accept = '.jpg, .jpeg, .png';
+	        this.fileInput.multiple = true;
 	        this.images = [];
 	        this.editMode = null;
 	        this.selectedImage = null;
@@ -492,13 +493,15 @@
 	        this.fileInput.addEventListener('change', this.onFileInputChange);
 	    }
 	    onFileInputChange() {
-	        Array.from(this.fileInput.files).forEach((file) => __awaiter(this, void 0, void 0, function* () {
+	        Array.from(this.fileInput.files).forEach((file, index) => __awaiter(this, void 0, void 0, function* () {
 	            const image = new IImage();
 	            yield image.load(file);
 	            image.setInitialPosition(this.map);
 	            this.images.push(image);
 	            this.drawImage(image);
-	            this.selectImage(image.id);
+	            this.map.fire('image.add', image);
+	            if (this.fileInput.files.length - 1 === index)
+	                this.selectImage(image.id);
 	        }));
 	    }
 	    drawImage(image) {
@@ -550,6 +553,7 @@
 	            this.movingOff();
 	            this.transformOn();
 	        }
+	        this.map.fire('image.select', this.selectedImage);
 	    }
 	    deselectImage() {
 	        if (!this.selectedImage)
@@ -560,6 +564,7 @@
 	        else if (this.editMode === EditMode.Transform) {
 	            this.transformOff();
 	        }
+	        this.map.fire('image.deselect', this.selectedImage);
 	        this.selectedImage = null;
 	        this.editMode = null;
 	    }
@@ -569,6 +574,7 @@
 	        this.map.getSource(selectedImage.imageSource.id).setCoordinates(selectedImage.coordinates);
 	        this.map.getSource(selectedImage.shapeSource.id).setData(selectedImage.asPolygon);
 	        this.map.getSource(selectedImage.cornersSource.id).setData(selectedImage.asPoints);
+	        this.map.fire('image.update', this.selectedImage);
 	    }
 	    onAddControl() {
 	        if (this.map.isStyleLoaded()) {
@@ -1144,7 +1150,9 @@
 	        const marker = new mapboxGl.Marker({ element: markerNode, draggable: true })
 	            .setLngLat(event.lngLat)
 	            .addTo(this.map);
-	        this.coordinates.push([event.lngLat.lng, event.lngLat.lat]);
+	        const newCoordinate = [event.lngLat.lng, event.lngLat.lat];
+	        this.coordinates.push(newCoordinate);
+	        this.map.fire('ruler.change', { coordinates: this.coordinates });
 	        this.updateLabels();
 	        lineSource.setData(lineStringFeature(this.coordinates));
 	        symbolSource.setData(pointFeatureCollection(this.coordinates, this.labels));
@@ -1400,6 +1408,12 @@
 
 	/* Ruler */
 	map.addControl(new RulerControl(), 'bottom-right');
+	map.on('ruler.on', () => console.log('%cruler.on', 'color: #3D5AFE'));
+	map.on('ruler.off', () => console.log('%cruler.off', 'color: #3D5AFE'));
+	map.on('ruler.change', (params) => {
+	  console.log('%cruler.change', 'color: #3D5AFE');
+	  console.table(params.coordinates);
+	});
 
 	/* Inspect */
 	map.addControl(new InspectControl(), 'bottom-right');
@@ -1409,6 +1423,11 @@
 
 	/* Image */
 	map.addControl(new ImageControl(), 'bottom-right');
+	map.on('image.add', (image) => console.log('%cimage.add', 'color: #3D5AFE', image) );
+	map.on('image.select', (image) => console.log('%cimage.select', 'color: #3D5AFE', image) );
+	map.on('image.update', (image) => console.log('%cimage.update', 'color: #3D5AFE', image) );
+	map.on('image.deselect', (image) => console.log('%cimage.deselect', 'color: #3D5AFE', image) );
+
 
 	/* Tooltip */
 	map.addControl(new TooltipControl({
@@ -1433,11 +1452,6 @@
 	    paint: { 'line-width': 2, 'line-color': '#4264fb' },
 	  });
 	});
-
-	/* Example for mapbox issue: https://github.com/mapbox/mapbox-gl-js/issues/8765 */
-	map.on('load', () => console.log('load'));
-	map.on('style.load', () => console.log('style.load'));
-	map.on('styledata', () => console.log('styledata'));
 
 }());
 //# sourceMappingURL=docs.bundle.js.map

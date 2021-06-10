@@ -23,6 +23,7 @@ export default class ImageControl extends Base {
     this.fileInput = document.createElement('input');
     this.fileInput.type = 'file';
     this.fileInput.accept = '.jpg, .jpeg, .png';
+    this.fileInput.multiple = true;
     this.images = [];
     this.editMode = null;
     this.selectedImage = null;
@@ -40,13 +41,14 @@ export default class ImageControl extends Base {
   }
 
   onFileInputChange() {
-    Array.from(this.fileInput.files).forEach(async (file) => {
+    Array.from(this.fileInput.files).forEach(async (file, index) => {
       const image = new IImage();
       await image.load(file);
       image.setInitialPosition(this.map);
       this.images.push(image);
       this.drawImage(image);
-      this.selectImage(image.id);
+      this.map.fire('image.add', image);
+      if (this.fileInput.files.length - 1 === index) this.selectImage(image.id);
     });
   }
 
@@ -101,6 +103,7 @@ export default class ImageControl extends Base {
       this.movingOff();
       this.transformOn();
     }
+    this.map.fire('image.select', this.selectedImage);
   }
 
   deselectImage() {
@@ -110,6 +113,7 @@ export default class ImageControl extends Base {
     } else if (this.editMode === EditMode.Transform) {
       this.transformOff();
     }
+    this.map.fire('image.deselect', this.selectedImage);
     this.selectedImage = null;
     this.editMode = null;
   }
@@ -120,6 +124,7 @@ export default class ImageControl extends Base {
     (this.map.getSource(selectedImage.imageSource.id) as ImageSource).setCoordinates(selectedImage.coordinates);
     (this.map.getSource(selectedImage.shapeSource.id) as GeoJSONSource).setData(selectedImage.asPolygon);
     (this.map.getSource(selectedImage.cornersSource.id) as GeoJSONSource).setData(selectedImage.asPoints);
+    this.map.fire('image.update', this.selectedImage);
   }
 
   onAddControl() {

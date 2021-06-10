@@ -1,6 +1,7 @@
 import mapboxgl from 'mapbox-gl';
 import {
   CompassControl,
+  ImageControl,
   InspectControl,
   LanguageControl,
   RulerControl,
@@ -52,10 +53,10 @@ map.addControl(new ZoomControl(), 'bottom-right');
 
 /* Ruler */
 map.addControl(new RulerControl(), 'bottom-right');
-map.on('ruler.on', () => console.log('%cruler.on', 'color: #3D5AFE', 'event fired') );
-map.on('ruler.off', () => console.log('%cruler.off', 'color: #3D5AFE', 'event fired') );
+map.on('ruler.on', () => console.log('%cruler.on', 'color: #3D5AFE'));
+map.on('ruler.off', () => console.log('%cruler.off', 'color: #3D5AFE'));
 map.on('ruler.change', (params) => {
-  console.log('%cruler.change', 'color: #3D5AFE', 'event fired with coordinates:');
+  console.log('%cruler.change', 'color: #3D5AFE');
   console.table(params.coordinates);
 });
 
@@ -64,6 +65,14 @@ map.addControl(new InspectControl(), 'bottom-right');
 
 /* Compass */
 map.addControl(new CompassControl(), 'bottom-right');
+
+/* Image */
+map.addControl(new ImageControl(), 'bottom-right');
+map.on('image.add', (image) => console.log('%cimage.add', 'color: #3D5AFE', image) );
+map.on('image.select', (image) => console.log('%cimage.select', 'color: #3D5AFE', image) );
+map.on('image.update', (image) => console.log('%cimage.update', 'color: #3D5AFE', image) );
+map.on('image.deselect', (image) => console.log('%cimage.deselect', 'color: #3D5AFE', image) );
+
 
 /* Tooltip */
 map.addControl(new TooltipControl({
@@ -88,8 +97,3 @@ map.on('style.load', () => {
     paint: { 'line-width': 2, 'line-color': '#4264fb' },
   });
 });
-
-/* Example for mapbox issue: https://github.com/mapbox/mapbox-gl-js/issues/8765 */
-map.on('load', () => console.log('load'));
-map.on('style.load', () => console.log('style.load'));
-map.on('styledata', () => console.log('styledata'));

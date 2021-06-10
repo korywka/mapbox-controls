@@ -1,6 +1,6 @@
 import Base from '../Base/Base';
-import { StyleOption, defaultStyleOptions } from './StyleOption';
 import Button from '../Button/Button';
+import { StyleOption } from './types';
 
 interface StylesControlOptions {
   /** Array of style options */
@@ -16,7 +16,7 @@ export default class StylesControl extends Base {
 
   constructor(options?: StylesControlOptions) {
     super();
-    this.styles = options?.styles ?? defaultStyleOptions;
+    this.styles = options?.styles ?? this.defaultOptions;
     this.onChange = options?.onChange;
     this.buttons = [];
   }
@@ -46,6 +46,20 @@ export default class StylesControl extends Base {
         currentButton.addClassName('-active');
       }
     });
+  }
+
+  get defaultOptions(): StyleOption[] {
+    return [
+      {
+        label: 'Streets',
+        styleName: 'Mapbox Streets',
+        styleUrl: 'mapbox://styles/mapbox/streets-v11',
+      }, {
+        label: 'Satellite',
+        styleName: 'Mapbox Satellite Streets',
+        styleUrl: 'mapbox://sprites/mapbox/satellite-streets-v11',
+      },
+    ];
   }
 
   onAddControl() {

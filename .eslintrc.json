@@ -9,6 +9,7 @@
     "ecmaVersion": 2020
   },
   "rules": {
-    "@typescript-eslint/explicit-module-boundary-types": 0
+    "@typescript-eslint/explicit-module-boundary-types": 0,
+    "operator-linebreak": [2, "before"]
   }
 }

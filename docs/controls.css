@@ -3,6 +3,22 @@
   align-items: center;
   justify-content: center;
 }
+.mapbox-control button.-active svg {
+  fill: #4264fb;
+}
+
+.mapbox-control-image button {
+  overflow: hidden;
+}
+.mapbox-control-image input[type=file] {
+  opacity: 0;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
 
 .mapbox-control-inspect-popup {
   position: absolute;
@@ -74,13 +90,6 @@
 .mapbox-control-inspect-feature tr:not(:last-child) td, .mapbox-control-inspect-feature tr:not(:last-child) th {
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
-.mapbox-control-inspect button.-active svg {
-  fill: #4264fb;
-}
-
-.mapbox-control-ruler button.-active svg {
-  fill: #4264fb;
-}
 
 .mapbox-control-styles {
   display: flex;
@@ -110,8 +119,6 @@
   white-space: nowrap;
   z-index: 3;
   /* show tooltip over controls buttons with z-index 2 */
-  pointer-events: none;
-  /* do not block map scrolling */
 }
 .mapbox-control-tooltip:empty {
   display: none;

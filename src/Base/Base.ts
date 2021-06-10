@@ -27,6 +27,7 @@ class Base {
   onAddControl() {
     // extend
   }
+
   onRemoveControl() {
     // extend
   }

@@ -1,6 +1,6 @@
 # Mapbox Controls
 
-[![Preview](./docs/map.png)](https://bravecow.github.io/mapbox-gl-controls/)
+[![Preview](./docs/map.png)](https://korywka.github.io/mapbox-gl-controls/)
 
 ### Usage
 
@@ -10,7 +10,7 @@ npm install mapbox-gl-controls
 
 Include styles from package: `mapbox-gl-controls/lib/controls.css`
 
-### Ruler Control [[options](https://github.com/bravecow/mapbox-gl-controls/blob/master/src/RulerControl/RulerControl.ts#L19)]
+### Ruler Control [[options](https://github.com/korywka/mapbox-gl-controls/blob/master/src/RulerControl/RulerControl.ts#L19)]
 
 ```javascript
 import { RulerControl } from 'mapbox-gl-controls';
@@ -26,7 +26,7 @@ map.addControl(new RulerControl({
 }), 'top-right');
 ```
 
-### Styles Control [[options](https://github.com/bravecow/mapbox-gl-controls/blob/master/src/StylesControl/StylesControl.ts#L5)]
+### Styles Control [[options](https://github.com/korywka/mapbox-gl-controls/blob/master/src/StylesControl/StylesControl.ts#L5)]
 
 Adds style switcher similar to Google Maps.
 
@@ -53,7 +53,7 @@ map.addControl(new StylesControl({
 }), 'top-left');
 ```
 
-### Compass Control [[options](https://github.com/bravecow/mapbox-gl-controls/blob/master/src/CompassControl/CompassControl.ts#L5)]
+### Compass Control [[options](https://github.com/korywka/mapbox-gl-controls/blob/master/src/CompassControl/CompassControl.ts#L5)]
 
 ```javascript
 import { CompassControl } from 'mapbox-gl-controls';
@@ -69,7 +69,7 @@ import { ZoomControl } from 'mapbox-gl-controls';
 map.addControl(new ZoomControl(), 'top-right');
 ```
 
-### Language Control [[options](https://github.com/bravecow/mapbox-gl-controls/blob/master/src/LanguageControl/LanguageControl.ts#L7)]
+### Language Control [[options](https://github.com/korywka/mapbox-gl-controls/blob/master/src/LanguageControl/LanguageControl.ts#L7)]
 
 Localize map. Language can be set dynamically with `.setLanguage(lang)` method.
 
@@ -101,7 +101,7 @@ import { InspectControl } from 'mapbox-gl-controls';
 map.addControl(new InspectControl(), 'bottom-right');
 ```
 
-### Tooltip Control [[options](https://github.com/bravecow/mapbox-gl-controls/blob/master/src/TooltipControl/TooltipControl.ts#L4)]
+### Tooltip Control [[options](https://github.com/korywka/mapbox-gl-controls/blob/master/src/TooltipControl/TooltipControl.ts#L4)]
 
 Shows tooltip on hover on some layer or whole map.
 
@@ -109,6 +109,13 @@ Shows tooltip on hover on some layer or whole map.
 
 ```javascript
 import { TooltipControl } from 'mapbox-gl-controls';
+
+map.addLayer({
+  id: '$fill',
+  type: 'fill',
+  source: { type: 'geojson', data: polygon },
+  paint: { 'fill-opacity': 0.3, 'fill-color': '#4264fb' },
+});
 
 map.addControl(new TooltipControl({ layer: '$fill' }));
 ```

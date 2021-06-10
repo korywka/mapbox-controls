@@ -59,7 +59,7 @@ export default class RulerControl extends Base {
   secondaryColor: string
   button: Button
 
-  constructor(options: RulerControlOptions) {
+  constructor(options?: RulerControlOptions) {
     super();
     this.isMeasuring = false;
     this.markers = [];
@@ -169,8 +169,10 @@ export default class RulerControl extends Base {
     const marker = new mapboxgl.Marker({ element: markerNode, draggable: true })
       .setLngLat(event.lngLat)
       .addTo(this.map);
+    const newCoordinate = [event.lngLat.lng, event.lngLat.lat];
 
-    this.coordinates.push([event.lngLat.lng, event.lngLat.lat]);
+    this.coordinates.push(newCoordinate);
+    this.map.fire('ruler.change', { coordinates: this.coordinates });
     this.updateLabels();
     lineSource.setData(lineStringFeature(this.coordinates));
     symbolSource.setData(pointFeatureCollection(this.coordinates, this.labels));

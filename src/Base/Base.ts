@@ -32,13 +32,13 @@ class Base {
     // extend
   }
 
-  private onAdd(map: Map) {
+  onAdd(map: Map) {
     this.map = map;
     this.onAddControl();
     return this.node;
   }
 
-  private onRemove() {
+  onRemove() {
     this.onRemoveControl();
     this.node.parentNode.removeChild(this.node);
     this.map = undefined;

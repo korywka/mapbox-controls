@@ -11,7 +11,7 @@ export default class CompassControl extends Base {
   button: Button
   instant: boolean
 
-  constructor(options: CompassControlOptions) {
+  constructor(options?: CompassControlOptions) {
     super();
     this.button = new Button();
     this.instant = options?.instant ?? true;

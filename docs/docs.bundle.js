@@ -166,7 +166,7 @@
 	}
 
 	class IImage {
-	    load(file) {
+	    loadFile(file) {
 	        return new Promise(((resolve, reject) => {
 	            const reader = new FileReader();
 	            const node = new Image();
@@ -183,6 +183,20 @@
 	                node.src = imageUrl;
 	            }, false);
 	            reader.readAsDataURL(file);
+	        }));
+	    }
+	    loadUrl(url) {
+	        return new Promise(((resolve, reject) => {
+	            const node = new Image();
+	            node.onload = () => {
+	                this.id = url.split('/').pop();
+	                this.url = url;
+	                this.width = node.width;
+	                this.height = node.height;
+	                resolve(this);
+	            };
+	            node.onerror = reject;
+	            node.src = url;
 	        }));
 	    }
 	    setInitialPosition(map) {
@@ -237,9 +251,9 @@
 	            source: { type: 'image', url: this.url, coordinates: this.coordinates },
 	        };
 	    }
-	    get shapeSource() {
+	    get polygonSource() {
 	        return {
-	            id: `${this.id}-shape`,
+	            id: `${this.id}-polygon`,
 	            source: { type: 'geojson', data: this.asPolygon },
 	        };
 	    }
@@ -261,7 +275,7 @@
 	        return ({
 	            id: `${this.id}-fill`,
 	            type: 'fill',
-	            source: this.shapeSource.id,
+	            source: this.polygonSource.id,
 	            paint: { 'fill-opacity': 0 },
 	        });
 	    }
@@ -332,8 +346,8 @@
 	function moveable(map, image, onUpdate) {
 	    const mapCanvas = map.getCanvas();
 	    let startPosition = null;
-	    map.addLayer(Object.assign(Object.assign({}, contourLayer), { source: image.shapeSource.id }));
-	    map.addLayer(Object.assign(Object.assign({}, shadowLayer), { source: image.shapeSource.id }));
+	    map.addLayer(Object.assign(Object.assign({}, contourLayer), { source: image.polygonSource.id }));
+	    map.addLayer(Object.assign(Object.assign({}, shadowLayer), { source: image.polygonSource.id }));
 	    function onPointerMove(event) {
 	        const currentPosition = event.lngLat;
 	        const deltaLng = startPosition.lng - currentPosition.lng;
@@ -391,7 +405,7 @@
 	function resizeable(map, image, onUpdate) {
 	    const mapCanvas = map.getCanvas();
 	    let currentIndex;
-	    map.addLayer(Object.assign(Object.assign({}, contourLayer), { source: image.shapeSource.id }));
+	    map.addLayer(Object.assign(Object.assign({}, contourLayer), { source: image.polygonSource.id }));
 	    map.addLayer(Object.assign(Object.assign({}, cornersLayer), { source: image.cornersSource.id }));
 	    function onPointerMove(event) {
 	        const pointA = map.project(image.position[currentIndex]);
@@ -482,6 +496,7 @@
 	        this.selectedImage = null;
 	        this.onMapClick = this.onMapClick.bind(this);
 	        this.onFileInputChange = this.onFileInputChange.bind(this);
+	        this.keyDownListener = this.keyDownListener.bind(this);
 	    }
 	    insert() {
 	        this.addClassName('mapbox-control-image');
@@ -493,19 +508,38 @@
 	    }
 	    onFileInputChange() {
 	        Array.from(this.fileInput.files).forEach((file, index) => __awaiter(this, void 0, void 0, function* () {
-	            const image = new IImage();
-	            yield image.load(file);
-	            image.setInitialPosition(this.map);
-	            this.images.push(image);
-	            this.drawImage(image);
-	            this.map.fire('image.add', image);
+	            const image = yield this.addImage(file);
 	            if (this.fileInput.files.length - 1 === index)
 	                this.selectImage(image.id);
 	        }));
 	    }
+	    addImage(data, options = {}) {
+	        return __awaiter(this, void 0, void 0, function* () {
+	            const image = new IImage();
+	            if (typeof data === 'string') {
+	                yield image.loadUrl(data);
+	            }
+	            else if (data) {
+	                yield image.loadFile(data);
+	            }
+	            else {
+	                throw Error('file or url is required');
+	            }
+	            if (options.position) {
+	                image.position = options.position;
+	            }
+	            else {
+	                image.setInitialPosition(this.map);
+	            }
+	            this.images.push(image);
+	            this.drawImage(image);
+	            this.map.fire('image.add', image);
+	            return image;
+	        });
+	    }
 	    drawImage(image) {
 	        this.map.addSource(image.imageSource.id, image.imageSource.source);
-	        this.map.addSource(image.shapeSource.id, image.shapeSource.source);
+	        this.map.addSource(image.polygonSource.id, image.polygonSource.source);
 	        this.map.addSource(image.cornersSource.id, image.cornersSource.source);
 	        this.map.addLayer(image.rasterLayer);
 	        this.map.addLayer(image.fillLayer);
@@ -553,6 +587,7 @@
 	            this.transformOn();
 	        }
 	        this.map.fire('image.select', this.selectedImage);
+	        document.addEventListener('keydown', this.keyDownListener);
 	    }
 	    deselectImage() {
 	        if (!this.selectedImage)
@@ -566,14 +601,20 @@
 	        this.map.fire('image.deselect', this.selectedImage);
 	        this.selectedImage = null;
 	        this.editMode = null;
+	        document.removeEventListener('keydown', this.keyDownListener);
 	    }
 	    updateImageSource(position) {
 	        const selectedImage = this.selectedImage;
 	        selectedImage.position = position;
 	        this.map.getSource(selectedImage.imageSource.id).setCoordinates(selectedImage.coordinates);
-	        this.map.getSource(selectedImage.shapeSource.id).setData(selectedImage.asPolygon);
+	        this.map.getSource(selectedImage.polygonSource.id).setData(selectedImage.asPolygon);
 	        this.map.getSource(selectedImage.cornersSource.id).setData(selectedImage.asPoints);
 	        this.map.fire('image.update', this.selectedImage);
+	    }
+	    keyDownListener(event) {
+	        if (event.key === 'Escape') {
+	            this.deselectImage();
+	        }
 	    }
 	    onAddControl() {
 	        if (this.map.isStyleLoaded()) {
@@ -1421,11 +1462,22 @@
 	map.addControl(new CompassControl(), 'bottom-right');
 
 	/* Image */
-	map.addControl(new ImageControl(), 'bottom-right');
+	const imageControl = new ImageControl();
+	map.addControl(imageControl, 'bottom-right');
 	map.on('image.add', (image) => console.log('%cimage.add', 'color: #3D5AFE', image) );
 	map.on('image.select', (image) => console.log('%cimage.select', 'color: #3D5AFE', image) );
 	map.on('image.update', (image) => console.log('%cimage.update', 'color: #3D5AFE', image) );
 	map.on('image.deselect', (image) => console.log('%cimage.deselect', 'color: #3D5AFE', image) );
+	// map.on('style.load', () => {
+	//   imageControl.addImage('https://img.lunstatic.net/building-800x600/41771.jpg', {
+	//     position: [
+	//       new mapboxgl.LngLat(30.500998190307115, 50.46018203970871),
+	//       new mapboxgl.LngLat(30.545801809692108, 50.46018203970871),
+	//       new mapboxgl.LngLat(30.545801809692108, 50.44001581151167),
+	//       new mapboxgl.LngLat(30.500998190307115, 50.44001581151167),
+	//     ],
+	//   });
+	// });
 
 
 	/* Tooltip */

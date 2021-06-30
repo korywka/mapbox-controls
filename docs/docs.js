@@ -67,11 +67,22 @@ map.addControl(new InspectControl(), 'bottom-right');
 map.addControl(new CompassControl(), 'bottom-right');
 
 /* Image */
-map.addControl(new ImageControl(), 'bottom-right');
+const imageControl = new ImageControl();
+map.addControl(imageControl, 'bottom-right');
 map.on('image.add', (image) => console.log('%cimage.add', 'color: #3D5AFE', image) );
 map.on('image.select', (image) => console.log('%cimage.select', 'color: #3D5AFE', image) );
 map.on('image.update', (image) => console.log('%cimage.update', 'color: #3D5AFE', image) );
 map.on('image.deselect', (image) => console.log('%cimage.deselect', 'color: #3D5AFE', image) );
+// map.on('style.load', () => {
+//   imageControl.addImage('https://img.lunstatic.net/building-800x600/41771.jpg', {
+//     position: [
+//       new mapboxgl.LngLat(30.500998190307115, 50.46018203970871),
+//       new mapboxgl.LngLat(30.545801809692108, 50.46018203970871),
+//       new mapboxgl.LngLat(30.545801809692108, 50.44001581151167),
+//       new mapboxgl.LngLat(30.500998190307115, 50.44001581151167),
+//     ],
+//   });
+// });
 
 
 /* Tooltip */

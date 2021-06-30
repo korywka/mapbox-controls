@@ -9,7 +9,7 @@ class IImage {
   height: number
   position: ImagePosition
 
-  load(file: File) {
+  loadFile(file: File) {
     return new Promise(((resolve, reject) => {
       const reader = new FileReader();
       const node = new Image();
@@ -30,6 +30,22 @@ class IImage {
       }, false);
 
       reader.readAsDataURL(file);
+    }));
+  }
+
+  loadUrl(url: string) {
+    return new Promise(((resolve, reject) => {
+      const node = new Image();
+      node.onload = () => {
+        this.id = url.split('/').pop();
+        this.url = url;
+        this.width = node.width;
+        this.height = node.height;
+        resolve(this);
+      };
+
+      node.onerror = reject;
+      node.src = url;
     }));
   }
 
@@ -89,9 +105,9 @@ class IImage {
     };
   }
 
-  get shapeSource(): { id: string, source: GeoJSONSourceRaw } {
+  get polygonSource(): { id: string, source: GeoJSONSourceRaw } {
     return {
-      id: `${this.id}-shape`,
+      id: `${this.id}-polygon`,
       source: { type: 'geojson', data: this.asPolygon },
     };
   }
@@ -116,7 +132,7 @@ class IImage {
     return ({
       id: `${this.id}-fill`,
       type: 'fill',
-      source: this.shapeSource.id,
+      source: this.polygonSource.id,
       paint: { 'fill-opacity': 0 },
     });
   }

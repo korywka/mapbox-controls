@@ -22,7 +22,7 @@ export default function resizeable(map: Map, image: IImage, onUpdate: (position:
   const mapCanvas = map.getCanvas();
   let currentIndex: number;
 
-  map.addLayer({ ...contourLayer, source: image.shapeSource.id });
+  map.addLayer({ ...contourLayer, source: image.polygonSource.id });
   map.addLayer({ ...cornersLayer, source: image.cornersSource.id });
 
   function onPointerMove(event: MapMouseEvent) {

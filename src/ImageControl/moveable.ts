@@ -7,8 +7,8 @@ export default function moveable(map: Map, image: IImage, onUpdate: (position: I
   const mapCanvas = map.getCanvas();
   let startPosition: LngLat = null;
 
-  map.addLayer({ ...contourLayer, source: image.shapeSource.id });
-  map.addLayer({ ...shadowLayer, source: image.shapeSource.id });
+  map.addLayer({ ...contourLayer, source: image.polygonSource.id });
+  map.addLayer({ ...shadowLayer, source: image.polygonSource.id });
 
   function onPointerMove(event: MapMouseEvent) {
     const currentPosition = event.lngLat;

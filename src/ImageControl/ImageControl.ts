@@ -29,6 +29,7 @@ export default class ImageControl extends Base {
     this.selectedImage = null;
     this.onMapClick = this.onMapClick.bind(this);
     this.onFileInputChange = this.onFileInputChange.bind(this);
+    this.keyDownListener = this.keyDownListener.bind(this);
   }
 
   insert() {
@@ -42,19 +43,34 @@ export default class ImageControl extends Base {
 
   onFileInputChange() {
     Array.from(this.fileInput.files).forEach(async (file, index) => {
-      const image = new IImage();
-      await image.load(file);
-      image.setInitialPosition(this.map);
-      this.images.push(image);
-      this.drawImage(image);
-      this.map.fire('image.add', image);
+      const image = await this.addImage(file);
       if (this.fileInput.files.length - 1 === index) this.selectImage(image.id);
     });
   }
 
+  async addImage(data: File | string, options: { position?: ImagePosition } = {}): Promise<IImage> {
+    const image = new IImage();
+    if (typeof data === 'string') {
+      await image.loadUrl(data);
+    } else if (data) {
+      await image.loadFile(data);
+    } else {
+      throw Error('file or url is required');
+    }
+    if (options.position) {
+      image.position = options.position;
+    } else {
+      image.setInitialPosition(this.map);
+    }
+    this.images.push(image);
+    this.drawImage(image);
+    this.map.fire('image.add', image);
+    return image;
+  }
+
   drawImage(image: IImage) {
     this.map.addSource(image.imageSource.id, image.imageSource.source);
-    this.map.addSource(image.shapeSource.id, image.shapeSource.source);
+    this.map.addSource(image.polygonSource.id, image.polygonSource.source);
     this.map.addSource(image.cornersSource.id, image.cornersSource.source);
     this.map.addLayer(image.rasterLayer);
     this.map.addLayer(image.fillLayer);
@@ -104,6 +120,7 @@ export default class ImageControl extends Base {
       this.transformOn();
     }
     this.map.fire('image.select', this.selectedImage);
+    document.addEventListener('keydown', this.keyDownListener);
   }
 
   deselectImage() {
@@ -116,15 +133,22 @@ export default class ImageControl extends Base {
     this.map.fire('image.deselect', this.selectedImage);
     this.selectedImage = null;
     this.editMode = null;
+    document.removeEventListener('keydown', this.keyDownListener);
   }
 
   updateImageSource(position: ImagePosition) {
     const selectedImage = this.selectedImage;
     selectedImage.position = position;
     (this.map.getSource(selectedImage.imageSource.id) as ImageSource).setCoordinates(selectedImage.coordinates);
-    (this.map.getSource(selectedImage.shapeSource.id) as GeoJSONSource).setData(selectedImage.asPolygon);
+    (this.map.getSource(selectedImage.polygonSource.id) as GeoJSONSource).setData(selectedImage.asPolygon);
     (this.map.getSource(selectedImage.cornersSource.id) as GeoJSONSource).setData(selectedImage.asPoints);
     this.map.fire('image.update', this.selectedImage);
+  }
+
+  keyDownListener(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      this.deselectImage();
+    }
   }
 
   onAddControl() {

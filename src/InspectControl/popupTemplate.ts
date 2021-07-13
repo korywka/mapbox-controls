@@ -1,4 +1,5 @@
 import { MapboxGeoJSONFeature } from 'mapbox-gl';
+import { GeoJsonProperties } from 'geojson';
 import iconLeft from '../icons/left';
 import iconRight from '../icons/right';
 
@@ -8,19 +9,29 @@ enum Direction {
 }
 
 function getData(feature: MapboxGeoJSONFeature) {
-  const props = feature.properties;
-  const data = [
-    { key: '$id', value: feature.layer.id },
-    { key: '$type', value: feature.layer.type },
+  const layerData = [
+    'layer',
+    { key: 'id', value: feature.layer.id },
+    { key: 'type', value: feature.layer.type },
     { key: 'source', value: feature.layer.source },
     { key: 'source-layer', value: feature.layer['source-layer'] },
   ];
 
-  Object.keys(props).forEach((key) => {
-    data.push({ key, value: props[key] });
+  const featureData: (string | GeoJsonProperties)[] = ['properties'];
+
+  if (feature.id) {
+    featureData.push({ key: '$id', value: feature.id });
+  }
+
+  Object.entries(feature.properties).forEach(([key, value]) => {
+    featureData.push({ key, value });
   });
 
-  return data;
+  if (featureData.length === 1) {
+    featureData.pop(); // remove title if there are no properties
+  }
+
+  return [...layerData, ...featureData];
 }
 
 export default function popupTemplate(features: MapboxGeoJSONFeature[]) {
@@ -66,14 +77,26 @@ export default function popupTemplate(features: MapboxGeoJSONFeature[]) {
 
   const templateFeature = (feature: MapboxGeoJSONFeature) => {
     const table = document.createElement('table');
-    table.classList.add('mapbox-control-inspect-feature');
+    table.classList.add('mapbox-control-inspect-grid');
     const data = getData(feature);
-    data.forEach((prop) => {
+    data.forEach((record) => {
       const row = document.createElement('tr');
+      if (typeof record === 'string') {
+        const caption = document.createElement('th');
+        caption.classList.add('mapbox-control-inspect-caption');
+        caption.colSpan = 2;
+        caption.textContent = record;
+        row.appendChild(caption);
+        table.append(row);
+        return;
+      }
+
       const key = document.createElement('th');
       const value = document.createElement('td');
-      key.textContent = prop.key;
-      value.textContent = String(prop.value);
+      key.classList.add('mapbox-control-inspect-key');
+      value.classList.add('mapbox-control-inspect-value');
+      key.textContent = record.key;
+      value.textContent = String(record.value);
       row.appendChild(key);
       row.appendChild(value);
       table.append(row);

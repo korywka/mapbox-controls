@@ -61,7 +61,7 @@ map.on('ruler.change', (params) => {
 });
 
 /* Inspect */
-map.addControl(new InspectControl(), 'bottom-right');
+map.addControl(new InspectControl({ console: true }), 'bottom-right');
 
 /* Compass */
 map.addControl(new CompassControl(), 'bottom-right');

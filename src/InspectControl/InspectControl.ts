@@ -4,7 +4,13 @@ import Button from '../Button/Button';
 import popupTemplate from './popupTemplate';
 import iconInspect from '../icons/inspect';
 
+interface InspectControlOptions {
+  /** Log inspected features to console */
+  console?: boolean
+}
+
 export default class InspectControl extends Base {
+  console: boolean
   popupNode: HTMLDivElement
   lngLat: LngLat
   isInspecting: boolean
@@ -12,8 +18,9 @@ export default class InspectControl extends Base {
   mapContainer: HTMLElement
   mapCanvas: HTMLCanvasElement
 
-  constructor() {
+  constructor(options: InspectControlOptions) {
     super();
+    this.console = options.console;
     this.popupNode = null;
     this.lngLat = null;
     this.isInspecting = false;
@@ -65,6 +72,9 @@ export default class InspectControl extends Base {
     this.popupNode = popupTemplate(features);
     this.mapContainer.appendChild(this.popupNode);
     this.updatePosition();
+    if (this.console) {
+      console.log(features);
+    }
   }
 
   removePopup() {

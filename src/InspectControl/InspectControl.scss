@@ -65,24 +65,36 @@
     margin-left: 6px;
   }
 
-  &-feature {
+  &-grid {
     width: 100%;
     min-width: 200px;
+    max-width: 400px;
     border-collapse: collapse;
-
-    th, td {
-      padding: 5px;
-      white-space: nowrap;
-    }
-
-    th {
-      text-align: right;
-    }
 
     tr:not(:last-child) {
       td, th {
         border-bottom: 1px solid rgba(0, 0, 0, 0.05);
       }
     }
+  }
+
+  &-key,
+  &-value {
+    width: 50%;
+    padding: 5px;
+    white-space: break-spaces;
+  }
+
+  &-key {
+    text-align: right;
+  }
+
+  &-value {
+    text-align: left;
+  }
+
+  &-caption {
+    text-align: center;
+    color: #4264fb;
   }
 }

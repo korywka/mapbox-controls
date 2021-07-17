@@ -14,7 +14,7 @@ function getData(feature: MapboxGeoJSONFeature) {
     { key: 'id', value: feature.layer.id },
     { key: 'type', value: feature.layer.type },
     { key: 'source', value: feature.layer.source },
-    { key: 'source-layer', value: feature.layer['source-layer'] },
+    { key: 'source-layer', value: feature.layer['source-layer'] ?? '—' },
   ];
 
   const featureData: (string | GeoJsonProperties)[] = ['properties'];

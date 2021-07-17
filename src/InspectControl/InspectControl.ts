@@ -18,9 +18,9 @@ export default class InspectControl extends Base {
   mapContainer: HTMLElement
   mapCanvas: HTMLCanvasElement
 
-  constructor(options: InspectControlOptions) {
+  constructor(options?: InspectControlOptions) {
     super();
-    this.console = options.console;
+    this.console = options?.console;
     this.popupNode = null;
     this.lngLat = null;
     this.isInspecting = false;

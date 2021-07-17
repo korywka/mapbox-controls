@@ -21,7 +21,9 @@ const map = new mapboxgl.Map({
 });
 
 const polygon = {
+  id: 1234567890,
   type: 'Feature',
+  properties: {},
   geometry: {
     type: 'Polygon',
     coordinates: [

@@ -655,12 +655,13 @@
 	    Direction["Prev"] = "prev";
 	})(Direction || (Direction = {}));
 	function getData(feature) {
+	    var _a;
 	    const layerData = [
 	        'layer',
 	        { key: 'id', value: feature.layer.id },
 	        { key: 'type', value: feature.layer.type },
 	        { key: 'source', value: feature.layer.source },
-	        { key: 'source-layer', value: feature.layer['source-layer'] },
+	        { key: 'source-layer', value: (_a = feature.layer['source-layer']) !== null && _a !== void 0 ? _a : '—' },
 	    ];
 	    const featureData = ['properties'];
 	    if (feature.id) {
@@ -774,7 +775,7 @@
 	class InspectControl extends Base {
 	    constructor(options) {
 	        super();
-	        this.console = options.console;
+	        this.console = options === null || options === void 0 ? void 0 : options.console;
 	        this.popupNode = null;
 	        this.lngLat = null;
 	        this.isInspecting = false;
@@ -1438,7 +1439,9 @@
 	});
 
 	const polygon = {
+	  id: 1234567890,
 	  type: 'Feature',
+	  properties: {},
 	  geometry: {
 	    type: 'Polygon',
 	    coordinates: [

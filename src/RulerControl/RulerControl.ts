@@ -164,28 +164,35 @@ export default class RulerControl extends Base {
 
   mapClickListener(event) {
     const markerNode = this.getMarkerNode();
-    const lineSource = this.map.getSource(SOURCE_LINE) as GeoJSONSource;
-    const symbolSource = this.map.getSource(SOURCE_SYMBOL) as GeoJSONSource;
+
     const marker = new mapboxgl.Marker({ element: markerNode, draggable: true })
       .setLngLat(event.lngLat)
       .addTo(this.map);
     const newCoordinate = [event.lngLat.lng, event.lngLat.lat];
-
     this.coordinates.push(newCoordinate);
-    this.map.fire('ruler.change', { coordinates: this.coordinates });
     this.updateLabels();
-    lineSource.setData(lineStringFeature(this.coordinates));
-    symbolSource.setData(pointFeatureCollection(this.coordinates, this.labels));
+    this.updateSource();
     this.markers.push(marker);
+    this.map.fire('ruler.change', { coordinates: this.coordinates });
 
     marker.on('drag', () => {
       const index = this.markers.indexOf(marker);
       const lngLat = marker.getLngLat();
       this.coordinates[index] = [lngLat.lng, lngLat.lat];
       this.updateLabels();
-      lineSource.setData(lineStringFeature(this.coordinates));
-      symbolSource.setData(pointFeatureCollection(this.coordinates, this.labels));
+      this.updateSource();
     });
+
+    marker.on('dragend', () => {
+      this.map.fire('ruler.change', { coordinates: this.coordinates });
+    });
+  }
+
+  updateSource() {
+    const lineSource = this.map.getSource(SOURCE_LINE) as GeoJSONSource;
+    const symbolSource = this.map.getSource(SOURCE_SYMBOL) as GeoJSONSource;
+    lineSource.setData(lineStringFeature(this.coordinates));
+    symbolSource.setData(pointFeatureCollection(this.coordinates, this.labels));
   }
 
   updateLabels() {

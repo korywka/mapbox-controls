@@ -1,4 +1,4 @@
-import { GeoJSONSource, ImageSource, MapMouseEvent } from 'mapbox-gl';
+import { GeoJSONSource, ImageSource, LngLat, MapMouseEvent } from 'mapbox-gl';
 import Base from '../Base/Base';
 import Button from '../Button/Button';
 import iconImage from '../icons/image';
@@ -12,10 +12,11 @@ export default class ImageControl extends Base {
   mapContainer: HTMLElement
   fileInput: HTMLInputElement
   images: IImage[]
-  editMode?: EditMode
+  editMode: EditMode
   selectedImage?: IImage
-  movingOff?: () => void
-  transformOff?: () => void
+  cursorPosition?: LngLat
+  movingModeOff?: () => void
+  transformModeOff?: () => void
 
   constructor() {
     super();
@@ -25,11 +26,15 @@ export default class ImageControl extends Base {
     this.fileInput.accept = '.jpg, .jpeg, .png';
     this.fileInput.multiple = true;
     this.images = [];
-    this.editMode = null;
+    this.editMode = EditMode.None;
     this.selectedImage = null;
+    this.cursorPosition = null;
+    this.insert = this.insert.bind(this);
+    this.redraw = this.redraw.bind(this);
     this.onMapClick = this.onMapClick.bind(this);
     this.onFileInputChange = this.onFileInputChange.bind(this);
     this.keyDownListener = this.keyDownListener.bind(this);
+    this.mouseMoveListener = this.mouseMoveListener.bind(this);
   }
 
   insert() {
@@ -42,9 +47,8 @@ export default class ImageControl extends Base {
   }
 
   onFileInputChange() {
-    Array.from(this.fileInput.files).forEach(async (file, index) => {
-      const image = await this.addImage(file);
-      if (this.fileInput.files.length - 1 === index) this.selectImage(image.id);
+    Array.from(this.fileInput.files).forEach(async (file) => {
+      await this.addImage(file);
     });
   }
 
@@ -78,11 +82,11 @@ export default class ImageControl extends Base {
 
   redraw() {
     this.images.forEach(image => this.drawImage(image));
-    if (this.movingOff) {
-      this.movingOff();
+    if (this.movingModeOff) {
+      this.movingModeOff();
     }
-    if (this.transformOff) {
-      this.transformOff();
+    if (this.transformModeOff) {
+      this.transformModeOff();
     }
   }
 
@@ -96,29 +100,43 @@ export default class ImageControl extends Base {
     }
   }
 
-  movingOn() {
-    this.movingOff = moveable(this.map, this.selectedImage, ((position) => {
-      this.updateImageSource(position as ImagePosition);
-    }));
+  movingModeOn() {
+    this.movingModeOff = moveable({
+      map: this.map,
+      image: this.selectedImage,
+      cursorPosition: this.cursorPosition,
+      onUpdate: (position) => {
+        this.updateImageSource(position as ImagePosition);
+      },
+    });
   }
 
-  transformOn() {
-    this.transformOff = resizeable(this.map, this.selectedImage, ((position) => {
-      this.updateImageSource(position as ImagePosition);
-    }));
+  transformModeOn() {
+    this.transformModeOff = resizeable({
+      map: this.map,
+      image: this.selectedImage,
+      onUpdate: ((position) => {
+        this.updateImageSource(position as ImagePosition);
+      }),
+    });
   }
 
   selectImage(id: string) {
     if (this.selectedImage && this.selectedImage.id !== id) this.deselectImage();
-    this.selectedImage = this.images.find(i => i.id === id);
-    if (!this.editMode) {
+    const selectedImage = this.images.find(i => i.id === id);
+    if (selectedImage.locked) return;
+
+    this.selectedImage = selectedImage;
+
+    if (this.editMode === EditMode.None) {
       this.editMode = EditMode.Move;
-      this.movingOn();
+      this.movingModeOn();
     } else if (this.editMode === EditMode.Move) {
       this.editMode = EditMode.Transform;
-      this.movingOff();
-      this.transformOn();
+      this.movingModeOff();
+      this.transformModeOn();
     }
+
     this.map.fire('image.select', this.selectedImage);
     document.addEventListener('keydown', this.keyDownListener);
   }
@@ -126,13 +144,13 @@ export default class ImageControl extends Base {
   deselectImage() {
     if (!this.selectedImage) return;
     if (this.editMode === EditMode.Move) {
-      this.movingOff();
+      this.movingModeOff();
     } else if (this.editMode === EditMode.Transform) {
-      this.transformOff();
+      this.transformModeOff();
     }
     this.map.fire('image.deselect', this.selectedImage);
     this.selectedImage = null;
-    this.editMode = null;
+    this.editMode = EditMode.None;
     document.removeEventListener('keydown', this.keyDownListener);
   }
 
@@ -145,20 +163,38 @@ export default class ImageControl extends Base {
     this.map.fire('image.update', this.selectedImage);
   }
 
+  setLock(imageId: string, value: boolean) {
+    const image = this.images.find(i => i.id === imageId);
+    if (!image) throw Error(`image with id ${imageId} doesn't exist`);
+    image.locked = value;
+  }
+
   keyDownListener(event: KeyboardEvent) {
     if (event.key === 'Escape') {
       this.deselectImage();
     }
   }
 
+  mouseMoveListener(event: MapMouseEvent) {
+    this.cursorPosition = event.lngLat;
+  }
+
   onAddControl() {
+    this.mapContainer = this.map.getContainer();
     if (this.map.isStyleLoaded()) {
       this.insert();
     } else {
-      this.map.once('style.load', () => this.insert());
+      this.map.once('style.load', this.insert);
     }
-    this.map.on('style.load', () => this.redraw());
-    this.mapContainer = this.map.getContainer();
+    this.map.on('style.load', this.redraw);
     this.map.on('click', this.onMapClick);
+    this.map.on('mousemove', this.mouseMoveListener);
+  }
+
+  onRemoveControl() {
+    this.map.off('style.load', this.insert);
+    this.map.off('style.load', this.redraw);
+    this.map.off('click', this.onMapClick);
+    this.map.off('mousemove', this.mouseMoveListener);
   }
 }

@@ -1,14 +1,25 @@
-import { LngLat, Map, MapLayerMouseEvent, MapMouseEvent } from 'mapbox-gl';
+import mapboxgl, { LngLat, Map, MapLayerMouseEvent, MapMouseEvent } from 'mapbox-gl';
 import { Cursor, ImagePosition, Visibility } from './types';
 import { contourLayer, shadowLayer } from './layers';
 import IImage from './IImage';
 
-export default function moveable(map: Map, image: IImage, onUpdate: (position: ImagePosition) => void): () => void {
+interface Options {
+  map: Map
+  image: IImage
+  cursorPosition: LngLat
+  onUpdate: (position: ImagePosition) => void
+}
+
+export default function moveable({ map, image, cursorPosition, onUpdate }: Options): () => void {
   const mapCanvas = map.getCanvas();
+  const imageBounds = new mapboxgl.LngLatBounds(image.position[3], image.position[1]);
   let startPosition: LngLat = null;
 
   map.addLayer({ ...contourLayer, source: image.polygonSource.id });
   map.addLayer({ ...shadowLayer, source: image.polygonSource.id });
+  if (imageBounds.contains(cursorPosition)) {
+    mapCanvas.style.cursor = Cursor.Move;
+  }
 
   function onPointerMove(event: MapMouseEvent) {
     const currentPosition = event.lngLat;

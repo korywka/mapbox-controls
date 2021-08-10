@@ -177,6 +177,7 @@
 	                    this.url = imageUrl;
 	                    this.width = node.width;
 	                    this.height = node.height;
+	                    this.locked = false;
 	                    resolve(this);
 	                };
 	                node.onerror = reject;
@@ -305,6 +306,7 @@
 	})(Cursor || (Cursor = {}));
 	var EditMode;
 	(function (EditMode) {
+	    EditMode["None"] = "none";
 	    EditMode["Move"] = "move";
 	    EditMode["Transform"] = "transform";
 	})(EditMode || (EditMode = {}));
@@ -343,11 +345,15 @@
 	    }
 	};
 
-	function moveable(map, image, onUpdate) {
+	function moveable({ map, image, cursorPosition, onUpdate }) {
 	    const mapCanvas = map.getCanvas();
+	    const imageBounds = new mapboxgl.LngLatBounds(image.position[3], image.position[1]);
 	    let startPosition = null;
 	    map.addLayer(Object.assign(Object.assign({}, contourLayer), { source: image.polygonSource.id }));
 	    map.addLayer(Object.assign(Object.assign({}, shadowLayer), { source: image.polygonSource.id }));
+	    if (imageBounds.contains(cursorPosition)) {
+	        mapCanvas.style.cursor = Cursor.Move;
+	    }
 	    function onPointerMove(event) {
 	        const currentPosition = event.lngLat;
 	        const deltaLng = startPosition.lng - currentPosition.lng;
@@ -402,7 +408,7 @@
 	    const t = vu / v2;
 	    return [a[0] + v[0] * t, a[1] + v[1] * t];
 	}
-	function resizeable(map, image, onUpdate) {
+	function resizeable({ map, image, onUpdate }) {
 	    const mapCanvas = map.getCanvas();
 	    let currentIndex;
 	    map.addLayer(Object.assign(Object.assign({}, contourLayer), { source: image.polygonSource.id }));
@@ -492,11 +498,15 @@
 	        this.fileInput.accept = '.jpg, .jpeg, .png';
 	        this.fileInput.multiple = true;
 	        this.images = [];
-	        this.editMode = null;
+	        this.editMode = EditMode.None;
 	        this.selectedImage = null;
+	        this.cursorPosition = null;
+	        this.insert = this.insert.bind(this);
+	        this.redraw = this.redraw.bind(this);
 	        this.onMapClick = this.onMapClick.bind(this);
 	        this.onFileInputChange = this.onFileInputChange.bind(this);
 	        this.keyDownListener = this.keyDownListener.bind(this);
+	        this.mouseMoveListener = this.mouseMoveListener.bind(this);
 	    }
 	    insert() {
 	        this.addClassName('mapbox-control-image');
@@ -507,10 +517,8 @@
 	        this.fileInput.addEventListener('change', this.onFileInputChange);
 	    }
 	    onFileInputChange() {
-	        Array.from(this.fileInput.files).forEach((file, index) => __awaiter(this, void 0, void 0, function* () {
-	            const image = yield this.addImage(file);
-	            if (this.fileInput.files.length - 1 === index)
-	                this.selectImage(image.id);
+	        Array.from(this.fileInput.files).forEach((file) => __awaiter(this, void 0, void 0, function* () {
+	            yield this.addImage(file);
 	        }));
 	    }
 	    addImage(data, options = {}) {
@@ -546,11 +554,11 @@
 	    }
 	    redraw() {
 	        this.images.forEach(image => this.drawImage(image));
-	        if (this.movingOff) {
-	            this.movingOff();
+	        if (this.movingModeOff) {
+	            this.movingModeOff();
 	        }
-	        if (this.transformOff) {
-	            this.transformOff();
+	        if (this.transformModeOff) {
+	            this.transformModeOff();
 	        }
 	    }
 	    onMapClick(event) {
@@ -563,28 +571,37 @@
 	            this.deselectImage();
 	        }
 	    }
-	    movingOn() {
-	        this.movingOff = moveable(this.map, this.selectedImage, ((position) => {
-	            this.updateImageSource(position);
-	        }));
+	    movingModeOn() {
+	        this.movingModeOff = moveable({
+	            map: this.map,
+	            image: this.selectedImage,
+	            cursorPosition: this.cursorPosition,
+	            onUpdate: (position) => {
+	                this.updateImageSource(position);
+	            },
+	        });
 	    }
-	    transformOn() {
-	        this.transformOff = resizeable(this.map, this.selectedImage, ((position) => {
-	            this.updateImageSource(position);
-	        }));
+	    transformModeOn() {
+	        this.transformModeOff = resizeable({
+	            map: this.map,
+	            image: this.selectedImage,
+	            onUpdate: ((position) => {
+	                this.updateImageSource(position);
+	            }),
+	        });
 	    }
 	    selectImage(id) {
 	        if (this.selectedImage && this.selectedImage.id !== id)
 	            this.deselectImage();
 	        this.selectedImage = this.images.find(i => i.id === id);
-	        if (!this.editMode) {
+	        if (this.editMode === EditMode.None) {
 	            this.editMode = EditMode.Move;
-	            this.movingOn();
+	            this.movingModeOn();
 	        }
 	        else if (this.editMode === EditMode.Move) {
 	            this.editMode = EditMode.Transform;
-	            this.movingOff();
-	            this.transformOn();
+	            this.movingModeOff();
+	            this.transformModeOn();
 	        }
 	        this.map.fire('image.select', this.selectedImage);
 	        document.addEventListener('keydown', this.keyDownListener);
@@ -593,14 +610,14 @@
 	        if (!this.selectedImage)
 	            return;
 	        if (this.editMode === EditMode.Move) {
-	            this.movingOff();
+	            this.movingModeOff();
 	        }
 	        else if (this.editMode === EditMode.Transform) {
-	            this.transformOff();
+	            this.transformModeOff();
 	        }
 	        this.map.fire('image.deselect', this.selectedImage);
 	        this.selectedImage = null;
-	        this.editMode = null;
+	        this.editMode = EditMode.None;
 	        document.removeEventListener('keydown', this.keyDownListener);
 	    }
 	    updateImageSource(position) {
@@ -611,21 +628,37 @@
 	        this.map.getSource(selectedImage.cornersSource.id).setData(selectedImage.asPoints);
 	        this.map.fire('image.update', this.selectedImage);
 	    }
+	    lockImage(imageId) {
+	        const image = this.images.find(i => i.id === imageId);
+	        if (!image)
+	            throw Error(`image with id ${imageId} doesn't exist`);
+	        image.frozen = true;
+	    }
 	    keyDownListener(event) {
 	        if (event.key === 'Escape') {
 	            this.deselectImage();
 	        }
 	    }
+	    mouseMoveListener(event) {
+	        this.cursorPosition = event.lngLat;
+	    }
 	    onAddControl() {
+	        this.mapContainer = this.map.getContainer();
 	        if (this.map.isStyleLoaded()) {
 	            this.insert();
 	        }
 	        else {
-	            this.map.once('style.load', () => this.insert());
+	            this.map.once('style.load', this.insert);
 	        }
-	        this.map.on('style.load', () => this.redraw());
-	        this.mapContainer = this.map.getContainer();
+	        this.map.on('style.load', this.redraw);
 	        this.map.on('click', this.onMapClick);
+	        this.map.on('mousemove', this.mouseMoveListener);
+	    }
+	    onRemoveControl() {
+	        this.map.off('style.load', this.insert);
+	        this.map.off('style.load', this.redraw);
+	        this.map.off('click', this.onMapClick);
+	        this.map.off('mousemove', this.mouseMoveListener);
 	    }
 	}
 

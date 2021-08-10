@@ -8,6 +8,11 @@ class IImage {
   width: number
   height: number
   position: ImagePosition
+  locked: boolean
+
+  constructor() {
+    this.locked = false;
+  }
 
   loadFile(file: File) {
     return new Promise(((resolve, reject) => {

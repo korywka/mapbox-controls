@@ -11,6 +11,7 @@ export enum Cursor {
 }
 
 export enum EditMode {
+  None= 'none',
   Move= 'move',
   Transform = 'transform',
 }

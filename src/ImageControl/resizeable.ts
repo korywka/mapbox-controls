@@ -18,7 +18,13 @@ function getClosestPoint(a: P, b: P, p: P): P {
   return [a[0] + v[0] * t, a[1] + v[1] * t];
 }
 
-export default function resizeable(map: Map, image: IImage, onUpdate: (position: ImagePosition) => void): () => void {
+interface Options {
+  map: Map
+  image: IImage
+  onUpdate: (position: ImagePosition) => void
+}
+
+export default function resizeable({ map, image, onUpdate }: Options): () => void {
   const mapCanvas = map.getCanvas();
   let currentIndex: number;
 

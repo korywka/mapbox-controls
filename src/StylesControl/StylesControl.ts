@@ -27,7 +27,7 @@ export default class StylesControl extends Base {
       const button = new Button();
       button.setText(style.label);
       button.onClick(() => {
-        if (button.node.classList.contains('-active')) return;
+        if (button.isActive()) return;
         this.map.setStyle(style.styleUrl);
         if (this.onChange) this.onChange(style);
       });
@@ -37,13 +37,13 @@ export default class StylesControl extends Base {
 
     this.map.on('styledata', () => {
       this.buttons.forEach((button) => {
-        button.removeClassName('-active');
+        button.setActive(false);
       });
       const styleNames = this.styles.map(style => style.styleName);
       const currentStyleIndex = styleNames.indexOf(this.map.getStyle().name);
       if (currentStyleIndex !== -1) {
         const currentButton = this.buttons[currentStyleIndex];
-        currentButton.addClassName('-active');
+        currentButton.setActive(true);
       }
     });
   }

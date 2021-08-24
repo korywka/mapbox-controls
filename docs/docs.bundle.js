@@ -52,7 +52,7 @@
 
 	var mapboxgl = mapboxGl.exports;
 
-	const svg$7 = `
+	const svg$9 = `
 <svg viewBox="0 0 24 24" width="22" height="22" xmlns="http://www.w3.org/2000/svg">
     <g fill="none" fill-rule="evenodd">
         <path d="M0 0h24v24H0z"/>
@@ -62,7 +62,7 @@
 </svg>
 `;
 	function iconPointer () {
-	    return (new DOMParser().parseFromString(svg$7, 'image/svg+xml')).firstChild;
+	    return (new DOMParser().parseFromString(svg$9, 'image/svg+xml')).firstChild;
 	}
 
 	class Base {
@@ -72,8 +72,8 @@
 	        this.node.classList.add('mapboxgl-ctrl-group');
 	        this.node.classList.add('mapbox-control');
 	    }
-	    addButton(button) {
-	        this.node.appendChild(button.node);
+	    addButton(...buttons) {
+	        buttons.forEach(button => this.node.appendChild(button.node));
 	    }
 	    addClassName(className) {
 	        this.node.classList.add(className);
@@ -108,18 +108,37 @@
 	    setIcon(icon) {
 	        this.icon = icon;
 	        this.node.appendChild(icon);
+	        return this;
 	    }
 	    setText(text) {
 	        this.node.textContent = text;
+	        return this;
+	    }
+	    setDisabled(isDisabled) {
+	        this.node.disabled = isDisabled;
+	        return this;
+	    }
+	    setActive(isActive) {
+	        if (isActive) {
+	            this.addClassName('-active');
+	        }
+	        else {
+	            this.removeClassName('-active');
+	        }
+	    }
+	    isActive() {
+	        return this.node.classList.contains('-active');
 	    }
 	    onClick(callback) {
 	        this.node.addEventListener('click', callback);
 	    }
 	    addClassName(className) {
 	        this.node.classList.add(className);
+	        return this;
 	    }
 	    removeClassName(className) {
 	        this.node.classList.remove(className);
+	        return this;
 	    }
 	}
 
@@ -127,7 +146,7 @@
 	    constructor(options) {
 	        var _a;
 	        super();
-	        this.button = new Button();
+	        this.buttonCompass = new Button();
 	        this.instant = (_a = options === null || options === void 0 ? void 0 : options.instant) !== null && _a !== void 0 ? _a : true;
 	        this.syncRotate = this.syncRotate.bind(this);
 	    }
@@ -135,11 +154,12 @@
 	        this.addClassName('mapbox-compass');
 	        if (!this.instant)
 	            this.node.hidden = true;
-	        this.button.setIcon(iconPointer());
-	        this.button.onClick(() => {
+	        this.buttonCompass
+	            .setIcon(iconPointer())
+	            .onClick(() => {
 	            this.map.easeTo({ bearing: 0, pitch: 0 });
 	        });
-	        this.addButton(this.button);
+	        this.addButton(this.buttonCompass);
 	    }
 	    onAddControl() {
 	        this.insert();
@@ -151,21 +171,51 @@
 	        if (!this.instant) {
 	            this.node.hidden = angle === 0;
 	        }
-	        this.button.icon.style.transform = `rotate(${angle}deg)`;
+	        this.buttonCompass.icon.style.transform = `rotate(${angle}deg)`;
 	    }
 	}
 
-	const svg$6 = `
+	const svg$8 = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="#505050">
   <path d="M0 0h24v24H0V0z" fill="none"/>
   <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14 6 17h12l-3.86-5.14z"/>
 </svg>
 `;
 	function iconImage () {
+	    return (new DOMParser().parseFromString(svg$8, 'image/svg+xml')).firstChild;
+	}
+
+	const svg$7 = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="#505050">
+  <path d="M0 0h24v24H0V0z" fill="none"/>
+  <path d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"/>
+</svg>
+`;
+	function iconMove () {
+	    return (new DOMParser().parseFromString(svg$7, 'image/svg+xml')).firstChild;
+	}
+
+	const svg$6 = `
+<svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" viewBox="0 0 24 24" width="20" height="20" fill="#505050">
+  <rect fill="none" height="24" width="24"/><polygon points="21,11 21,3 13,3 16.29,6.29 6.29,16.29 3,13 3,21 11,21 7.71,17.71 17.71,7.71"/>
+</svg>
+`;
+	function iconResize () {
 	    return (new DOMParser().parseFromString(svg$6, 'image/svg+xml')).firstChild;
 	}
 
-	class IImage {
+	function getFileInput() {
+	    const node = document.createElement('input');
+	    node.type = 'file';
+	    node.accept = '.jpg, .jpeg, .png';
+	    node.multiple = true;
+	    return node;
+	}
+
+	class Picture {
+	    constructor() {
+	        this.locked = false;
+	    }
 	    loadFile(file) {
 	        return new Promise(((resolve, reject) => {
 	            const reader = new FileReader();
@@ -177,7 +227,6 @@
 	                    this.url = imageUrl;
 	                    this.width = node.width;
 	                    this.height = node.height;
-	                    this.locked = false;
 	                    resolve(this);
 	                };
 	                node.onerror = reject;
@@ -304,12 +353,6 @@
 	    Cursor["NESWResize"] = "nesw-resize";
 	    Cursor["NWSEResize"] = "nwse-resize";
 	})(Cursor || (Cursor = {}));
-	var EditMode;
-	(function (EditMode) {
-	    EditMode["None"] = "none";
-	    EditMode["Move"] = "move";
-	    EditMode["Transform"] = "transform";
-	})(EditMode || (EditMode = {}));
 	var Visibility;
 	(function (Visibility) {
 	    Visibility["Visible"] = "visible";
@@ -329,11 +372,6 @@
 	        'line-width': 2,
 	    },
 	};
-	const shadowLayer = {
-	    id: '$shadowLayerId',
-	    type: 'fill',
-	    paint: { 'fill-opacity': 0 },
-	};
 	const cornersLayer = {
 	    id: '$cornersLayer',
 	    type: 'circle',
@@ -345,56 +383,62 @@
 	    }
 	};
 
-	function moveable({ map, image, cursorPosition, onUpdate }) {
-	    const mapCanvas = map.getCanvas();
-	    const imageBounds = new mapboxgl.LngLatBounds(image.position[3], image.position[1]);
-	    let startPosition = null;
-	    map.addLayer(Object.assign(Object.assign({}, contourLayer), { source: image.polygonSource.id }));
-	    map.addLayer(Object.assign(Object.assign({}, shadowLayer), { source: image.polygonSource.id }));
-	    if (imageBounds.contains(cursorPosition)) {
-	        mapCanvas.style.cursor = Cursor.Move;
+	const shadowLayer = {
+	    id: '$shadowLayerId',
+	    type: 'fill',
+	    paint: { 'fill-opacity': 0 },
+	};
+	class MoveMode {
+	    constructor(options) {
+	        const { map, button, picture, onUpdate } = options;
+	        const mapCanvas = map.getCanvas();
+	        let startPosition = null;
+	        map.addLayer(Object.assign(Object.assign({}, contourLayer), { source: picture.polygonSource.id }));
+	        map.addLayer(Object.assign(Object.assign({}, shadowLayer), { source: picture.polygonSource.id }));
+	        function onPointerMove(event) {
+	            const currentPosition = event.lngLat;
+	            const deltaLng = startPosition.lng - currentPosition.lng;
+	            const deltaLat = startPosition.lat - currentPosition.lat;
+	            onUpdate(picture.position.map(p => new mapboxGl.exports.LngLat(p.lng - deltaLng, p.lat - deltaLat)));
+	            startPosition = currentPosition;
+	        }
+	        function onPointerUp() {
+	            mapCanvas.style.cursor = Cursor.Move;
+	            map.off('mousemove', onPointerMove);
+	            map.setLayoutProperty(contourLayer.id, 'visibility', Visibility.Visible);
+	        }
+	        function onPointerDown(event) {
+	            event.preventDefault();
+	            startPosition = event.lngLat;
+	            mapCanvas.style.cursor = Cursor.Grabbing;
+	            map.on('mousemove', onPointerMove);
+	            map.setLayoutProperty(contourLayer.id, 'visibility', Visibility.None);
+	            document.addEventListener('pointerup', onPointerUp, { once: true });
+	        }
+	        function onPointerEnter() {
+	            mapCanvas.style.cursor = Cursor.Move;
+	        }
+	        function onPointerLeave() {
+	            mapCanvas.style.cursor = '';
+	        }
+	        button.setActive(true);
+	        map.on('mouseenter', shadowLayer.id, onPointerEnter);
+	        map.on('mouseleave', shadowLayer.id, onPointerLeave);
+	        map.on('mousedown', shadowLayer.id, onPointerDown);
+	        this.destroy = () => {
+	            button.setActive(false);
+	            mapCanvas.style.cursor = '';
+	            map.off('mousemove', onPointerMove);
+	            map.off('mouseenter', shadowLayer.id, onPointerEnter);
+	            map.off('mouseleave', shadowLayer.id, onPointerLeave);
+	            map.off('mousedown', shadowLayer.id, onPointerDown);
+	            document.removeEventListener('pointerup', onPointerUp);
+	            if (map.getLayer(shadowLayer.id))
+	                map.removeLayer(shadowLayer.id);
+	            if (map.getLayer(contourLayer.id))
+	                map.removeLayer(contourLayer.id);
+	        };
 	    }
-	    function onPointerMove(event) {
-	        const currentPosition = event.lngLat;
-	        const deltaLng = startPosition.lng - currentPosition.lng;
-	        const deltaLat = startPosition.lat - currentPosition.lat;
-	        onUpdate(image.position.map(p => new mapboxGl.exports.LngLat(p.lng - deltaLng, p.lat - deltaLat)));
-	        startPosition = currentPosition;
-	    }
-	    function onPointerUp() {
-	        mapCanvas.style.cursor = Cursor.Move;
-	        map.off('mousemove', onPointerMove);
-	        map.setLayoutProperty(contourLayer.id, 'visibility', Visibility.Visible);
-	    }
-	    function onPointerDown(event) {
-	        event.preventDefault();
-	        startPosition = event.lngLat;
-	        mapCanvas.style.cursor = Cursor.Grabbing;
-	        map.on('mousemove', onPointerMove);
-	        map.setLayoutProperty(contourLayer.id, 'visibility', Visibility.None);
-	        document.addEventListener('pointerup', onPointerUp, { once: true });
-	    }
-	    function onPointerEnter() {
-	        mapCanvas.style.cursor = Cursor.Move;
-	    }
-	    function onPointerLeave() {
-	        mapCanvas.style.cursor = '';
-	    }
-	    map.on('mouseenter', shadowLayer.id, onPointerEnter);
-	    map.on('mouseleave', shadowLayer.id, onPointerLeave);
-	    map.on('mousedown', shadowLayer.id, onPointerDown);
-	    return () => {
-	        mapCanvas.style.cursor = '';
-	        map.off('mousemove', onPointerMove);
-	        map.off('mouseenter', shadowLayer.id, onPointerEnter);
-	        map.off('mouseleave', shadowLayer.id, onPointerLeave);
-	        map.off('mousedown', shadowLayer.id, onPointerDown);
-	        document.removeEventListener('pointerup', onPointerUp);
-	        if (map.getLayer(shadowLayer.id))
-	            map.removeLayer(shadowLayer.id);
-	        if (map.getLayer(contourLayer.id))
-	            map.removeLayer(contourLayer.id);
-	    };
 	}
 
 	/**
@@ -408,76 +452,83 @@
 	    const t = vu / v2;
 	    return [a[0] + v[0] * t, a[1] + v[1] * t];
 	}
-	function resizeable({ map, image, onUpdate }) {
-	    const mapCanvas = map.getCanvas();
-	    let currentIndex;
-	    map.addLayer(Object.assign(Object.assign({}, contourLayer), { source: image.polygonSource.id }));
-	    map.addLayer(Object.assign(Object.assign({}, cornersLayer), { source: image.cornersSource.id }));
-	    function onPointerMove(event) {
-	        const pointA = map.project(image.position[currentIndex]);
-	        const pointB = map.project(image.position[image.getOppositePoint(currentIndex)]);
-	        const pointP = map.project(event.lngLat);
-	        const closestPoint = getClosestPoint([pointA.x, pointA.y], [pointB.x, pointB.y], [pointP.x, pointP.y]);
-	        const closestLngLat = map.unproject(closestPoint);
-	        const scaledPosition = image.position;
-	        scaledPosition[currentIndex] = new mapboxGl.exports.LngLat(closestLngLat.lng, closestLngLat.lat);
-	        setResizeCursor(currentIndex);
-	        if (currentIndex === 0) {
-	            scaledPosition[1] = new mapboxGl.exports.LngLat(scaledPosition[1].lng, closestLngLat.lat);
-	            scaledPosition[3] = new mapboxGl.exports.LngLat(closestLngLat.lng, scaledPosition[3].lat);
+
+	class ResizeMode {
+	    constructor(options) {
+	        const { map, button, picture, onUpdate } = options;
+	        const mapCanvas = map.getCanvas();
+	        let currentIndex;
+	        map.addLayer(Object.assign(Object.assign({}, contourLayer), { source: picture.polygonSource.id }));
+	        map.addLayer(Object.assign(Object.assign({}, cornersLayer), { source: picture.cornersSource.id }));
+	        function onPointerMove(event) {
+	            const pointA = map.project(picture.position[currentIndex]);
+	            const pointB = map.project(picture.position[picture.getOppositePoint(currentIndex)]);
+	            const pointP = map.project(event.lngLat);
+	            const closestPoint = getClosestPoint([pointA.x, pointA.y], [pointB.x, pointB.y], [pointP.x, pointP.y]);
+	            const closestLngLat = map.unproject(closestPoint);
+	            const scaledPosition = picture.position;
+	            scaledPosition[currentIndex] = new mapboxGl.exports.LngLat(closestLngLat.lng, closestLngLat.lat);
+	            setResizeCursor(currentIndex);
+	            if (currentIndex === 0) {
+	                scaledPosition[1] = new mapboxGl.exports.LngLat(scaledPosition[1].lng, closestLngLat.lat);
+	                scaledPosition[3] = new mapboxGl.exports.LngLat(closestLngLat.lng, scaledPosition[3].lat);
+	            }
+	            else if (currentIndex === 1) {
+	                scaledPosition[0] = new mapboxGl.exports.LngLat(scaledPosition[0].lng, closestLngLat.lat);
+	                scaledPosition[2] = new mapboxGl.exports.LngLat(closestLngLat.lng, scaledPosition[2].lat);
+	            }
+	            else if (currentIndex === 2) {
+	                scaledPosition[3] = new mapboxGl.exports.LngLat(scaledPosition[3].lng, closestLngLat.lat);
+	                scaledPosition[1] = new mapboxGl.exports.LngLat(closestLngLat.lng, scaledPosition[1].lat);
+	            }
+	            else if (currentIndex === 3) {
+	                scaledPosition[2] = new mapboxGl.exports.LngLat(scaledPosition[2].lng, closestLngLat.lat);
+	                scaledPosition[0] = new mapboxGl.exports.LngLat(closestLngLat.lng, scaledPosition[0].lat);
+	            }
+	            onUpdate(scaledPosition);
 	        }
-	        else if (currentIndex === 1) {
-	            scaledPosition[0] = new mapboxGl.exports.LngLat(scaledPosition[0].lng, closestLngLat.lat);
-	            scaledPosition[2] = new mapboxGl.exports.LngLat(closestLngLat.lng, scaledPosition[2].lat);
+	        function onPointerUp() {
+	            currentIndex = null;
+	            mapCanvas.style.cursor = '';
+	            map.off('mousemove', onPointerMove);
+	            map.setLayoutProperty(cornersLayer.id, 'visibility', Visibility.Visible);
+	            map.setLayoutProperty(contourLayer.id, 'visibility', Visibility.Visible);
 	        }
-	        else if (currentIndex === 2) {
-	            scaledPosition[3] = new mapboxGl.exports.LngLat(scaledPosition[3].lng, closestLngLat.lat);
-	            scaledPosition[1] = new mapboxGl.exports.LngLat(closestLngLat.lng, scaledPosition[1].lat);
+	        function onPointerDown(event) {
+	            event.preventDefault();
+	            currentIndex = event.features[0].properties.index;
+	            map.on('mousemove', onPointerMove);
+	            map.setLayoutProperty(cornersLayer.id, 'visibility', Visibility.None);
+	            map.setLayoutProperty(contourLayer.id, 'visibility', Visibility.None);
+	            document.addEventListener('pointerup', onPointerUp, { once: true });
 	        }
-	        else if (currentIndex === 3) {
-	            scaledPosition[2] = new mapboxGl.exports.LngLat(scaledPosition[2].lng, closestLngLat.lat);
-	            scaledPosition[0] = new mapboxGl.exports.LngLat(closestLngLat.lng, scaledPosition[0].lat);
+	        function onPointerEnter(event) {
+	            setResizeCursor(event.features[0].properties.index);
 	        }
-	        onUpdate(scaledPosition);
+	        function onPointerLeave() {
+	            mapCanvas.style.cursor = '';
+	        }
+	        function setResizeCursor(index) {
+	            mapCanvas.style.cursor = [1, 3].includes(index) ? Cursor.NESWResize : Cursor.NWSEResize;
+	        }
+	        button.setActive(true);
+	        map.on('mouseenter', cornersLayer.id, onPointerEnter);
+	        map.on('mouseleave', cornersLayer.id, onPointerLeave);
+	        map.on('mousedown', cornersLayer.id, onPointerDown);
+	        this.destroy = () => {
+	            button.setActive(false);
+	            mapCanvas.style.cursor = '';
+	            map.off('mousemove', onPointerMove);
+	            map.off('mouseenter', cornersLayer.id, onPointerEnter);
+	            map.off('mouseleave', cornersLayer.id, onPointerLeave);
+	            map.off('mousedown', cornersLayer.id, onPointerDown);
+	            document.removeEventListener('pointerup', onPointerUp);
+	            if (map.getLayer(cornersLayer.id))
+	                map.removeLayer(cornersLayer.id);
+	            if (map.getLayer(contourLayer.id))
+	                map.removeLayer(contourLayer.id);
+	        };
 	    }
-	    function onPointerUp() {
-	        currentIndex = null;
-	        mapCanvas.style.cursor = '';
-	        map.off('mousemove', onPointerMove);
-	        map.setLayoutProperty(cornersLayer.id, 'visibility', Visibility.Visible);
-	        map.setLayoutProperty(contourLayer.id, 'visibility', Visibility.Visible);
-	    }
-	    function onPointerDown(event) {
-	        event.preventDefault();
-	        currentIndex = event.features[0].properties.index;
-	        map.on('mousemove', onPointerMove);
-	        map.setLayoutProperty(cornersLayer.id, 'visibility', Visibility.None);
-	        map.setLayoutProperty(contourLayer.id, 'visibility', Visibility.None);
-	        document.addEventListener('pointerup', onPointerUp, { once: true });
-	    }
-	    function onPointerEnter(event) {
-	        setResizeCursor(event.features[0].properties.index);
-	    }
-	    function onPointerLeave() {
-	        mapCanvas.style.cursor = '';
-	    }
-	    function setResizeCursor(index) {
-	        mapCanvas.style.cursor = [1, 3].includes(index) ? Cursor.NESWResize : Cursor.NWSEResize;
-	    }
-	    map.on('mouseenter', cornersLayer.id, onPointerEnter);
-	    map.on('mouseleave', cornersLayer.id, onPointerLeave);
-	    map.on('mousedown', cornersLayer.id, onPointerDown);
-	    return () => {
-	        map.off('mousemove', onPointerMove);
-	        map.off('mouseenter', cornersLayer.id, onPointerEnter);
-	        map.off('mouseleave', cornersLayer.id, onPointerLeave);
-	        map.off('mousedown', cornersLayer.id, onPointerDown);
-	        document.removeEventListener('pointerup', onPointerUp);
-	        if (map.getLayer(cornersLayer.id))
-	            map.removeLayer(cornersLayer.id);
-	        if (map.getLayer(contourLayer.id))
-	            map.removeLayer(contourLayer.id);
-	    };
 	}
 
 	var __awaiter = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -489,176 +540,163 @@
 	        step((generator = generator.apply(thisArg, _arguments || [])).next());
 	    });
 	};
-	class ImageControl extends Base {
+	class PictureControl extends Base {
 	    constructor() {
 	        super();
-	        this.button = new Button();
-	        this.fileInput = document.createElement('input');
-	        this.fileInput.type = 'file';
-	        this.fileInput.accept = '.jpg, .jpeg, .png';
-	        this.fileInput.multiple = true;
-	        this.images = [];
-	        this.editMode = EditMode.None;
-	        this.selectedImage = null;
-	        this.cursorPosition = null;
+	        this.buttonUpload = new Button();
+	        this.buttonMove = new Button();
+	        this.buttonResize = new Button();
+	        this.fileInput = getFileInput();
+	        this.pictures = [];
+	        this.currentMode = null;
+	        this.selectedPicture = null;
 	        this.insert = this.insert.bind(this);
 	        this.redraw = this.redraw.bind(this);
 	        this.onMapClick = this.onMapClick.bind(this);
-	        this.onFileInputChange = this.onFileInputChange.bind(this);
+	        this.setMoveMode = this.setMoveMode.bind(this);
+	        this.setResizeMode = this.setResizeMode.bind(this);
 	        this.keyDownListener = this.keyDownListener.bind(this);
-	        this.mouseMoveListener = this.mouseMoveListener.bind(this);
+	        this.onFileInputChange = this.onFileInputChange.bind(this);
 	    }
 	    insert() {
-	        this.addClassName('mapbox-control-image');
-	        this.button.setIcon(iconImage());
-	        this.addButton(this.button);
+	        this.addClassName('mapbox-control-picture');
+	        this.buttonUpload.setIcon(iconImage());
+	        this.buttonMove.setIcon(iconMove()).setDisabled(true).onClick(this.setMoveMode);
+	        this.buttonResize.setIcon(iconResize()).setDisabled(true).onClick(this.setResizeMode);
+	        this.addButton(this.buttonUpload, this.buttonMove, this.buttonResize);
 	        this.node.appendChild(this.fileInput);
-	        this.button.onClick(() => this.fileInput.click());
+	        this.buttonUpload.onClick(() => this.fileInput.click());
 	        this.fileInput.addEventListener('change', this.onFileInputChange);
 	    }
 	    onFileInputChange() {
+	        this.deselectPicture();
 	        Array.from(this.fileInput.files).forEach((file) => __awaiter(this, void 0, void 0, function* () {
-	            yield this.addImage(file);
+	            yield this.addPicture(file);
 	        }));
 	    }
-	    addImage(data, options = {}) {
+	    addPicture(data, options = {}) {
 	        return __awaiter(this, void 0, void 0, function* () {
-	            const image = new IImage();
+	            const picture = new Picture();
 	            if (typeof data === 'string') {
-	                yield image.loadUrl(data);
+	                yield picture.loadUrl(data);
 	            }
 	            else if (data) {
-	                yield image.loadFile(data);
+	                yield picture.loadFile(data);
 	            }
 	            else {
 	                throw Error('file or url is required');
 	            }
 	            if (options.position) {
-	                image.position = options.position;
+	                picture.position = options.position;
 	            }
 	            else {
-	                image.setInitialPosition(this.map);
+	                picture.setInitialPosition(this.map);
 	            }
-	            this.images.push(image);
-	            this.drawImage(image);
-	            this.map.fire('image.add', image);
-	            return image;
+	            this.pictures.push(picture);
+	            this.drawPicture(picture);
+	            this.map.fire('picture.add', picture);
+	            return picture;
 	        });
 	    }
-	    drawImage(image) {
-	        this.map.addSource(image.imageSource.id, image.imageSource.source);
-	        this.map.addSource(image.polygonSource.id, image.polygonSource.source);
-	        this.map.addSource(image.cornersSource.id, image.cornersSource.source);
-	        this.map.addLayer(image.rasterLayer);
-	        this.map.addLayer(image.fillLayer);
+	    drawPicture(picture) {
+	        this.map.addSource(picture.imageSource.id, picture.imageSource.source);
+	        this.map.addSource(picture.polygonSource.id, picture.polygonSource.source);
+	        this.map.addSource(picture.cornersSource.id, picture.cornersSource.source); /// ???
+	        this.map.addLayer(picture.rasterLayer);
+	        this.map.addLayer(picture.fillLayer);
 	    }
 	    redraw() {
-	        this.images.forEach(image => this.drawImage(image));
-	        if (this.movingModeOff) {
-	            this.movingModeOff();
-	        }
-	        if (this.transformModeOff) {
-	            this.transformModeOff();
-	        }
+	        this.deselectPicture();
+	        this.pictures.forEach(picture => this.drawPicture(picture));
 	    }
 	    onMapClick(event) {
-	        const imageFillLayersId = this.images.map(i => i.fillLayer.id);
-	        const features = this.map.queryRenderedFeatures(event.point, { layers: imageFillLayersId });
+	        const pictureFillLayersId = this.pictures.map(p => p.fillLayer.id);
+	        const features = this.map.queryRenderedFeatures(event.point, { layers: pictureFillLayersId });
 	        if (features.length) {
-	            this.selectImage(features[0].properties.id);
+	            this.selectPicture(features[0].properties.id);
 	        }
 	        else {
-	            this.deselectImage();
+	            this.deselectPicture();
 	        }
 	    }
-	    movingModeOn() {
-	        this.movingModeOff = moveable({
-	            map: this.map,
-	            image: this.selectedImage,
-	            cursorPosition: this.cursorPosition,
-	            onUpdate: (position) => {
-	                this.updateImageSource(position);
-	            },
-	        });
-	    }
-	    transformModeOn() {
-	        this.transformModeOff = resizeable({
-	            map: this.map,
-	            image: this.selectedImage,
-	            onUpdate: ((position) => {
-	                this.updateImageSource(position);
-	            }),
-	        });
-	    }
-	    selectImage(id) {
-	        if (this.selectedImage && this.selectedImage.id !== id)
-	            this.deselectImage();
-	        this.selectedImage = this.images.find(i => i.id === id);
-	        if (this.editMode === EditMode.None) {
-	            this.editMode = EditMode.Move;
-	            this.movingModeOn();
-	        }
-	        else if (this.editMode === EditMode.Move) {
-	            this.editMode = EditMode.Transform;
-	            this.movingModeOff();
-	            this.transformModeOn();
-	        }
-	        this.map.fire('image.select', this.selectedImage);
+	    selectPicture(pictureId) {
+	        var _a, _b;
+	        if (((_a = this.selectedPicture) === null || _a === void 0 ? void 0 : _a.id) === pictureId)
+	            return;
+	        if (((_b = this.selectedPicture) === null || _b === void 0 ? void 0 : _b.id) !== pictureId)
+	            this.deselectPicture();
+	        const selectedPicture = this.pictures.find(p => p.id === pictureId);
+	        if (selectedPicture.locked)
+	            return;
+	        if (this.currentMode)
+	            this.currentMode.destroy();
+	        this.selectedPicture = selectedPicture;
+	        this.buttonMove.setDisabled(false);
+	        this.buttonResize.setDisabled(false);
+	        this.setMoveMode();
+	        this.map.fire('picture.select', this.selectedPicture);
 	        document.addEventListener('keydown', this.keyDownListener);
 	    }
-	    deselectImage() {
-	        if (!this.selectedImage)
+	    deselectPicture() {
+	        if (this.currentMode)
+	            this.currentMode.destroy();
+	        if (!this.selectedPicture)
 	            return;
-	        if (this.editMode === EditMode.Move) {
-	            this.movingModeOff();
-	        }
-	        else if (this.editMode === EditMode.Transform) {
-	            this.transformModeOff();
-	        }
-	        this.map.fire('image.deselect', this.selectedImage);
-	        this.selectedImage = null;
-	        this.editMode = EditMode.None;
+	        this.map.fire('picture.deselect', this.selectedPicture);
+	        this.selectedPicture = null;
+	        this.buttonMove.setDisabled(true);
+	        this.buttonResize.setDisabled(true);
 	        document.removeEventListener('keydown', this.keyDownListener);
 	    }
-	    updateImageSource(position) {
-	        const selectedImage = this.selectedImage;
-	        selectedImage.position = position;
-	        this.map.getSource(selectedImage.imageSource.id).setCoordinates(selectedImage.coordinates);
-	        this.map.getSource(selectedImage.polygonSource.id).setData(selectedImage.asPolygon);
-	        this.map.getSource(selectedImage.cornersSource.id).setData(selectedImage.asPoints);
-	        this.map.fire('image.update', this.selectedImage);
+	    setPositionToPictureSource(position) {
+	        const selectedPicture = this.selectedPicture;
+	        selectedPicture.position = position;
+	        this.map.getSource(selectedPicture.imageSource.id).setCoordinates(selectedPicture.coordinates);
+	        this.map.getSource(selectedPicture.polygonSource.id).setData(selectedPicture.asPolygon);
+	        this.map.getSource(selectedPicture.cornersSource.id).setData(selectedPicture.asPoints);
+	        this.map.fire('picture.update', this.selectedPicture);
 	    }
-	    lockImage(imageId) {
-	        const image = this.images.find(i => i.id === imageId);
-	        if (!image)
-	            throw Error(`image with id ${imageId} doesn't exist`);
-	        image.frozen = true;
+	    setLock(pictureId, value) {
+	        const picture = this.pictures.find(i => i.id === pictureId);
+	        if (!picture)
+	            throw Error(`picture with id ${pictureId} doesn't exist`);
+	        picture.locked = value;
 	    }
 	    keyDownListener(event) {
 	        if (event.key === 'Escape') {
-	            this.deselectImage();
+	            this.deselectPicture();
 	        }
 	    }
-	    mouseMoveListener(event) {
-	        this.cursorPosition = event.lngLat;
+	    setMoveMode() {
+	        if (this.currentMode && this.currentMode.name !== 'move')
+	            this.currentMode.destroy();
+	        this.currentMode = new MoveMode({
+	            button: this.buttonMove,
+	            map: this.map,
+	            picture: this.selectedPicture,
+	            onUpdate: position => this.setPositionToPictureSource(position),
+	        });
+	    }
+	    setResizeMode() {
+	        if (this.currentMode && this.currentMode.name !== 'resize')
+	            this.currentMode.destroy();
+	        this.currentMode = new ResizeMode({
+	            button: this.buttonResize,
+	            map: this.map,
+	            picture: this.selectedPicture,
+	            onUpdate: position => this.setPositionToPictureSource(position),
+	        });
 	    }
 	    onAddControl() {
 	        this.mapContainer = this.map.getContainer();
-	        if (this.map.isStyleLoaded()) {
-	            this.insert();
-	        }
-	        else {
-	            this.map.once('style.load', this.insert);
-	        }
+	        this.insert();
 	        this.map.on('style.load', this.redraw);
 	        this.map.on('click', this.onMapClick);
-	        this.map.on('mousemove', this.mouseMoveListener);
 	    }
 	    onRemoveControl() {
-	        this.map.off('style.load', this.insert);
+	        this.deselectPicture();
 	        this.map.off('style.load', this.redraw);
 	        this.map.off('click', this.onMapClick);
-	        this.map.off('mousemove', this.mouseMoveListener);
 	    }
 	}
 
@@ -812,12 +850,13 @@
 	        this.popupNode = null;
 	        this.lngLat = null;
 	        this.isInspecting = false;
-	        this.button = new Button();
+	        this.buttonInspect = new Button();
 	    }
 	    insert() {
 	        this.addClassName('mapbox-control-inspect');
-	        this.button.setIcon(iconInspect());
-	        this.button.onClick(() => {
+	        this.buttonInspect
+	            .setIcon(iconInspect())
+	            .onClick(() => {
 	            if (this.isInspecting) {
 	                this.inspectingOff();
 	            }
@@ -825,20 +864,20 @@
 	                this.inspectingOn();
 	            }
 	        });
-	        this.addButton(this.button);
+	        this.addButton(this.buttonInspect);
 	        this.mapClickListener = this.mapClickListener.bind(this);
 	        this.updatePosition = this.updatePosition.bind(this);
 	    }
 	    inspectingOn() {
 	        this.isInspecting = true;
-	        this.button.addClassName('-active');
+	        this.buttonInspect.setActive(true);
 	        this.map.on('click', this.mapClickListener);
 	        this.map.on('move', this.updatePosition);
 	        this.map.getCanvas().style.cursor = 'pointer';
 	    }
 	    inspectingOff() {
 	        this.isInspecting = false;
-	        this.button.removeClassName('-active');
+	        this.buttonInspect.setActive(false);
 	        this.map.off('click', this.mapClickListener);
 	        this.map.off('move', this.updatePosition);
 	        this.map.getCanvas().style.cursor = '';
@@ -1160,14 +1199,15 @@
 	        this.labelFormat = (_g = options === null || options === void 0 ? void 0 : options.labelFormat) !== null && _g !== void 0 ? _g : labelFormat;
 	        this.mainColor = (_h = options === null || options === void 0 ? void 0 : options.mainColor) !== null && _h !== void 0 ? _h : MAIN_COLOR;
 	        this.secondaryColor = (_j = options === null || options === void 0 ? void 0 : options.secondaryColor) !== null && _j !== void 0 ? _j : HALO_COLOR;
-	        this.button = new Button();
+	        this.buttonRuler = new Button();
+	        this.draw = this.draw.bind(this);
 	        this.mapClickListener = this.mapClickListener.bind(this);
-	        this.styleLoadListener = this.styleLoadListener.bind(this);
 	    }
 	    insert() {
 	        this.addClassName('mapbox-control-ruler');
-	        this.button.setIcon(iconRuler());
-	        this.button.onClick(() => {
+	        this.buttonRuler
+	            .setIcon(iconRuler())
+	            .onClick(() => {
 	            if (this.isMeasuring) {
 	                this.measuringOff();
 	            }
@@ -1175,7 +1215,7 @@
 	                this.measuringOn();
 	            }
 	        });
-	        this.addButton(this.button);
+	        this.addButton(this.buttonRuler);
 	    }
 	    draw() {
 	        this.map.addSource(SOURCE_LINE, {
@@ -1219,16 +1259,16 @@
 	        this.coordinates = [];
 	        this.labels = [];
 	        this.map.getCanvas().style.cursor = 'crosshair';
-	        this.button.addClassName('-active');
+	        this.buttonRuler.setActive(true);
 	        this.draw();
 	        this.map.on('click', this.mapClickListener);
-	        this.map.on('style.load', this.styleLoadListener);
+	        this.map.on('style.load', this.draw);
 	        this.map.fire('ruler.on');
 	    }
 	    measuringOff() {
 	        this.isMeasuring = false;
 	        this.map.getCanvas().style.cursor = '';
-	        this.button.removeClassName('-active');
+	        this.buttonRuler.setActive(false);
 	        // remove layers, sources and event listeners
 	        this.map.removeLayer(LAYER_LINE);
 	        this.map.removeLayer(LAYER_SYMBOL);
@@ -1236,7 +1276,7 @@
 	        this.map.removeSource(SOURCE_SYMBOL);
 	        this.markers.forEach(m => m.remove());
 	        this.map.off('click', this.mapClickListener);
-	        this.map.off('style.load', this.styleLoadListener);
+	        this.map.off('style.load', this.draw);
 	        this.map.fire('ruler.off');
 	    }
 	    mapClickListener(event) {
@@ -1287,9 +1327,6 @@
 	        node.style.border = `2px solid ${this.mainColor}`;
 	        return node;
 	    }
-	    styleLoadListener() {
-	        this.draw();
-	    }
 	    onAddControl() {
 	        this.insert();
 	    }
@@ -1314,7 +1351,7 @@
 	            const button = new Button();
 	            button.setText(style.label);
 	            button.onClick(() => {
-	                if (button.node.classList.contains('-active'))
+	                if (button.isActive())
 	                    return;
 	                this.map.setStyle(style.styleUrl);
 	                if (this.onChange)
@@ -1325,13 +1362,13 @@
 	        });
 	        this.map.on('styledata', () => {
 	            this.buttons.forEach((button) => {
-	                button.removeClassName('-active');
+	                button.setActive(false);
 	            });
 	            const styleNames = this.styles.map(style => style.styleName);
 	            const currentStyleIndex = styleNames.indexOf(this.map.getStyle().name);
 	            if (currentStyleIndex !== -1) {
 	                const currentButton = this.buttons[currentStyleIndex];
-	                currentButton.addClassName('-active');
+	                currentButton.setActive(true);
 	            }
 	        });
 	    }
@@ -1449,17 +1486,14 @@
 	class ZoomControl extends Base {
 	    constructor() {
 	        super();
-	        this.zoomIn = new Button();
-	        this.zoomOut = new Button();
+	        this.buttonZoomIn = new Button();
+	        this.buttonZoomOut = new Button();
 	    }
 	    insert() {
 	        this.addClassName('mapbox-zoom');
-	        this.zoomIn.setIcon(iconPlus());
-	        this.zoomIn.onClick(() => this.map.zoomIn());
-	        this.zoomOut.setIcon(iconMinus());
-	        this.zoomOut.onClick(() => this.map.zoomOut());
-	        this.addButton(this.zoomIn);
-	        this.addButton(this.zoomOut);
+	        this.buttonZoomIn.setIcon(iconPlus()).onClick(() => this.map.zoomIn());
+	        this.buttonZoomOut.setIcon(iconMinus()).onClick(() => this.map.zoomOut());
+	        this.addButton(this.buttonZoomIn, this.buttonZoomOut);
 	    }
 	    onAddControl() {
 	        this.insert();
@@ -1525,12 +1559,12 @@
 	map.addControl(new CompassControl(), 'bottom-right');
 
 	/* Image */
-	const imageControl = new ImageControl();
-	map.addControl(imageControl, 'bottom-right');
-	map.on('image.add', (image) => console.log('%cimage.add', 'color: #3D5AFE', image) );
-	map.on('image.select', (image) => console.log('%cimage.select', 'color: #3D5AFE', image) );
-	map.on('image.update', (image) => console.log('%cimage.update', 'color: #3D5AFE', image) );
-	map.on('image.deselect', (image) => console.log('%cimage.deselect', 'color: #3D5AFE', image) );
+	const pictureControl = new PictureControl();
+	map.addControl(pictureControl, 'bottom-right');
+	map.on('picture.add', (image) => console.log('%cpicture.add', 'color: #3D5AFE', image) );
+	map.on('picture.select', (image) => console.log('%cpicture.select', 'color: #3D5AFE', image) );
+	map.on('picture.update', (image) => console.log('%cpicture.update', 'color: #3D5AFE', image) );
+	map.on('picture.deselect', (image) => console.log('%cpicture.deselect', 'color: #3D5AFE', image) );
 	// map.on('style.load', () => {
 	//   imageControl.addImage('https://img.lunstatic.net/building-800x600/41771.jpg', {
 	//     position: [

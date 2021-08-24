@@ -1,15 +1,11 @@
-.mapbox-control-image {
-  button {
-    overflow: hidden;
-  }
-
+.mapbox-control-picture {
   input[type="file"] {
     opacity: 0;
     position: absolute;
     left: 0;
     top: 0;
-    width: 100%;
-    height: 100%;
+    width: 29px;
+    height: 29px;
     pointer-events: none;
   }
 }

@@ -1,7 +1,7 @@
 import mapboxgl from 'mapbox-gl';
 import {
   CompassControl,
-  ImageControl,
+  PictureControl,
   InspectControl,
   LanguageControl,
   RulerControl,
@@ -69,12 +69,12 @@ map.addControl(new InspectControl({ console: true }), 'bottom-right');
 map.addControl(new CompassControl(), 'bottom-right');
 
 /* Image */
-const imageControl = new ImageControl();
-map.addControl(imageControl, 'bottom-right');
-map.on('image.add', (image) => console.log('%cimage.add', 'color: #3D5AFE', image) );
-map.on('image.select', (image) => console.log('%cimage.select', 'color: #3D5AFE', image) );
-map.on('image.update', (image) => console.log('%cimage.update', 'color: #3D5AFE', image) );
-map.on('image.deselect', (image) => console.log('%cimage.deselect', 'color: #3D5AFE', image) );
+const pictureControl = new PictureControl();
+map.addControl(pictureControl, 'bottom-right');
+map.on('picture.add', (image) => console.log('%cpicture.add', 'color: #3D5AFE', image) );
+map.on('picture.select', (image) => console.log('%cpicture.select', 'color: #3D5AFE', image) );
+map.on('picture.update', (image) => console.log('%cpicture.update', 'color: #3D5AFE', image) );
+map.on('picture.deselect', (image) => console.log('%cpicture.deselect', 'color: #3D5AFE', image) );
 // map.on('style.load', () => {
 //   imageControl.addImage('https://img.lunstatic.net/building-800x600/41771.jpg', {
 //     position: [

@@ -1,5 +1,5 @@
 export { default as CompassControl } from './CompassControl/CompassControl';
-export { default as ImageControl } from './ImageControl/ImageControl';
+export { default as PictureControl } from './PictureControl/PictureControl';
 export { default as InspectControl } from './InspectControl/InspectControl';
 export { default as LanguageControl } from './LanguageControl/LanguageControl';
 export { default as RulerControl } from './RulerControl/RulerControl';

@@ -57,7 +57,7 @@ export default class RulerControl extends Base {
   labelFormat: (n: number) => string
   mainColor: string
   secondaryColor: string
-  button: Button
+  buttonRuler: Button
 
   constructor(options?: RulerControlOptions) {
     super();
@@ -76,22 +76,23 @@ export default class RulerControl extends Base {
     this.labelFormat = options?.labelFormat ?? labelFormat;
     this.mainColor = options?.mainColor ?? MAIN_COLOR;
     this.secondaryColor = options?.secondaryColor ?? HALO_COLOR;
-    this.button = new Button();
+    this.buttonRuler = new Button();
+    this.draw = this.draw.bind(this);
     this.mapClickListener = this.mapClickListener.bind(this);
-    this.styleLoadListener = this.styleLoadListener.bind(this);
   }
 
   insert() {
     this.addClassName('mapbox-control-ruler');
-    this.button.setIcon(iconRuler());
-    this.button.onClick(() => {
-      if (this.isMeasuring) {
-        this.measuringOff();
-      } else {
-        this.measuringOn();
-      }
-    });
-    this.addButton(this.button);
+    this.buttonRuler
+      .setIcon(iconRuler())
+      .onClick(() => {
+        if (this.isMeasuring) {
+          this.measuringOff();
+        } else {
+          this.measuringOn();
+        }
+      });
+    this.addButton(this.buttonRuler);
   }
 
   draw() {
@@ -140,17 +141,17 @@ export default class RulerControl extends Base {
     this.coordinates = [];
     this.labels = [];
     this.map.getCanvas().style.cursor = 'crosshair';
-    this.button.addClassName('-active');
+    this.buttonRuler.setActive(true);
     this.draw();
     this.map.on('click', this.mapClickListener);
-    this.map.on('style.load', this.styleLoadListener);
+    this.map.on('style.load', this.draw);
     this.map.fire('ruler.on');
   }
 
   measuringOff() {
     this.isMeasuring = false;
     this.map.getCanvas().style.cursor = '';
-    this.button.removeClassName('-active');
+    this.buttonRuler.setActive(false);
     // remove layers, sources and event listeners
     this.map.removeLayer(LAYER_LINE);
     this.map.removeLayer(LAYER_SYMBOL);
@@ -158,7 +159,7 @@ export default class RulerControl extends Base {
     this.map.removeSource(SOURCE_SYMBOL);
     this.markers.forEach(m => m.remove());
     this.map.off('click', this.mapClickListener);
-    this.map.off('style.load', this.styleLoadListener);
+    this.map.off('style.load', this.draw);
     this.map.fire('ruler.off');
   }
 
@@ -214,10 +215,6 @@ export default class RulerControl extends Base {
     node.style.boxSizing = 'border-box';
     node.style.border = `2px solid ${this.mainColor}`;
     return node;
-  }
-
-  styleLoadListener() {
-    this.draw();
   }
 
   onAddControl() {

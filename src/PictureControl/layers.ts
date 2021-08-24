@@ -1,4 +1,4 @@
-import { CircleLayer, FillLayer, LineLayer } from 'mapbox-gl';
+import { CircleLayer, LineLayer } from 'mapbox-gl';
 
 export const contourLayer: LineLayer = {
   id: '$contourLayerId',
@@ -14,11 +14,7 @@ export const contourLayer: LineLayer = {
   },
 };
 
-export const shadowLayer: FillLayer = {
-  id: '$shadowLayerId',
-  type: 'fill',
-  paint: { 'fill-opacity': 0 },
-};
+
 
 export const cornersLayer: CircleLayer = {
   id: '$cornersLayer',

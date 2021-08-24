@@ -8,12 +8,12 @@ interface CompassControlOptions {
 }
 
 export default class CompassControl extends Base {
-  button: Button
+  buttonCompass: Button
   instant: boolean
 
   constructor(options?: CompassControlOptions) {
     super();
-    this.button = new Button();
+    this.buttonCompass = new Button();
     this.instant = options?.instant ?? true;
     this.syncRotate = this.syncRotate.bind(this);
   }
@@ -21,11 +21,12 @@ export default class CompassControl extends Base {
   insert() {
     this.addClassName('mapbox-compass');
     if (!this.instant) this.node.hidden = true;
-    this.button.setIcon(iconPointer());
-    this.button.onClick(() => {
-      this.map.easeTo({ bearing: 0, pitch: 0 });
-    });
-    this.addButton(this.button);
+    this.buttonCompass
+      .setIcon(iconPointer())
+      .onClick(() => {
+        this.map.easeTo({ bearing: 0, pitch: 0 });
+      });
+    this.addButton(this.buttonCompass);
   }
 
   onAddControl() {
@@ -40,6 +41,6 @@ export default class CompassControl extends Base {
     if (!this.instant) {
       this.node.hidden = angle === 0;
     }
-    this.button.icon.style.transform = `rotate(${angle}deg)`;
+    this.buttonCompass.icon.style.transform = `rotate(${angle}deg)`;
   }
 }

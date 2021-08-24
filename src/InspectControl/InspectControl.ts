@@ -14,7 +14,7 @@ export default class InspectControl extends Base {
   popupNode: HTMLDivElement
   lngLat: LngLat
   isInspecting: boolean
-  button: Button
+  buttonInspect: Button
   mapContainer: HTMLElement
   mapCanvas: HTMLCanvasElement
 
@@ -24,27 +24,28 @@ export default class InspectControl extends Base {
     this.popupNode = null;
     this.lngLat = null;
     this.isInspecting = false;
-    this.button = new Button();
+    this.buttonInspect = new Button();
   }
 
   insert() {
     this.addClassName('mapbox-control-inspect');
-    this.button.setIcon(iconInspect());
-    this.button.onClick(() => {
-      if (this.isInspecting) {
-        this.inspectingOff();
-      } else {
-        this.inspectingOn();
-      }
-    });
-    this.addButton(this.button);
+    this.buttonInspect
+      .setIcon(iconInspect())
+      .onClick(() => {
+        if (this.isInspecting) {
+          this.inspectingOff();
+        } else {
+          this.inspectingOn();
+        }
+      });
+    this.addButton(this.buttonInspect);
     this.mapClickListener = this.mapClickListener.bind(this);
     this.updatePosition = this.updatePosition.bind(this);
   }
 
   inspectingOn() {
     this.isInspecting = true;
-    this.button.addClassName('-active');
+    this.buttonInspect.setActive(true);
     this.map.on('click', this.mapClickListener);
     this.map.on('move', this.updatePosition);
     this.map.getCanvas().style.cursor = 'pointer';
@@ -52,7 +53,7 @@ export default class InspectControl extends Base {
 
   inspectingOff() {
     this.isInspecting = false;
-    this.button.removeClassName('-active');
+    this.buttonInspect.setActive(false);
     this.map.off('click', this.mapClickListener);
     this.map.off('move', this.updatePosition);
     this.map.getCanvas().style.cursor = '';

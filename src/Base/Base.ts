@@ -12,8 +12,8 @@ class Base {
     this.node.classList.add('mapbox-control');
   }
 
-  addButton(button: Button) {
-    this.node.appendChild(button.node);
+  addButton(...buttons: Button[]) {
+    buttons.forEach(button => this.node.appendChild(button.node));
   }
 
   addClassName(className: string) {

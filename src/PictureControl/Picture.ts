@@ -1,13 +1,13 @@
 import { FillLayer, GeoJSONSourceRaw, ImageSourceRaw, Map, RasterLayer } from 'mapbox-gl';
 import { FeatureCollection } from 'geojson';
-import { ImagePosition } from './types';
+import { PicturePosition } from './types';
 
-class IImage {
+class Picture {
   id: string
   url: string
   width: number
   height: number
-  position: ImagePosition
+  position: PicturePosition
   locked: boolean
 
   constructor() {
@@ -72,7 +72,7 @@ class IImage {
       [canvasWidth / 2 - resizeWidth / 2, canvasHeight / 2 + resizeHeight / 2], // left bottom
     ];
     map.setPitch(0); // reset pitch for correct projection
-    this.position = result.map(point => map.unproject(point)) as ImagePosition;
+    this.position = result.map(point => map.unproject(point)) as PicturePosition;
   }
 
   get coordinates() {
@@ -155,4 +155,4 @@ class IImage {
   }
 }
 
-export default IImage;
+export default Picture;

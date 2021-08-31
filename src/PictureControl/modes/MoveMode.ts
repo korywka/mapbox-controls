@@ -1,12 +1,5 @@
-import { FillLayer, LngLat, MapLayerMouseEvent, MapMouseEvent } from 'mapbox-gl';
+import { LngLat, MapLayerMouseEvent, MapMouseEvent } from 'mapbox-gl';
 import { Cursor, PicturePosition, ModeOptions, Visibility } from '../types';
-import { contourLayer } from '../layers';
-
-const shadowLayer: FillLayer = {
-  id: '$shadowLayerId',
-  type: 'fill',
-  paint: { 'fill-opacity': 0 },
-};
 
 class MoveMode {
   name: 'move'
@@ -15,10 +8,8 @@ class MoveMode {
   constructor(options: ModeOptions) {
     const { map, button, picture, onUpdate } = options;
     const mapCanvas = map.getCanvas();
+    const contourLayer = picture.getContourLayer();
     let startPosition: LngLat = null;
-
-    map.addLayer({ ...contourLayer, source: picture.polygonSource.id });
-    map.addLayer({ ...shadowLayer, source: picture.polygonSource.id });
 
     function onPointerMove(event: MapMouseEvent) {
       const currentPosition = event.lngLat;
@@ -48,25 +39,22 @@ class MoveMode {
     }
 
     function onPointerLeave() {
-      mapCanvas.style.cursor = '';
+      mapCanvas.style.cursor = Cursor.Default;
     }
 
     button.setActive(true);
-    map.on('mouseenter', shadowLayer.id, onPointerEnter);
-    map.on('mouseleave', shadowLayer.id, onPointerLeave);
-    map.on('mousedown', shadowLayer.id, onPointerDown);
+    map.on('mouseenter', picture.fillLayer.id, onPointerEnter);
+    map.on('mouseleave', picture.fillLayer.id, onPointerLeave);
+    map.on('mousedown', picture.fillLayer.id, onPointerDown);
 
     this.destroy = () => {
       button.setActive(false);
-      mapCanvas.style.cursor = '';
+      mapCanvas.style.cursor = Cursor.Default;
       map.off('mousemove', onPointerMove);
-      map.off('mouseenter', shadowLayer.id, onPointerEnter);
-      map.off('mouseleave', shadowLayer.id, onPointerLeave);
-      map.off('mousedown', shadowLayer.id, onPointerDown);
+      map.off('mouseenter', picture.fillLayer.id, onPointerEnter);
+      map.off('mouseleave', picture.fillLayer.id, onPointerLeave);
+      map.off('mousedown', picture.fillLayer.id, onPointerDown);
       document.removeEventListener('pointerup', onPointerUp);
-
-      if (map.getLayer(shadowLayer.id)) map.removeLayer(shadowLayer.id);
-      if (map.getLayer(contourLayer.id)) map.removeLayer(contourLayer.id);
     };
   }
 }

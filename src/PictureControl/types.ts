@@ -1,4 +1,4 @@
-import { LngLat, Map } from 'mapbox-gl';
+import { CircleLayout, CirclePaint, LineLayout, LinePaint, LngLat, Map } from 'mapbox-gl';
 import Button from '../Button/Button';
 import Picture from './Picture';
 
@@ -22,4 +22,13 @@ export interface ModeOptions {
 export enum Visibility {
   Visible= 'visible',
   None = 'none',
+}
+
+export interface ModeStyle {
+  moveContourLayout: LineLayout;
+  moveContourPaint: LinePaint;
+  resizeContourLayout: LineLayout;
+  resizeContourPaint: LinePaint;
+  resizeKnobLayout: CircleLayout;
+  resizeKnobPaint: CirclePaint;
 }

@@ -80,7 +80,7 @@ export default class PictureControl extends Base {
   drawPicture(picture: Picture) {
     this.map.addSource(picture.imageSource.id, picture.imageSource.source);
     this.map.addSource(picture.polygonSource.id, picture.polygonSource.source);
-    this.map.addSource(picture.cornersSource.id, picture.cornersSource.source); /// ???
+    this.map.addSource(picture.pointsSource.id, picture.pointsSource.source);
     this.map.addLayer(picture.rasterLayer);
     this.map.addLayer(picture.fillLayer);
   }
@@ -110,8 +110,8 @@ export default class PictureControl extends Base {
     this.selectedPicture = selectedPicture;
     this.buttonMove.setDisabled(false);
     this.buttonResize.setDisabled(false);
-    this.setMoveMode();
 
+    this.map.addLayer(this.selectedPicture.getContourLayer());
     this.map.fire('picture.select', this.selectedPicture);
     document.addEventListener('keydown', this.keyDownListener);
   }
@@ -119,6 +119,7 @@ export default class PictureControl extends Base {
   deselectPicture() {
     if (this.currentMode) this.currentMode.destroy();
     if (!this.selectedPicture) return;
+    this.map.removeLayer(this.selectedPicture.getContourLayer().id);
     this.map.fire('picture.deselect', this.selectedPicture);
     this.selectedPicture = null;
     this.buttonMove.setDisabled(true);
@@ -131,7 +132,7 @@ export default class PictureControl extends Base {
     selectedPicture.position = position;
     (this.map.getSource(selectedPicture.imageSource.id) as ImageSource).setCoordinates(selectedPicture.coordinates);
     (this.map.getSource(selectedPicture.polygonSource.id) as GeoJSONSource).setData(selectedPicture.asPolygon);
-    (this.map.getSource(selectedPicture.cornersSource.id) as GeoJSONSource).setData(selectedPicture.asPoints);
+    (this.map.getSource(selectedPicture.pointsSource.id) as GeoJSONSource).setData(selectedPicture.asPoints);
     this.map.fire('picture.update', this.selectedPicture);
   }
 

@@ -307,9 +307,9 @@
 	            source: { type: 'geojson', data: this.asPolygon },
 	        };
 	    }
-	    get cornersSource() {
+	    get pointsSource() {
 	        return {
-	            id: `${this.id}-corners`,
+	            id: `${this.id}-points`,
 	            source: { type: 'geojson', data: this.asPoints },
 	        };
 	    }
@@ -327,6 +327,35 @@
 	            type: 'fill',
 	            source: this.polygonSource.id,
 	            paint: { 'fill-opacity': 0 },
+	        });
+	    }
+	    getContourLayer() {
+	        return ({
+	            id: `${this.id}-contour`,
+	            type: 'line',
+	            source: `${this.id}-polygon`,
+	            layout: {
+	                'line-cap': 'round',
+	                'line-join': 'round',
+	            },
+	            paint: {
+	                'line-dasharray': [0.2, 2],
+	                'line-color': 'rgb(61, 90, 254)',
+	                'line-width': 2,
+	            },
+	        });
+	    }
+	    getKnobsLayer() {
+	        return ({
+	            id: `${this.id}-knobs`,
+	            type: 'circle',
+	            source: `${this.id}-points`,
+	            paint: {
+	                'circle-radius': 5,
+	                'circle-color': 'rgb(61, 90, 254)',
+	                'circle-stroke-width': 3,
+	                'circle-stroke-color': '#fff',
+	            },
 	        });
 	    }
 	    get ratio() {
@@ -359,42 +388,12 @@
 	    Visibility["None"] = "none";
 	})(Visibility || (Visibility = {}));
 
-	const contourLayer = {
-	    id: '$contourLayerId',
-	    type: 'line',
-	    layout: {
-	        'line-cap': 'round',
-	        'line-join': 'round',
-	    },
-	    paint: {
-	        'line-dasharray': [0.2, 2],
-	        'line-color': '#3d5afe',
-	        'line-width': 2,
-	    },
-	};
-	const cornersLayer = {
-	    id: '$cornersLayer',
-	    type: 'circle',
-	    paint: {
-	        'circle-radius': 5,
-	        'circle-color': '#3d5afe',
-	        'circle-stroke-width': 3,
-	        'circle-stroke-color': '#fff',
-	    }
-	};
-
-	const shadowLayer = {
-	    id: '$shadowLayerId',
-	    type: 'fill',
-	    paint: { 'fill-opacity': 0 },
-	};
 	class MoveMode {
 	    constructor(options) {
 	        const { map, button, picture, onUpdate } = options;
 	        const mapCanvas = map.getCanvas();
+	        const contourLayer = picture.getContourLayer();
 	        let startPosition = null;
-	        map.addLayer(Object.assign(Object.assign({}, contourLayer), { source: picture.polygonSource.id }));
-	        map.addLayer(Object.assign(Object.assign({}, shadowLayer), { source: picture.polygonSource.id }));
 	        function onPointerMove(event) {
 	            const currentPosition = event.lngLat;
 	            const deltaLng = startPosition.lng - currentPosition.lng;
@@ -419,24 +418,20 @@
 	            mapCanvas.style.cursor = Cursor.Move;
 	        }
 	        function onPointerLeave() {
-	            mapCanvas.style.cursor = '';
+	            mapCanvas.style.cursor = Cursor.Default;
 	        }
 	        button.setActive(true);
-	        map.on('mouseenter', shadowLayer.id, onPointerEnter);
-	        map.on('mouseleave', shadowLayer.id, onPointerLeave);
-	        map.on('mousedown', shadowLayer.id, onPointerDown);
+	        map.on('mouseenter', picture.fillLayer.id, onPointerEnter);
+	        map.on('mouseleave', picture.fillLayer.id, onPointerLeave);
+	        map.on('mousedown', picture.fillLayer.id, onPointerDown);
 	        this.destroy = () => {
 	            button.setActive(false);
-	            mapCanvas.style.cursor = '';
+	            mapCanvas.style.cursor = Cursor.Default;
 	            map.off('mousemove', onPointerMove);
-	            map.off('mouseenter', shadowLayer.id, onPointerEnter);
-	            map.off('mouseleave', shadowLayer.id, onPointerLeave);
-	            map.off('mousedown', shadowLayer.id, onPointerDown);
+	            map.off('mouseenter', picture.fillLayer.id, onPointerEnter);
+	            map.off('mouseleave', picture.fillLayer.id, onPointerLeave);
+	            map.off('mousedown', picture.fillLayer.id, onPointerDown);
 	            document.removeEventListener('pointerup', onPointerUp);
-	            if (map.getLayer(shadowLayer.id))
-	                map.removeLayer(shadowLayer.id);
-	            if (map.getLayer(contourLayer.id))
-	                map.removeLayer(contourLayer.id);
 	        };
 	    }
 	}
@@ -457,9 +452,10 @@
 	    constructor(options) {
 	        const { map, button, picture, onUpdate } = options;
 	        const mapCanvas = map.getCanvas();
+	        const contourLayer = picture.getContourLayer();
+	        const knobsLayer = picture.getKnobsLayer();
 	        let currentIndex;
-	        map.addLayer(Object.assign(Object.assign({}, contourLayer), { source: picture.polygonSource.id }));
-	        map.addLayer(Object.assign(Object.assign({}, cornersLayer), { source: picture.cornersSource.id }));
+	        map.addLayer(knobsLayer);
 	        function onPointerMove(event) {
 	            const pointA = map.project(picture.position[currentIndex]);
 	            const pointB = map.project(picture.position[picture.getOppositePoint(currentIndex)]);
@@ -489,16 +485,16 @@
 	        }
 	        function onPointerUp() {
 	            currentIndex = null;
-	            mapCanvas.style.cursor = '';
+	            mapCanvas.style.cursor = Cursor.Default;
 	            map.off('mousemove', onPointerMove);
-	            map.setLayoutProperty(cornersLayer.id, 'visibility', Visibility.Visible);
+	            map.setLayoutProperty(knobsLayer.id, 'visibility', Visibility.Visible);
 	            map.setLayoutProperty(contourLayer.id, 'visibility', Visibility.Visible);
 	        }
 	        function onPointerDown(event) {
 	            event.preventDefault();
 	            currentIndex = event.features[0].properties.index;
 	            map.on('mousemove', onPointerMove);
-	            map.setLayoutProperty(cornersLayer.id, 'visibility', Visibility.None);
+	            map.setLayoutProperty(knobsLayer.id, 'visibility', Visibility.None);
 	            map.setLayoutProperty(contourLayer.id, 'visibility', Visibility.None);
 	            document.addEventListener('pointerup', onPointerUp, { once: true });
 	        }
@@ -506,27 +502,25 @@
 	            setResizeCursor(event.features[0].properties.index);
 	        }
 	        function onPointerLeave() {
-	            mapCanvas.style.cursor = '';
+	            mapCanvas.style.cursor = Cursor.Default;
 	        }
 	        function setResizeCursor(index) {
 	            mapCanvas.style.cursor = [1, 3].includes(index) ? Cursor.NESWResize : Cursor.NWSEResize;
 	        }
 	        button.setActive(true);
-	        map.on('mouseenter', cornersLayer.id, onPointerEnter);
-	        map.on('mouseleave', cornersLayer.id, onPointerLeave);
-	        map.on('mousedown', cornersLayer.id, onPointerDown);
+	        map.on('mouseenter', knobsLayer.id, onPointerEnter);
+	        map.on('mouseleave', knobsLayer.id, onPointerLeave);
+	        map.on('mousedown', knobsLayer.id, onPointerDown);
 	        this.destroy = () => {
 	            button.setActive(false);
-	            mapCanvas.style.cursor = '';
+	            mapCanvas.style.cursor = Cursor.Default;
 	            map.off('mousemove', onPointerMove);
-	            map.off('mouseenter', cornersLayer.id, onPointerEnter);
-	            map.off('mouseleave', cornersLayer.id, onPointerLeave);
-	            map.off('mousedown', cornersLayer.id, onPointerDown);
+	            map.off('mouseenter', knobsLayer.id, onPointerEnter);
+	            map.off('mouseleave', knobsLayer.id, onPointerLeave);
+	            map.off('mousedown', knobsLayer.id, onPointerDown);
 	            document.removeEventListener('pointerup', onPointerUp);
-	            if (map.getLayer(cornersLayer.id))
-	                map.removeLayer(cornersLayer.id);
-	            if (map.getLayer(contourLayer.id))
-	                map.removeLayer(contourLayer.id);
+	            if (map.getLayer(knobsLayer.id))
+	                map.removeLayer(knobsLayer.id);
 	        };
 	    }
 	}
@@ -601,7 +595,7 @@
 	    drawPicture(picture) {
 	        this.map.addSource(picture.imageSource.id, picture.imageSource.source);
 	        this.map.addSource(picture.polygonSource.id, picture.polygonSource.source);
-	        this.map.addSource(picture.cornersSource.id, picture.cornersSource.source); /// ???
+	        this.map.addSource(picture.pointsSource.id, picture.pointsSource.source);
 	        this.map.addLayer(picture.rasterLayer);
 	        this.map.addLayer(picture.fillLayer);
 	    }
@@ -633,7 +627,7 @@
 	        this.selectedPicture = selectedPicture;
 	        this.buttonMove.setDisabled(false);
 	        this.buttonResize.setDisabled(false);
-	        this.setMoveMode();
+	        this.map.addLayer(this.selectedPicture.getContourLayer());
 	        this.map.fire('picture.select', this.selectedPicture);
 	        document.addEventListener('keydown', this.keyDownListener);
 	    }
@@ -642,6 +636,7 @@
 	            this.currentMode.destroy();
 	        if (!this.selectedPicture)
 	            return;
+	        this.map.removeLayer(this.selectedPicture.getContourLayer().id);
 	        this.map.fire('picture.deselect', this.selectedPicture);
 	        this.selectedPicture = null;
 	        this.buttonMove.setDisabled(true);
@@ -653,7 +648,7 @@
 	        selectedPicture.position = position;
 	        this.map.getSource(selectedPicture.imageSource.id).setCoordinates(selectedPicture.coordinates);
 	        this.map.getSource(selectedPicture.polygonSource.id).setData(selectedPicture.asPolygon);
-	        this.map.getSource(selectedPicture.cornersSource.id).setData(selectedPicture.asPoints);
+	        this.map.getSource(selectedPicture.pointsSource.id).setData(selectedPicture.asPoints);
 	        this.map.fire('picture.update', this.selectedPicture);
 	    }
 	    setLock(pictureId, value) {

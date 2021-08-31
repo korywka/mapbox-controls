@@ -1,4 +1,4 @@
-import { FillLayer, GeoJSONSourceRaw, ImageSourceRaw, Map, RasterLayer } from 'mapbox-gl';
+import { CircleLayer, FillLayer, GeoJSONSourceRaw, ImageSourceRaw, LineLayer, Map, RasterLayer } from 'mapbox-gl';
 import { FeatureCollection } from 'geojson';
 import { PicturePosition } from './types';
 
@@ -117,9 +117,9 @@ class Picture {
     };
   }
 
-  get cornersSource(): { id: string, source: GeoJSONSourceRaw } {
+  get pointsSource(): { id: string, source: GeoJSONSourceRaw } {
     return {
-      id: `${this.id}-corners`,
+      id: `${this.id}-points`,
       source: { type: 'geojson', data: this.asPoints },
     };
   }
@@ -139,6 +139,37 @@ class Picture {
       type: 'fill',
       source: this.polygonSource.id,
       paint: { 'fill-opacity': 0 },
+    });
+  }
+
+  getContourLayer(): LineLayer {
+    return ({
+      id: `${this.id}-contour`,
+      type: 'line',
+      source: `${this.id}-polygon`,
+      layout: {
+        'line-cap': 'round',
+        'line-join': 'round',
+      },
+      paint: {
+        'line-dasharray': [0.2, 2],
+        'line-color': 'rgb(61, 90, 254)',
+        'line-width': 2,
+      },
+    });
+  }
+
+  getKnobsLayer(): CircleLayer {
+    return ({
+      id: `${this.id}-knobs`,
+      type: 'circle',
+      source: `${this.id}-points`,
+      paint: {
+        'circle-radius': 5,
+        'circle-color': 'rgb(61, 90, 254)',
+        'circle-stroke-width': 3,
+        'circle-stroke-color': '#fff',
+      },
     });
   }
 

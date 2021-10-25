@@ -41,6 +41,6 @@ export default class CompassControl extends Base {
     if (!this.instant) {
       this.node.hidden = angle === 0;
     }
-    this.buttonCompass.icon.style.transform = `rotate(${angle}deg)`;
+    this.buttonCompass.icon!.style.transform = `rotate(${angle}deg)`;
   }
 }

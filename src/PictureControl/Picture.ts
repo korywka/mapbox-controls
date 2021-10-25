@@ -2,6 +2,14 @@ import { CircleLayer, FillLayer, GeoJSONSourceRaw, ImageSourceRaw, LineLayer, Ma
 import { FeatureCollection } from 'geojson';
 import { PicturePosition } from './types';
 
+interface PictureOptions {
+  id: string;
+  url: string;
+  width: number;
+  height: number;
+  position: PicturePosition;
+}
+
 class Picture {
   id: string
   url: string
@@ -10,69 +18,13 @@ class Picture {
   position: PicturePosition
   locked: boolean
 
-  constructor() {
+  constructor(options: PictureOptions) {
+    this.id = options.id;
+    this.url = options.url;
+    this.width = options.width;
+    this.height = options.height;
+    this.position = options.position;
     this.locked = false;
-  }
-
-  loadFile(file: File) {
-    return new Promise(((resolve, reject) => {
-      const reader = new FileReader();
-      const node = new Image();
-
-      reader.addEventListener('load', () => {
-        const imageUrl = reader.result as string;
-
-        node.onload = () => {
-          this.id = file.name;
-          this.url = imageUrl;
-          this.width = node.width;
-          this.height = node.height;
-          resolve(this);
-        };
-
-        node.onerror = reject;
-        node.src = imageUrl;
-      }, false);
-
-      reader.readAsDataURL(file);
-    }));
-  }
-
-  loadUrl(url: string) {
-    return new Promise(((resolve, reject) => {
-      const node = new Image();
-      node.onload = () => {
-        this.id = url.split('/').pop();
-        this.url = url;
-        this.width = node.width;
-        this.height = node.height;
-        resolve(this);
-      };
-
-      node.onerror = reject;
-      node.src = url;
-    }));
-  }
-
-  setInitialPosition(map: Map) {
-    if (!this.width || !this.height) throw Error('image is not loaded');
-    const padding = 20;
-    const mapCanvas = map.getCanvas();
-    const canvasWidth = mapCanvas.offsetWidth;
-    const canvasHeight = mapCanvas.offsetHeight;
-    const maxWidth = canvasWidth - padding * 2;
-    const maxHeight = canvasHeight - padding * 2;
-    const ratio = Math.min(maxWidth / this.width, maxHeight / this.height);
-    const resizeWidth = this.width * ratio;
-    const resizeHeight = this.height * ratio;
-    const result: Array<[number, number]> = [
-      [canvasWidth / 2 - resizeWidth / 2, canvasHeight / 2 - resizeHeight / 2], // left top
-      [canvasWidth / 2 + resizeWidth / 2, canvasHeight / 2 - resizeHeight / 2], // right top
-      [canvasWidth / 2 + resizeWidth / 2, canvasHeight / 2 + resizeHeight / 2], // right bottom
-      [canvasWidth / 2 - resizeWidth / 2, canvasHeight / 2 + resizeHeight / 2], // left bottom
-    ];
-    map.setPitch(0); // reset pitch for correct projection
-    this.position = result.map(point => map.unproject(point)) as PicturePosition;
   }
 
   get coordinates() {

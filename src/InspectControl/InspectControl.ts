@@ -10,19 +10,15 @@ interface InspectControlOptions {
 }
 
 export default class InspectControl extends Base {
-  console: boolean
-  popupNode: HTMLDivElement
-  lngLat: LngLat
-  isInspecting: boolean
+  console?: boolean
+  popupNode?: HTMLDivElement
+  lngLat?: LngLat
+  isInspecting = false
   buttonInspect: Button
-  mapContainer: HTMLElement
-  mapCanvas: HTMLCanvasElement
 
   constructor(options?: InspectControlOptions) {
     super();
     this.console = options?.console;
-    this.popupNode = null;
-    this.lngLat = null;
     this.isInspecting = false;
     this.buttonInspect = new Button();
   }
@@ -71,7 +67,7 @@ export default class InspectControl extends Base {
 
   addPopup(features: MapboxGeoJSONFeature[]) {
     this.popupNode = popupTemplate(features);
-    this.mapContainer.appendChild(this.popupNode);
+    this.map.getContainer().appendChild(this.popupNode);
     this.updatePosition();
     if (this.console) {
       console.log(features);
@@ -80,13 +76,14 @@ export default class InspectControl extends Base {
 
   removePopup() {
     if (!this.popupNode) return;
-    this.mapContainer.removeChild(this.popupNode);
-    this.popupNode = null;
+    this.map.getContainer().removeChild(this.popupNode);
+    this.popupNode = undefined;
   }
 
   updatePosition() {
     if (!this.lngLat) return;
-    const canvasRect = this.mapCanvas.getBoundingClientRect();
+    if (!this.popupNode) return;
+    const canvasRect = this.map.getCanvas().getBoundingClientRect();
     const pos = this.map.project(this.lngLat);
     this.popupNode.style.left = `${pos.x - canvasRect.left}px`;
     this.popupNode.style.top = `${pos.y - canvasRect.top}px`;
@@ -100,8 +97,6 @@ export default class InspectControl extends Base {
   }
 
   onAddControl() {
-    this.mapContainer = this.map.getContainer();
-    this.mapCanvas = this.map.getCanvas();
     this.insert();
   }
 

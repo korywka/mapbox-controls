@@ -1,11 +1,10 @@
 class Button {
   node: HTMLButtonElement
-  icon: SVGElement
+  icon?: SVGElement
 
   constructor() {
     this.node = document.createElement('button');
     this.node.type = 'button';
-    this.icon = null;
   }
 
   setIcon(icon: SVGElement) {

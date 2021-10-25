@@ -9,15 +9,13 @@ interface TooltipControlOptions {
 }
 
 export default class TooltipControl extends Base {
-  layer: string
+  layer?: string
   getContent: (event: MapMouseEvent) => string
   container: HTMLDivElement
   eventShow: keyof MapLayerEventType
   eventHide: keyof MapLayerEventType
-  lngLat: LngLat
+  lngLat?: LngLat
   cursorStyle: string
-  mapContainer: HTMLElement
-  mapCanvas: HTMLCanvasElement
 
   constructor(options: TooltipControlOptions) {
     super();
@@ -31,7 +29,7 @@ export default class TooltipControl extends Base {
     this.eventHide = this.layer ? 'mouseleave' : 'mouseout';
     this.node = document.createElement('div');
     this.node.classList.add('mapbox-control-tooltip');
-    this.lngLat = null;
+    this.lngLat = undefined;
     this.cursorStyle = '';
     this.show = this.show.bind(this);
     this.move = this.move.bind(this);
@@ -40,20 +38,20 @@ export default class TooltipControl extends Base {
   }
 
   show() {
-    this.mapContainer.appendChild(this.node);
-    this.cursorStyle = this.mapCanvas.style.cursor;
-    this.mapCanvas.style.cursor = 'pointer';
+    this.map.getContainer().appendChild(this.node);
+    this.cursorStyle = this.map.getCanvas().style.cursor;
+    this.map.getCanvas().style.cursor = 'pointer';
     this.map.on('move', this.updatePosition);
   }
 
   hide() {
     this.node.innerHTML = '';
-    this.mapContainer.removeChild(this.node);
-    this.mapCanvas.style.cursor = this.cursorStyle;
+    this.map.getContainer().removeChild(this.node);
+    this.map.getCanvas().style.cursor = this.cursorStyle;
     this.map.off('move', this.updatePosition);
   }
 
-  move(event) {
+  move(event: MapMouseEvent) {
     this.node.innerHTML = this.getContent(event);
     this.lngLat = event.lngLat;
     this.updatePosition();
@@ -67,8 +65,6 @@ export default class TooltipControl extends Base {
   }
 
   onAddControl() {
-    this.mapContainer = this.map.getContainer();
-    this.mapCanvas = this.map.getCanvas();
     if (this.layer) {
       this.map.on(this.eventShow, this.layer, this.show);
       this.map.on('mousemove', this.layer, this.move);

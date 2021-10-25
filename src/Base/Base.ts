@@ -3,6 +3,7 @@ import Button from '../Button/Button';
 
 class Base {
   node: HTMLDivElement;
+  // @ts-ignore
   map: Map
 
   constructor() {
@@ -40,8 +41,7 @@ class Base {
 
   onRemove() {
     this.onRemoveControl();
-    this.node.parentNode.removeChild(this.node);
-    this.map = undefined;
+    this.node.parentNode!.removeChild(this.node);
   }
 }
 

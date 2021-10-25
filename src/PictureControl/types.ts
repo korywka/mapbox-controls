@@ -12,23 +12,39 @@ export enum Cursor {
   NWSEResize = 'nwse-resize',
 }
 
-export interface ModeOptions {
-  button: Button
+export type OnUpdate = (position: PicturePosition) => void;
+
+export abstract class Mode {
   map: Map
-  picture: Picture
-  onUpdate: (position: PicturePosition) => void
+  onUpdate: OnUpdate
+  button: Button
+  picture?: Picture
+
+  protected constructor(map: Map, onUpdate: OnUpdate) {
+    this.map = map;
+    this.onUpdate = onUpdate;
+    this.button = new Button();
+  }
+
+  activate(picture: Picture) {
+    this.picture = picture;
+  }
+  deactivate() {
+    this.picture = undefined;
+  }
 }
+
 
 export enum Visibility {
   Visible= 'visible',
   None = 'none',
 }
 
-export interface ModeStyle {
-  moveContourLayout: LineLayout;
-  moveContourPaint: LinePaint;
-  resizeContourLayout: LineLayout;
-  resizeContourPaint: LinePaint;
-  resizeKnobLayout: CircleLayout;
-  resizeKnobPaint: CirclePaint;
-}
+// export interface ModeStyle {
+//   moveContourLayout: LineLayout;
+//   moveContourPaint: LinePaint;
+//   resizeContourLayout: LineLayout;
+//   resizeContourPaint: LinePaint;
+//   resizeKnobLayout: CircleLayout;
+//   resizeKnobPaint: CirclePaint;
+// }

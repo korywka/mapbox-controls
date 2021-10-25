@@ -23,9 +23,11 @@ function getData(feature: MapboxGeoJSONFeature) {
     featureData.push({ key: '$id', value: feature.id });
   }
 
-  Object.entries(feature.properties).forEach(([key, value]) => {
-    featureData.push({ key, value });
-  });
+  if (feature.properties) {
+    Object.entries(feature.properties).forEach(([key, value]) => {
+      featureData.push({ key, value });
+    });
+  }
 
   if (featureData.length === 1) {
     featureData.pop(); // remove title if there are no properties
@@ -95,8 +97,8 @@ export default function popupTemplate(features: MapboxGeoJSONFeature[]) {
       const value = document.createElement('td');
       key.classList.add('mapbox-control-inspect-key');
       value.classList.add('mapbox-control-inspect-value');
-      key.textContent = record.key;
-      value.textContent = String(record.value);
+      key.textContent = record!.key;
+      value.textContent = String(record!.value);
       row.appendChild(key);
       row.appendChild(value);
       table.append(row);

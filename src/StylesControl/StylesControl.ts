@@ -6,12 +6,12 @@ interface StylesControlOptions {
   /** Array of style options */
   styles?: StyleOption[]
   /** Triggered on style change */
-  onChange?: (StyleOption) => void
+  onChange?: (style: StyleOption) => void
 }
 
 export default class StylesControl extends Base {
   styles: StyleOption[]
-  onChange: (StyleOption) => void
+  onChange?: (style: StyleOption) => void
   buttons: Button[]
 
   constructor(options?: StylesControlOptions) {
@@ -40,7 +40,9 @@ export default class StylesControl extends Base {
         button.setActive(false);
       });
       const styleNames = this.styles.map(style => style.styleName);
-      const currentStyleIndex = styleNames.indexOf(this.map.getStyle().name);
+      const styleName = this.map.getStyle().name;
+      if (!styleName) throw Error('style must have name');
+      const currentStyleIndex = styleNames.indexOf(styleName);
       if (currentStyleIndex !== -1) {
         const currentButton = this.buttons[currentStyleIndex];
         currentButton.setActive(true);

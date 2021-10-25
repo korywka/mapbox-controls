@@ -17,7 +17,7 @@ interface LanguageControlOptions {
 
 export default class LanguageControl extends Base {
   supportedLanguages: string[]
-  language: string
+  language?: string
   getLanguageField: (language: string) => string
   excludedLayerIds: string[]
 
@@ -46,6 +46,7 @@ export default class LanguageControl extends Base {
   setLanguage(lang = this.browserLanguage()) {
     const language = this.supportedLanguages.indexOf(lang) < 0 ? 'mul' : lang;
     const style = this.map.getStyle();
+    if (!style.layers) return;
     const languageField = this.getLanguageField(language);
     const layers = style.layers.map((layer) => {
       if (layer.type !== 'symbol') return layer;

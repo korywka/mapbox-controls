@@ -1,4 +1,4 @@
-import mapboxgl, { GeoJSONSource, Marker } from 'mapbox-gl';
+import mapboxgl, { GeoJSONSource, MapMouseEvent, Marker } from 'mapbox-gl';
 import { Position } from 'geojson';
 import distance from '@turf/distance';
 import { Units } from '@turf/helpers';
@@ -163,7 +163,7 @@ export default class RulerControl extends Base {
     this.map.fire('ruler.off');
   }
 
-  mapClickListener(event) {
+  mapClickListener(event: MapMouseEvent) {
     const markerNode = this.getMarkerNode();
 
     const marker = new mapboxgl.Marker({ element: markerNode, draggable: true })

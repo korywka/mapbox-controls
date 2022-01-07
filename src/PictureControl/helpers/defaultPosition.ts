@@ -1,7 +1,7 @@
 import { Map } from 'mapbox-gl';
 import { PicturePosition } from '../types';
 
-export function getDefaultPosition(map: Map, pictureWidth: number, pictureHeight: number) {
+export function defaultPosition(map: Map, pictureWidth: number, pictureHeight: number) {
   if (!pictureWidth || !pictureHeight) throw Error('image is not loaded');
   const padding = 20;
   const mapCanvas = map.getCanvas();

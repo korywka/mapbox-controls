@@ -3,7 +3,7 @@ type P = [number, number];
 /**
  * Find the closest point on the line AB from the point P
  */
-export default function getClosestPoint(a: P, b: P, p: P): P {
+export default function closestLinePoint(a: P, b: P, p: P): P {
   const u = [p[0] - a[0], p[1] - a[1]]; // vector a->p
   const v = [b[0] - a[0], b[1] - a[1]]; // vector a->b
   const v2 = v[0] ** 2 + v[1] ** 2;

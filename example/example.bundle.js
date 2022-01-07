@@ -177,7 +177,7 @@
 </svg>`;
 	var iconImage = () => (new DOMParser().parseFromString(svg$9, 'image/svg+xml')).firstChild;
 
-	function getFileInput() {
+	function fileInputNode() {
 	    const node = document.createElement('input');
 	    node.type = 'file';
 	    node.accept = '.jpg, .jpeg, .png';
@@ -298,7 +298,7 @@
 	    }
 	}
 
-	function getDefaultPosition(map, pictureWidth, pictureHeight) {
+	function defaultPosition(map, pictureWidth, pictureHeight) {
 	    if (!pictureWidth || !pictureHeight)
 	        throw Error('image is not loaded');
 	    const padding = 20;
@@ -332,7 +332,7 @@
 	                    url: imageUrl,
 	                    width: node.width,
 	                    height: node.height,
-	                    position: getDefaultPosition(map, node.width, node.height),
+	                    position: defaultPosition(map, node.width, node.height),
 	                });
 	                resolve(picture);
 	            };
@@ -351,7 +351,7 @@
 	                url,
 	                width: node.width,
 	                height: node.height,
-	                position: getDefaultPosition(map, node.width, node.height),
+	                position: defaultPosition(map, node.width, node.height),
 	            });
 	            resolve(picture);
 	        };
@@ -365,8 +365,6 @@
 	    Cursor["Default"] = "";
 	    Cursor["Move"] = "move";
 	    Cursor["Grabbing"] = "grabbing";
-	    Cursor["NESWResize"] = "nesw-resize";
-	    Cursor["NWSEResize"] = "nwse-resize";
 	})(Cursor || (Cursor = {}));
 	class BaseMode {
 	    constructor(map, picture, onUpdate) {
@@ -391,40 +389,44 @@
 	class MoveMode extends BaseMode {
 	    constructor(map, picture, onUpdate) {
 	        super(map, picture, onUpdate);
-	        this.onPointerMove = (event) => {
-	            if (!this.startPosition)
-	                throw Error('start position is expected');
-	            const currentPosition = event.lngLat;
-	            const deltaLng = this.startPosition.lng - currentPosition.lng;
-	            const deltaLat = this.startPosition.lat - currentPosition.lat;
-	            this.onUpdate(this.picture.position.map((p) => new mapboxGl.exports.LngLat(p.lng - deltaLng, p.lat - deltaLat)));
-	            this.startPosition = currentPosition;
-	        };
-	        this.onPointerUp = () => {
-	            this.map.getCanvas().style.cursor = Cursor.Move;
-	            this.map.off('mousemove', this.onPointerMove);
-	            this.map.setLayoutProperty(this.picture.contourLayer.id, 'visibility', Visibility.Visible);
-	        };
-	        this.onPointerDown = (event) => {
-	            event.preventDefault();
-	            this.startPosition = event.lngLat;
-	            this.map.getCanvas().style.cursor = Cursor.Grabbing;
-	            this.map.on('mousemove', this.onPointerMove);
-	            this.map.setLayoutProperty(this.picture.contourLayer.id, 'visibility', Visibility.None);
-	            document.addEventListener('pointerup', this.onPointerUp, { once: true });
-	        };
-	        this.onPointerEnter = () => {
-	            this.map.getCanvas().style.cursor = Cursor.Move;
-	        };
 	        this.onPointerLeave = () => {
 	            this.map.getCanvas().style.cursor = Cursor.Default;
 	        };
 	        this.map.on('mouseenter', this.picture.fillLayer.id, this.onPointerEnter);
 	        this.map.on('mouseleave', this.picture.fillLayer.id, this.onPointerLeave);
 	        this.map.on('mousedown', this.picture.fillLayer.id, this.onPointerDown);
+	        this.onPointerEnter = this.onPointerEnter.bind(this);
+	        this.onPointerDown = this.onPointerDown.bind(this);
+	        this.onPointerMove = this.onPointerMove.bind(this);
+	        this.onPointerUp = this.onPointerUp.bind(this);
 	    }
 	    static get button() {
 	        return (new Button()).setIcon(icon$2());
+	    }
+	    onPointerEnter() {
+	        this.map.getCanvas().style.cursor = Cursor.Move;
+	    }
+	    onPointerDown(event) {
+	        event.preventDefault();
+	        this.startPosition = event.lngLat;
+	        this.map.getCanvas().style.cursor = Cursor.Grabbing;
+	        this.map.on('mousemove', this.onPointerMove);
+	        this.map.setLayoutProperty(this.picture.contourLayer.id, 'visibility', Visibility.None);
+	        document.addEventListener('pointerup', this.onPointerUp, { once: true });
+	    }
+	    onPointerMove(event) {
+	        if (!this.startPosition)
+	            throw Error('start position is expected');
+	        const currentPosition = event.lngLat;
+	        const deltaLng = this.startPosition.lng - currentPosition.lng;
+	        const deltaLat = this.startPosition.lat - currentPosition.lat;
+	        this.onUpdate(this.picture.position.map((p) => new mapboxGl.exports.LngLat(p.lng - deltaLng, p.lat - deltaLat)));
+	        this.startPosition = currentPosition;
+	    }
+	    onPointerUp() {
+	        this.map.getCanvas().style.cursor = Cursor.Move;
+	        this.map.off('mousemove', this.onPointerMove);
+	        this.map.setLayoutProperty(this.picture.contourLayer.id, 'visibility', Visibility.Visible);
 	    }
 	    destroy() {
 	        this.startPosition = undefined;
@@ -440,7 +442,7 @@
 	/**
 	 * Find the closest point on the line AB from the point P
 	 */
-	function getClosestPoint(a, b, p) {
+	function closestLinePoint(a, b, p) {
 	    const u = [p[0] - a[0], p[1] - a[1]]; // vector a->p
 	    const v = [b[0] - a[0], b[1] - a[1]]; // vector a->b
 	    const v2 = Math.pow(v[0], 2) + Math.pow(v[1], 2);
@@ -458,20 +460,16 @@
 	class ResizeMode extends BaseMode {
 	    constructor(map, picture, onUpdate) {
 	        super(map, picture, onUpdate);
-	        this.setResizeCursor = (index) => {
-	            this.map.getCanvas().style.cursor = [1, 3].includes(index) ? Cursor.NESWResize : Cursor.NWSEResize;
-	        };
 	        this.onPointerMove = (event) => {
 	            if (this.currentIndex === undefined)
 	                return;
 	            const pointA = this.map.project(this.picture.position[this.currentIndex]);
 	            const pointB = this.map.project(this.picture.position[this.picture.oppositePointTo(this.currentIndex)]);
 	            const pointP = this.map.project(event.lngLat);
-	            const closestPoint = getClosestPoint([pointA.x, pointA.y], [pointB.x, pointB.y], [pointP.x, pointP.y]);
+	            const closestPoint = closestLinePoint([pointA.x, pointA.y], [pointB.x, pointB.y], [pointP.x, pointP.y]);
 	            const closestLngLat = this.map.unproject(closestPoint);
 	            const scaledPosition = this.picture.position;
 	            scaledPosition[this.currentIndex] = new mapboxGl.exports.LngLat(closestLngLat.lng, closestLngLat.lat);
-	            this.setResizeCursor(this.currentIndex);
 	            if (this.currentIndex === 0) {
 	                scaledPosition[1] = new mapboxGl.exports.LngLat(scaledPosition[1].lng, closestLngLat.lat);
 	                scaledPosition[3] = new mapboxGl.exports.LngLat(closestLngLat.lng, scaledPosition[3].lat);
@@ -501,6 +499,7 @@
 	            event.preventDefault();
 	            if (!this.picture)
 	                return;
+	            this.map.getCanvas().style.cursor = Cursor.Grabbing;
 	            const features = event.features;
 	            this.currentIndex = features[0].properties.index;
 	            this.map.on('mousemove', this.onPointerMove);
@@ -508,16 +507,7 @@
 	            this.map.setLayoutProperty(this.picture.contourLayer.id, 'visibility', Visibility.None);
 	            document.addEventListener('pointerup', this.onPointerUp, { once: true });
 	        };
-	        this.onPointerEnter = (event) => {
-	            const features = event.features;
-	            this.setResizeCursor(features[0].properties.index);
-	        };
-	        this.onPointerLeave = () => {
-	            this.map.getCanvas().style.cursor = Cursor.Default;
-	        };
 	        this.map.addLayer(this.picture.knobsLayer);
-	        this.map.on('mouseenter', this.picture.knobsLayer.id, this.onPointerEnter);
-	        this.map.on('mouseleave', this.picture.knobsLayer.id, this.onPointerLeave);
 	        this.map.on('mousedown', this.picture.knobsLayer.id, this.onPointerDown);
 	    }
 	    static get button() {
@@ -526,8 +516,6 @@
 	    destroy() {
 	        this.map.getCanvas().style.cursor = Cursor.Default;
 	        this.map.off('mousemove', this.onPointerMove);
-	        this.map.off('mouseenter', this.picture.knobsLayer.id, this.onPointerEnter);
-	        this.map.off('mouseleave', this.picture.knobsLayer.id, this.onPointerLeave);
 	        this.map.off('mousedown', this.picture.knobsLayer.id, this.onPointerDown);
 	        document.removeEventListener('pointerup', this.onPointerUp);
 	        this.map.removeLayer(this.picture.knobsLayer.id);
@@ -543,12 +531,13 @@
 	class RotateMode extends BaseMode {
 	    constructor(map, picture, onUpdate) {
 	        super(map, picture, onUpdate);
-	        console.log('TODO');
+	        this.map.addLayer(this.picture.knobsLayer);
 	    }
 	    static get button() {
 	        return (new Button()).setIcon(icon());
 	    }
 	    destroy() {
+	        this.map.removeLayer(this.picture.knobsLayer.id);
 	    }
 	}
 
@@ -595,8 +584,14 @@
 	            this.selectPicture((_a = features[0].properties) === null || _a === void 0 ? void 0 : _a.id);
 	        }
 	        else if (this.activePicture) {
-	            // outside click
-	            this.deselectPicture();
+	            // deselect on outside click with extra padding to exclude knobs controls
+	            const padding = 10;
+	            const { x, y } = event.point;
+	            const bbox = [[x - padding, y - padding], [x + padding, y + padding]];
+	            const features = this.map.queryRenderedFeatures(bbox, { layers: pictureFillLayersId });
+	            if (!features.length) {
+	                this.deselectPicture();
+	            }
 	        }
 	    }
 	    keyDownListener(event) {
@@ -605,16 +600,13 @@
 	        }
 	    }
 	    addUpload() {
-	        const fileInput = getFileInput();
+	        const fileInput = fileInputNode();
 	        const button = new Button();
 	        button.setIcon(iconImage());
 	        button.onClick(() => fileInput.click());
 	        fileInput.addEventListener('change', () => {
 	            if (!fileInput.files)
 	                return;
-	            // if (this.picture) {
-	            //   this.deselectPicture();
-	            // }
 	            Array.from(fileInput.files).forEach((file) => __awaiter(this, void 0, void 0, function* () {
 	                yield this.addPicture(file);
 	            }));

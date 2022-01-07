@@ -1,6 +1,6 @@
 import { LngLat, Map, MapLayerMouseEvent, MapMouseEvent } from 'mapbox-gl';
 import { Cursor, BaseMode, OnUpdate, Visibility } from '../types';
-import getClosestPoint from '../helpers/getClosestPoint';
+import closestLinePoint from '../helpers/closestLinePoint';
 import icon from '../../icons/ts/resize';
 import Button from '../../Button/Button';
 import Picture from '../Picture';
@@ -15,26 +15,19 @@ class ResizeMode extends BaseMode {
   constructor(map: Map, picture: Picture, onUpdate: OnUpdate) {
     super(map, picture, onUpdate);
     this.map.addLayer(this.picture.knobsLayer);
-    this.map.on('mouseenter', this.picture.knobsLayer.id, this.onPointerEnter);
-    this.map.on('mouseleave', this.picture.knobsLayer.id, this.onPointerLeave);
     this.map.on('mousedown', this.picture.knobsLayer.id, this.onPointerDown);
   }
-
-  setResizeCursor = (index: number) => {
-    this.map.getCanvas().style.cursor = [1, 3].includes(index) ? Cursor.NESWResize : Cursor.NWSEResize;
-  };
 
   onPointerMove = (event: MapMouseEvent) => {
     if (this.currentIndex === undefined) return;
     const pointA = this.map.project(this.picture.position[this.currentIndex]);
     const pointB = this.map.project(this.picture.position[this.picture.oppositePointTo(this.currentIndex)]);
     const pointP = this.map.project(event.lngLat);
-    const closestPoint = getClosestPoint([pointA.x, pointA.y], [pointB.x, pointB.y], [pointP.x, pointP.y]);
+    const closestPoint = closestLinePoint([pointA.x, pointA.y], [pointB.x, pointB.y], [pointP.x, pointP.y]);
     const closestLngLat = this.map.unproject(closestPoint);
     const scaledPosition = this.picture.position;
 
     scaledPosition[this.currentIndex] = new LngLat(closestLngLat.lng, closestLngLat.lat);
-    this.setResizeCursor(this.currentIndex);
 
     if (this.currentIndex === 0) {
       scaledPosition[1] = new LngLat(scaledPosition[1].lng, closestLngLat.lat);
@@ -64,6 +57,7 @@ class ResizeMode extends BaseMode {
   onPointerDown = (event: MapLayerMouseEvent) => {
     event.preventDefault();
     if (!this.picture) return;
+    this.map.getCanvas().style.cursor = Cursor.Grabbing;
     const features = event.features!;
     this.currentIndex = features[0].properties!.index;
     this.map.on('mousemove', this.onPointerMove);
@@ -72,20 +66,9 @@ class ResizeMode extends BaseMode {
     document.addEventListener('pointerup', this.onPointerUp, { once: true });
   };
 
-  onPointerEnter = (event: MapLayerMouseEvent) => {
-    const features = event.features!;
-    this.setResizeCursor(features[0].properties!.index as number);
-  };
-
-  onPointerLeave = () => {
-    this.map.getCanvas().style.cursor = Cursor.Default;
-  };
-
   destroy() {
     this.map.getCanvas().style.cursor = Cursor.Default;
     this.map.off('mousemove', this.onPointerMove);
-    this.map.off('mouseenter', this.picture.knobsLayer.id, this.onPointerEnter);
-    this.map.off('mouseleave', this.picture.knobsLayer.id, this.onPointerLeave);
     this.map.off('mousedown', this.picture.knobsLayer.id, this.onPointerDown);
     document.removeEventListener('pointerup', this.onPointerUp);
     this.map.removeLayer(this.picture.knobsLayer.id);

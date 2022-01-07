@@ -16,35 +16,39 @@ class MoveMode extends BaseMode {
     this.map.on('mouseenter', this.picture.fillLayer.id, this.onPointerEnter);
     this.map.on('mouseleave', this.picture.fillLayer.id, this.onPointerLeave);
     this.map.on('mousedown', this.picture.fillLayer.id, this.onPointerDown);
+    this.onPointerEnter = this.onPointerEnter.bind(this);
+    this.onPointerDown = this.onPointerDown.bind(this);
+    this.onPointerMove = this.onPointerMove.bind(this);
+    this.onPointerUp = this.onPointerUp.bind(this);
   }
 
-  onPointerMove = (event: MapMouseEvent) => {
-    if (!this.startPosition) throw Error('start position is expected');
-    const currentPosition = event.lngLat;
-    const deltaLng = this.startPosition.lng - currentPosition.lng;
-    const deltaLat = this.startPosition.lat - currentPosition.lat;
-    this.onUpdate(this.picture.position.map((p) => new LngLat(p.lng - deltaLng, p.lat - deltaLat)) as PicturePosition);
-    this.startPosition = currentPosition;
-  };
-
-  onPointerUp = () => {
+  onPointerEnter() {
     this.map.getCanvas().style.cursor = Cursor.Move;
-    this.map.off('mousemove', this.onPointerMove);
-    this.map.setLayoutProperty(this.picture.contourLayer.id, 'visibility', Visibility.Visible);
-  };
+  }
 
-  onPointerDown = (event: MapLayerMouseEvent) => {
+  onPointerDown(event: MapLayerMouseEvent) {
     event.preventDefault();
     this.startPosition = event.lngLat;
     this.map.getCanvas().style.cursor = Cursor.Grabbing;
     this.map.on('mousemove', this.onPointerMove);
     this.map.setLayoutProperty(this.picture.contourLayer.id, 'visibility', Visibility.None);
     document.addEventListener('pointerup', this.onPointerUp, { once: true });
-  };
+  }
 
-  onPointerEnter = () => {
+  onPointerMove(event: MapMouseEvent) {
+    if (!this.startPosition) throw Error('start position is expected');
+    const currentPosition = event.lngLat;
+    const deltaLng = this.startPosition.lng - currentPosition.lng;
+    const deltaLat = this.startPosition.lat - currentPosition.lat;
+    this.onUpdate(this.picture.position.map((p) => new LngLat(p.lng - deltaLng, p.lat - deltaLat)) as PicturePosition);
+    this.startPosition = currentPosition;
+  }
+
+  onPointerUp() {
     this.map.getCanvas().style.cursor = Cursor.Move;
-  };
+    this.map.off('mousemove', this.onPointerMove);
+    this.map.setLayoutProperty(this.picture.contourLayer.id, 'visibility', Visibility.Visible);
+  }
 
   onPointerLeave = () => {
     this.map.getCanvas().style.cursor = Cursor.Default;

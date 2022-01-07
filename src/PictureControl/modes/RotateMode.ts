@@ -1,5 +1,5 @@
-import { Map, LngLat } from 'mapbox-gl';
-import { BaseMode, OnUpdate } from '../types';
+import { Map, LngLat, MapLayerMouseEvent } from 'mapbox-gl';
+import { BaseMode, Cursor, OnUpdate } from '../types';
 import icon from '../../icons/ts/rotate';
 import Button from '../../Button/Button';
 import Picture from '../Picture';
@@ -13,10 +13,11 @@ class RotateMode extends BaseMode {
 
   constructor(map: Map, picture: Picture, onUpdate: OnUpdate) {
     super(map, picture, onUpdate);
-    console.log('TODO');
+    this.map.addLayer(this.picture.knobsLayer);
   }
 
   destroy() {
+    this.map.removeLayer(this.picture.knobsLayer.id);
   }
 }
 

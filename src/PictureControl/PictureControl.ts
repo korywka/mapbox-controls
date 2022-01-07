@@ -1,8 +1,8 @@
-import { GeoJSONSource, ImageSource, MapMouseEvent } from 'mapbox-gl';
+import { GeoJSONSource, ImageSource, MapMouseEvent, PointLike } from 'mapbox-gl';
 import Base from '../Base/Base';
 import Button from '../Button/Button';
 import iconImage from '../icons/ts/image';
-import getFileInput from './helpers/getFileInput';
+import fileInputNode from './helpers/fileInputNode';
 import Picture from './Picture';
 import { fromUrl, fromFile } from './loader';
 import { BaseMode, PicturePosition } from './types';
@@ -48,8 +48,14 @@ export default class PictureControl extends Base {
     if (features.length) {
       this.selectPicture(features[0].properties?.id as string);
     } else if (this.activePicture) {
-      // outside click
-      this.deselectPicture();
+      // deselect on outside click with extra padding to exclude knobs controls
+      const padding = 10;
+      const { x, y } = event.point;
+      const bbox: [PointLike, PointLike] = [[x - padding, y - padding], [x + padding, y + padding]];
+      const features = this.map.queryRenderedFeatures(bbox, { layers: pictureFillLayersId });
+      if (!features.length) {
+        this.deselectPicture();
+      }
     }
   }
 
@@ -60,15 +66,12 @@ export default class PictureControl extends Base {
   }
 
   addUpload() {
-    const fileInput = getFileInput();
+    const fileInput = fileInputNode();
     const button = new Button();
     button.setIcon(iconImage());
     button.onClick(() => fileInput.click());
     fileInput.addEventListener('change', () => {
       if (!fileInput.files) return;
-      // if (this.picture) {
-      //   this.deselectPicture();
-      // }
       Array.from(fileInput.files).forEach(async (file) => {
         await this.addPicture(file);
       });

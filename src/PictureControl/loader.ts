@@ -1,6 +1,6 @@
 import { Map } from 'mapbox-gl';
 import Picture from './Picture';
-import { getDefaultPosition } from './helpers/getDefaultPosition';
+import { defaultPosition } from './helpers/defaultPosition';
 
 export function fromFile(map: Map, file: File): Promise<Picture> {
   return new Promise(((resolve, reject) => {
@@ -16,7 +16,7 @@ export function fromFile(map: Map, file: File): Promise<Picture> {
           url: imageUrl,
           width: node.width,
           height: node.height,
-          position: getDefaultPosition(map, node.width, node.height),
+          position: defaultPosition(map, node.width, node.height),
         });
         resolve(picture);
       };
@@ -38,7 +38,7 @@ export function fromUrl(map: Map, url: string): Promise<Picture> {
         url,
         width: node.width,
         height: node.height,
-        position: getDefaultPosition(map, node.width, node.height),
+        position: defaultPosition(map, node.width, node.height),
       });
       resolve(picture);
     };

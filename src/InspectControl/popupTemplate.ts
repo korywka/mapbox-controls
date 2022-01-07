@@ -1,7 +1,7 @@
 import { MapboxGeoJSONFeature } from 'mapbox-gl';
-import { GeoJsonProperties } from 'geojson';
-import iconLeft from '../icons/left';
-import iconRight from '../icons/right';
+import type { GeoJsonProperties } from 'geojson';
+import iconLeft from '../icons/ts/left';
+import iconRight from '../icons/ts/right';
 
 enum Direction {
   Next = 'next',
@@ -49,6 +49,7 @@ export default function popupTemplate(features: MapboxGeoJSONFeature[]) {
     button.classList.add('mapbox-control-inspect-prev');
     button.appendChild(iconLeft());
     button.addEventListener('click', () => goTo(Direction.Prev));
+
     return button;
   };
 
@@ -58,6 +59,7 @@ export default function popupTemplate(features: MapboxGeoJSONFeature[]) {
     button.classList.add('mapbox-control-inspect-next');
     button.appendChild((iconRight()));
     button.addEventListener('click', () => goTo(Direction.Next));
+
     return button;
   };
 
@@ -65,6 +67,7 @@ export default function popupTemplate(features: MapboxGeoJSONFeature[]) {
     const title = document.createElement('div');
     title.classList.add('mapbox-control-inspect-current');
     title.textContent = `${current + 1} / ${features.length}`;
+
     return title;
   };
 
@@ -74,6 +77,7 @@ export default function popupTemplate(features: MapboxGeoJSONFeature[]) {
     header.appendChild(templatePrev());
     header.appendChild(templateTitle());
     header.appendChild(templateNext());
+
     return header;
   };
 
@@ -90,6 +94,7 @@ export default function popupTemplate(features: MapboxGeoJSONFeature[]) {
         caption.textContent = record;
         row.appendChild(caption);
         table.append(row);
+
         return;
       }
 

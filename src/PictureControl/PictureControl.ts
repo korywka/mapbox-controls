@@ -1,51 +1,74 @@
 import { GeoJSONSource, ImageSource, MapMouseEvent } from 'mapbox-gl';
 import Base from '../Base/Base';
 import Button from '../Button/Button';
-import iconImage from '../icons/image';
+import iconImage from '../icons/ts/image';
 import getFileInput from './helpers/getFileInput';
-import { Mode, PicturePosition } from './types';
 import Picture from './Picture';
-import MoveMode from './modes/MoveMode';
-import ResizeMode from './modes/ResizeMode';
 import { fromUrl, fromFile } from './loader';
+import { BaseMode, PicturePosition } from './types';
+import { MoveMode, ResizeMode, RotateMode } from './modes';
+
+const modes = [MoveMode, ResizeMode, RotateMode];
 
 export default class PictureControl extends Base {
-  mapContainer?: HTMLElement
-  pictures: Picture[] = []
-  modes: Mode[] = []
-  selectedMode?: Mode
-  selectedPicture?: Picture
+  mapContainer?: HTMLElement;
+  pictures: Picture[] = [];
+  buttons: Button[] = [];
+  activeButton?: Button;
+  activeMode?: BaseMode;
+  activePicture?: Picture;
 
   constructor() {
     super();
-    this.insert = this.insert.bind(this);
+    this.addClassName('mapbox-control-picture');
+    this.addUpload();
+    modes.forEach((mode) => {
+      const button = mode.button.setDisabled(true);
+      button.onClick(() => {
+        this.deselectMode();
+        this.selectMode(button, mode);
+      });
+      this.addButton(button);
+      this.buttons.push(button);
+    });
     this.redraw = this.redraw.bind(this);
+    this.update = this.update.bind(this);
     this.onMapClick = this.onMapClick.bind(this);
     this.keyDownListener = this.keyDownListener.bind(this);
   }
 
-  insert() {
-    this.addClassName('mapbox-control-picture');
-    this.insertUpload();
-    this.modes = [
-      new MoveMode(this.map, position => this.update(position)),
-      new ResizeMode(this.map, position => this.update(position)),
-    ];
-    this.modes.forEach((mode) => {
-      this.addButton(mode.button.setDisabled(true));
-      mode.button.onClick(() => this.activateMode(mode));
-    });
+  redraw() {
+    this.deselectPicture();
+    this.pictures.forEach((picture) => this.drawPicture(picture));
   }
 
-  insertUpload() {
+  onMapClick(event: MapMouseEvent) {
+    const pictureFillLayersId = this.pictures.map((p) => p.fillLayer.id);
+    const features = this.map.queryRenderedFeatures(event.point, { layers: pictureFillLayersId });
+    if (features.length) {
+      this.selectPicture(features[0].properties?.id as string);
+    } else if (this.activePicture) {
+      // outside click
+      this.deselectPicture();
+    }
+  }
+
+  keyDownListener(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      this.deselectPicture();
+    }
+  }
+
+  addUpload() {
     const fileInput = getFileInput();
     const button = new Button();
     button.setIcon(iconImage());
-
     button.onClick(() => fileInput.click());
     fileInput.addEventListener('change', () => {
-      this.deselectPicture();
       if (!fileInput.files) return;
+      // if (this.picture) {
+      //   this.deselectPicture();
+      // }
       Array.from(fileInput.files).forEach(async (file) => {
         await this.addPicture(file);
       });
@@ -70,6 +93,7 @@ export default class PictureControl extends Base {
     this.pictures.push(picture);
     this.drawPicture(picture);
     this.map.fire('picture.add', picture);
+
     return picture;
   }
 
@@ -81,81 +105,71 @@ export default class PictureControl extends Base {
     this.map.addLayer(picture.fillLayer);
   }
 
-  redraw() {
-    this.deselectPicture();
-    this.pictures.forEach(picture => this.drawPicture(picture));
-  }
-
-  onMapClick(event: MapMouseEvent) {
-    const pictureFillLayersId = this.pictures.map(p => p.fillLayer.id);
-    const features = this.map.queryRenderedFeatures(event.point, { layers: pictureFillLayersId });
-    if (features.length) {
-      this.selectPicture(features[0].properties?.id as string);
-    } else {
-      this.deselectPicture();
-    }
-  }
-
   selectPicture(pictureId: string) {
-    if (this.selectedPicture?.id === pictureId) return;
-    if (this.selectedPicture?.id !== pictureId) this.deselectPicture();
-    const pictureToSelect = this.pictures.find(p => p.id === pictureId)!;
-    if (pictureToSelect.locked) return;
-    this.selectedPicture = pictureToSelect;
-    this.modes.forEach(mode => mode.button.setDisabled(false));
-    this.map.addLayer(this.selectedPicture.getContourLayer());
-    this.map.fire('picture.select', this.selectedPicture);
+    const picture = this.pictures.find((p) => p.id === pictureId)!;
+    if (picture.locked) {
+      return; // do not select locked picture
+    }
+    if (this.activePicture?.id === pictureId) {
+      return; // selected the same picture
+    }
+    if (this.activePicture?.id !== pictureId) {
+      this.deselectPicture(); // selected new picture, so deselect previous one
+    }
+    this.activePicture = picture;
+    this.buttons.forEach((button) => button.setDisabled(false));
+    this.map.addLayer(this.activePicture.contourLayer);
+    this.map.fire('picture.select', this.activePicture);
     document.addEventListener('keydown', this.keyDownListener);
   }
 
   deselectPicture() {
-    this.deactivateMode();
-    if (!this.selectedPicture) return;
-    this.map.removeLayer(this.selectedPicture.getContourLayer().id);
-    this.map.fire('picture.deselect', this.selectedPicture);
-    this.selectedPicture = undefined;
-    this.modes.forEach(mode => mode.button.setDisabled(true));
+    if (!this.activePicture) return;
+    this.deselectMode();
+    this.map.removeLayer(this.activePicture.contourLayer.id);
+    this.map.fire('picture.deselect', this.activePicture);
+    this.activePicture = undefined;
+    this.buttons.forEach((button) => button.setDisabled(true));
     document.removeEventListener('keydown', this.keyDownListener);
   }
 
-  activateMode(mode: Mode) {
-    if (!this.selectedPicture) throw Error('no picture to for active mode');
-    this.deactivateMode();
-    mode.activate(this.selectedPicture);
-    this.selectedMode = mode;
+  selectMode(button: Button, ModeClass: typeof BaseMode) {
+    if (!this.activePicture) {
+      throw Error('no picture to for active mode');
+    }
+    this.activeButton = button.setActive(true);
+    this.activeMode = new ModeClass(this.map, this.activePicture, this.update);
   }
 
-  deactivateMode() {
-    if (!this.selectedMode) return;
-    this.selectedMode.deactivate();
-    this.selectedMode = undefined;
+  deselectMode() {
+    if (this.activeMode) {
+      this.activeMode.destroy();
+      this.activeMode = undefined;
+    }
+    if (this.activeButton) {
+      this.activeButton.setActive(false);
+      this.activeButton = undefined;
+    }
   }
 
   update(position: PicturePosition) {
-    const selectedPicture = this.selectedPicture;
+    const selectedPicture = this.activePicture;
     if (!selectedPicture) throw Error('no picture to update');
     selectedPicture.position = position;
     (this.map.getSource(selectedPicture.imageSource.id) as ImageSource).setCoordinates(selectedPicture.coordinates);
     (this.map.getSource(selectedPicture.polygonSource.id) as GeoJSONSource).setData(selectedPicture.asPolygon);
     (this.map.getSource(selectedPicture.pointsSource.id) as GeoJSONSource).setData(selectedPicture.asPoints);
-    this.map.fire('picture.update', this.selectedPicture);
+    this.map.fire('picture.update', this.activePicture);
   }
 
   setLock(pictureId: string, value: boolean) {
-    const picture = this.pictures.find(i => i.id === pictureId);
+    const picture = this.pictures.find((i) => i.id === pictureId);
     if (!picture) throw Error(`picture with id ${pictureId} doesn't exist`);
     picture.locked = value;
   }
 
-  keyDownListener(event: KeyboardEvent) {
-    if (event.key === 'Escape') {
-      this.deselectPicture();
-    }
-  }
-
   onAddControl() {
     this.mapContainer = this.map.getContainer();
-    this.insert();
     this.map.on('style.load', this.redraw);
     this.map.on('click', this.onMapClick);
   }

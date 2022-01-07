@@ -4,7 +4,7 @@ import Button from '../Button/Button';
 class Base {
   node: HTMLDivElement;
   // @ts-ignore
-  map: Map
+  map: Map;
 
   constructor() {
     this.node = document.createElement('div');
@@ -14,7 +14,7 @@ class Base {
   }
 
   addButton(...buttons: Button[]) {
-    buttons.forEach(button => this.node.appendChild(button.node));
+    buttons.forEach((button) => this.node.appendChild(button.node));
   }
 
   addClassName(className: string) {
@@ -36,6 +36,7 @@ class Base {
   onAdd(map: Map) {
     this.map = map;
     this.onAddControl();
+
     return this.node;
   }
 

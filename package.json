@@ -3,29 +3,30 @@
   "version": "2.3.5",
   "main": "./lib/index.js",
   "description": "Controls for mapbox-gl",
+  "type": "module",
   "scripts": {
-    "lint": "eslint src --ext .js,.ts",
-    "watch": "tsc --watch & sass --watch src/index.scss:lib/controls.css",
-    "build": "tsc && sass src/index.scss:lib/controls.css",
-    "docs": "cp lib/controls.css docs && rollup --config docs/rollup.config.js",
-    "docs:watch": "cp lib/controls.css docs && rollup --config docs/rollup.config.js --watch"
+    "dev": "tsc --watch & sass --watch src/index.scss:lib/controls.css & rollup --config example/rollup.config.js --watch",
+    "build:lib": "tsc && sass src/index.scss:lib/controls.css",
+    "build:example": "rollup --config example/rollup.config.js",
+    "build": "npm run build:lib && npm run build:example",
+    "icons": "node src/icons/convert.js",
+    "lint": "eslint src --ext .js,.ts --fix"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^21.0.0",
-    "@rollup/plugin-node-resolve": "^13.0.5",
+    "@rollup/plugin-commonjs": "^21.0.1",
+    "@rollup/plugin-node-resolve": "^13.1.2",
     "@types/geojson": "^7946.0.8",
-    "@types/mapbox-gl": "^2.4.2",
-    "@typescript-eslint/eslint-plugin": "^4.33.0",
-    "@typescript-eslint/parser": "^4.33.0",
-    "eslint": "^7.32.0",
-    "eslint-config-xxx": "^1.0.0",
-    "mapbox-gl": "^2.5.1",
-    "rollup": "^2.58.0",
-    "sass": "^1.42.1",
-    "typescript": "^4.4.3"
+    "@types/mapbox-gl": "^2.6.0",
+    "eslint": "^8.6.0",
+    "eslint-config-for-javascript": "1.2.0",
+    "eslint-config-for-typescript": "1.2.0",
+    "mapbox-gl": "^2.6.1",
+    "rollup": "^2.62.0",
+    "sass": "^1.45.2",
+    "typescript": "^4.5.4"
   },
   "dependencies": {
-    "@turf/distance": "^6.0.0"
+    "@turf/distance": "^6.5.0"
   },
   "peerDependencies": {
     "mapbox-gl": ">=1.0.0 <3.0.0"

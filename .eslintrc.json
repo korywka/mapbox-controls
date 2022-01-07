@@ -1,17 +1,6 @@
 {
-  "extends": ["eslint-config-xxx", "plugin:@typescript-eslint/recommended"],
-  "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
-  "env": {
-    "browser": true
-  },
-  "parserOptions": {
-    "ecmaVersion": 2020
-  },
-  "rules": {
-    "@typescript-eslint/explicit-module-boundary-types": 0,
-    "@typescript-eslint/no-non-null-assertion": 0,
-    "@typescript-eslint/ban-ts-comment": 0,
-    "operator-linebreak": [2, "before"]
-  }
+  "extends": [
+    "eslint-config-for-javascript",
+    "eslint-config-for-typescript"
+  ]
 }

@@ -1,6 +1,8 @@
-import { Position } from 'geojson';
+import type { Position } from 'geojson';
 
-export default function pointFeatureCollection(coordinates:Position[] = [], labels:string[] = []): GeoJSON.FeatureCollection {
+type FeatureCollection = GeoJSON.FeatureCollection;
+
+export default function pointFeatureCollection(coordinates:Position[] = [], labels:string[] = []): FeatureCollection {
   return {
     type: 'FeatureCollection',
     features: coordinates.map((c, i) => ({

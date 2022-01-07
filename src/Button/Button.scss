@@ -4,6 +4,12 @@
     align-items: center;
     justify-content: center;
 
+    svg {
+      width: 20px;
+      height: 20px;
+      fill: #505050;
+    }
+
     &.-active {
       background: rgba(0, 0, 0, 0.03);
 

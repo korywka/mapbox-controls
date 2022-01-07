@@ -19,5 +19,6 @@ export function getDefaultPosition(map: Map, pictureWidth: number, pictureHeight
     [canvasWidth / 2 - resizeWidth / 2, canvasHeight / 2 + resizeHeight / 2], // left bottom
   ];
   map.setPitch(0); // reset pitch for correct projection
-  return result.map(point => map.unproject(point)) as PicturePosition;
+
+  return result.map((point) => map.unproject(point)) as PicturePosition;
 }

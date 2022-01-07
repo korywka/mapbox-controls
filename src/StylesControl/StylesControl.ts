@@ -4,15 +4,15 @@ import { StyleOption } from './types';
 
 interface StylesControlOptions {
   /** Array of style options */
-  styles?: StyleOption[]
+  styles?: StyleOption[];
   /** Triggered on style change */
-  onChange?: (style: StyleOption) => void
+  onChange?: (style: StyleOption) => void;
 }
 
 export default class StylesControl extends Base {
-  styles: StyleOption[]
-  onChange?: (style: StyleOption) => void
-  buttons: Button[]
+  styles: StyleOption[];
+  onChange?: (style: StyleOption) => void;
+  buttons: Button[];
 
   constructor(options?: StylesControlOptions) {
     super();
@@ -39,7 +39,7 @@ export default class StylesControl extends Base {
       this.buttons.forEach((button) => {
         button.setActive(false);
       });
-      const styleNames = this.styles.map(style => style.styleName);
+      const styleNames = this.styles.map((style) => style.styleName);
       const styleName = this.map.getStyle().name;
       if (!styleName) throw Error('style must have name');
       const currentStyleIndex = styleNames.indexOf(styleName);

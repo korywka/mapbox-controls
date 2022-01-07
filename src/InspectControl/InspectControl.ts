@@ -1,20 +1,20 @@
 import { LngLat, MapboxGeoJSONFeature, MapMouseEvent, PointLike } from 'mapbox-gl';
 import Base from '../Base/Base';
 import Button from '../Button/Button';
+import iconInspect from '../icons/ts/inspect';
 import popupTemplate from './popupTemplate';
-import iconInspect from '../icons/inspect';
 
 interface InspectControlOptions {
   /** Log inspected features to console */
-  console?: boolean
+  console?: boolean;
 }
 
 export default class InspectControl extends Base {
-  console?: boolean
-  popupNode?: HTMLDivElement
-  lngLat?: LngLat
-  isInspecting = false
-  buttonInspect: Button
+  console?: boolean;
+  popupNode?: HTMLDivElement;
+  lngLat?: LngLat;
+  isInspecting = false;
+  buttonInspect: Button;
 
   constructor(options?: InspectControlOptions) {
     super();
@@ -62,6 +62,7 @@ export default class InspectControl extends Base {
       [event.point.x - selectThreshold, event.point.y + selectThreshold], // bottom left (SW)
       [event.point.x + selectThreshold, event.point.y - selectThreshold], // top right (NE)
     ] as [PointLike, PointLike];
+
     return this.map.queryRenderedFeatures(queryBox);
   }
 

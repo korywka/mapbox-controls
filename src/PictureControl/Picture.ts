@@ -1,5 +1,5 @@
-import { CircleLayer, FillLayer, GeoJSONSourceRaw, ImageSourceRaw, LineLayer, Map, RasterLayer } from 'mapbox-gl';
-import { FeatureCollection } from 'geojson';
+import { CircleLayer, FillLayer, GeoJSONSourceRaw, ImageSourceRaw, LineLayer, RasterLayer } from 'mapbox-gl';
+import type { FeatureCollection } from 'geojson';
 import { PicturePosition } from './types';
 
 interface PictureOptions {
@@ -11,12 +11,12 @@ interface PictureOptions {
 }
 
 class Picture {
-  id: string
-  url: string
-  width: number
-  height: number
-  position: PicturePosition
-  locked: boolean
+  id: string;
+  url: string;
+  width: number;
+  height: number;
+  position: PicturePosition;
+  locked: boolean;
 
   constructor(options: PictureOptions) {
     this.id = options.id;
@@ -28,7 +28,7 @@ class Picture {
   }
 
   get coordinates() {
-    return this.position.map(p => [p.lng, p.lat]);
+    return this.position.map((p) => [p.lng, p.lat]);
   }
 
   get asPolygon(): FeatureCollection {
@@ -55,21 +55,21 @@ class Picture {
     };
   }
 
-  get imageSource(): { id: string, source: ImageSourceRaw } {
+  get imageSource(): { id: string; source: ImageSourceRaw } {
     return {
       id: `${this.id}-raster`,
       source: { type: 'image', url: this.url, coordinates: this.coordinates },
     };
   }
 
-  get polygonSource(): { id: string, source: GeoJSONSourceRaw } {
+  get polygonSource(): { id: string; source: GeoJSONSourceRaw } {
     return {
       id: `${this.id}-polygon`,
       source: { type: 'geojson', data: this.asPolygon },
     };
   }
 
-  get pointsSource(): { id: string, source: GeoJSONSourceRaw } {
+  get pointsSource(): { id: string; source: GeoJSONSourceRaw } {
     return {
       id: `${this.id}-points`,
       source: { type: 'geojson', data: this.asPoints },
@@ -94,7 +94,7 @@ class Picture {
     });
   }
 
-  getContourLayer(): LineLayer {
+  get contourLayer(): LineLayer {
     return ({
       id: `${this.id}-contour`,
       type: 'line',
@@ -111,7 +111,7 @@ class Picture {
     });
   }
 
-  getKnobsLayer(): CircleLayer {
+  get knobsLayer(): CircleLayer {
     return ({
       id: `${this.id}-knobs`,
       type: 'circle',
@@ -129,7 +129,7 @@ class Picture {
     return this.width / this.height;
   }
 
-  getOppositePoint(index: number): number {
+  oppositePointTo(index: number): number {
     if (index === 0) return 2;
     if (index === 1) return 3;
     if (index === 2) return 0;

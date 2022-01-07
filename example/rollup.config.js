@@ -3,9 +3,9 @@ import commonjs from '@rollup/plugin-commonjs';
 
 export default [
   {
-    input: 'docs/docs.js',
+    input: 'example/example.js',
     output: {
-      file: 'docs/docs.bundle.js',
+      file: 'example/example.bundle.js',
       format: 'iife',
       sourcemap: true,
     },

@@ -1,5 +1,4 @@
 import { Map } from 'mapbox-gl';
-import { PicturePosition } from '../types';
 
 export function defaultPosition(map: Map, pictureWidth: number, pictureHeight: number) {
   if (!pictureWidth || !pictureHeight) throw Error('image is not loaded');
@@ -18,7 +17,8 @@ export function defaultPosition(map: Map, pictureWidth: number, pictureHeight: n
     [canvasWidth / 2 + resizeWidth / 2, canvasHeight / 2 + resizeHeight / 2], // right bottom
     [canvasWidth / 2 - resizeWidth / 2, canvasHeight / 2 + resizeHeight / 2], // left bottom
   ];
+
   map.setPitch(0); // reset pitch for correct projection
 
-  return result.map((point) => map.unproject(point)) as PicturePosition;
+  return result.map((point) => map.unproject(point));
 }

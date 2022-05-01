@@ -1,6 +1,7 @@
 import { CircleLayer, FillLayer, GeoJSONSourceRaw, ImageSourceRaw, LineLayer, RasterLayer } from 'mapbox-gl';
-import type { FeatureCollection } from 'geojson';
-import { PicturePosition } from './types';
+import centroid from '@turf/centroid';
+import type { Feature, FeatureCollection, Point, Polygon } from 'geojson';
+import type { PicturePosition } from './types';
 
 interface PictureOptions {
   id: string;
@@ -31,20 +32,18 @@ class Picture {
     return this.position.map((p) => [p.lng, p.lat]);
   }
 
-  get asPolygon(): FeatureCollection {
+  get asPolygon(): Feature<Polygon> {
     return {
-      type: 'FeatureCollection',
-      features: [
-        {
-          type: 'Feature',
-          properties: { id: this.id },
-          geometry: { type: 'Polygon', coordinates: [[...this.coordinates, this.coordinates[0]]] },
-        },
-      ],
+      type: 'Feature',
+      properties: { id: this.id },
+      geometry: {
+        type: 'Polygon',
+        coordinates: [[...this.coordinates, this.coordinates[0]]],
+      },
     };
   }
 
-  get asPoints(): FeatureCollection {
+  get asPoints(): FeatureCollection<Point> {
     return {
       type: 'FeatureCollection',
       features: this.coordinates.map((point, i) => ({
@@ -69,14 +68,7 @@ class Picture {
     };
   }
 
-  get pointsSource(): { id: string; source: GeoJSONSourceRaw } {
-    return {
-      id: `${this.id}-points`,
-      source: { type: 'geojson', data: this.asPoints },
-    };
-  }
-
-  get rasterLayer(): RasterLayer {
+  get asRasterLayer(): RasterLayer {
     return {
       id: `${this.id}-raster`,
       type: 'raster',
@@ -85,7 +77,7 @@ class Picture {
     };
   }
 
-  get fillLayer(): FillLayer {
+  get asFillLayer(): FillLayer {
     return ({
       id: `${this.id}-fill`,
       type: 'fill',
@@ -94,7 +86,7 @@ class Picture {
     });
   }
 
-  get contourLayer(): LineLayer {
+  get asLineLayer(): LineLayer {
     return ({
       id: `${this.id}-contour`,
       type: 'line',
@@ -111,11 +103,11 @@ class Picture {
     });
   }
 
-  get knobsLayer(): CircleLayer {
+  get asCircleLayer(): CircleLayer {
     return ({
-      id: `${this.id}-knobs`,
+      id: `${this.id}-circle`,
       type: 'circle',
-      source: `${this.id}-points`,
+      source: `${this.id}-polygon`,
       paint: {
         'circle-radius': 5,
         'circle-color': 'rgb(61, 90, 254)',
@@ -125,8 +117,8 @@ class Picture {
     });
   }
 
-  get ratio() {
-    return this.width / this.height;
+  get centroid() {
+    return centroid(this.asPolygon);
   }
 
   oppositePointTo(index: number): number {

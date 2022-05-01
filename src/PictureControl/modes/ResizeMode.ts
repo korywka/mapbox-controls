@@ -14,11 +14,26 @@ class ResizeMode extends BaseMode {
 
   constructor(map: Map, picture: Picture, onUpdate: OnUpdate) {
     super(map, picture, onUpdate);
-    this.map.addLayer(this.picture.knobsLayer);
-    this.map.on('mousedown', this.picture.knobsLayer.id, this.onPointerDown);
+    this.onPointerDown = this.onPointerDown.bind(this);
+    this.onPointerMove = this.onPointerMove.bind(this);
+    this.onPointerUp = this.onPointerUp.bind(this);
+    this.map.addLayer(this.picture.asCircleLayer);
+    this.map.on('mousedown', this.picture.asCircleLayer.id, this.onPointerDown);
   }
 
-  onPointerMove = (event: MapMouseEvent) => {
+  onPointerDown(event: MapLayerMouseEvent) {
+    event.preventDefault();
+    if (!this.picture) return;
+    this.map.getCanvas().style.cursor = Cursor.Grabbing;
+    const features = event.features!;
+    this.currentIndex = features[0].properties!.index;
+    this.map.on('mousemove', this.onPointerMove);
+    this.map.setLayoutProperty(this.picture.asCircleLayer.id, 'visibility', Visibility.None);
+    this.map.setLayoutProperty(this.picture.asLineLayer.id, 'visibility', Visibility.None);
+    document.addEventListener('pointerup', this.onPointerUp, { once: true });
+  }
+
+  onPointerMove(event: MapMouseEvent) {
     if (this.currentIndex === undefined) return;
     const pointA = this.map.project(this.picture.position[this.currentIndex]);
     const pointB = this.map.project(this.picture.position[this.picture.oppositePointTo(this.currentIndex)]);
@@ -44,34 +59,22 @@ class ResizeMode extends BaseMode {
     }
 
     this.onUpdate(scaledPosition);
-  };
+  }
 
-  onPointerUp = () => {
+  onPointerUp() {
     this.currentIndex = undefined;
     this.map.getCanvas().style.cursor = Cursor.Default;
     this.map.off('mousemove', this.onPointerMove);
-    this.map.setLayoutProperty(this.picture.knobsLayer.id, 'visibility', Visibility.Visible);
-    this.map.setLayoutProperty(this.picture.contourLayer.id, 'visibility', Visibility.Visible);
-  };
-
-  onPointerDown = (event: MapLayerMouseEvent) => {
-    event.preventDefault();
-    if (!this.picture) return;
-    this.map.getCanvas().style.cursor = Cursor.Grabbing;
-    const features = event.features!;
-    this.currentIndex = features[0].properties!.index;
-    this.map.on('mousemove', this.onPointerMove);
-    this.map.setLayoutProperty(this.picture.knobsLayer.id, 'visibility', Visibility.None);
-    this.map.setLayoutProperty(this.picture.contourLayer.id, 'visibility', Visibility.None);
-    document.addEventListener('pointerup', this.onPointerUp, { once: true });
-  };
+    this.map.setLayoutProperty(this.picture.asCircleLayer.id, 'visibility', Visibility.Visible);
+    this.map.setLayoutProperty(this.picture.asLineLayer.id, 'visibility', Visibility.Visible);
+  }
 
   destroy() {
     this.map.getCanvas().style.cursor = Cursor.Default;
     this.map.off('mousemove', this.onPointerMove);
-    this.map.off('mousedown', this.picture.knobsLayer.id, this.onPointerDown);
+    this.map.off('mousedown', this.picture.asCircleLayer.id, this.onPointerDown);
     document.removeEventListener('pointerup', this.onPointerUp);
-    this.map.removeLayer(this.picture.knobsLayer.id);
+    this.map.removeLayer(this.picture.asCircleLayer.id);
   }
 }
 

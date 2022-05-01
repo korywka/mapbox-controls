@@ -185,6 +185,408 @@
 	    return node;
 	}
 
+	/**
+	 * @module helpers
+	 */
+	/**
+	 * Earth Radius used with the Harvesine formula and approximates using a spherical (non-ellipsoid) Earth.
+	 *
+	 * @memberof helpers
+	 * @type {number}
+	 */
+	var earthRadius = 6371008.8;
+	/**
+	 * Unit of measurement factors using a spherical (non-ellipsoid) earth radius.
+	 *
+	 * @memberof helpers
+	 * @type {Object}
+	 */
+	var factors = {
+	    centimeters: earthRadius * 100,
+	    centimetres: earthRadius * 100,
+	    degrees: earthRadius / 111325,
+	    feet: earthRadius * 3.28084,
+	    inches: earthRadius * 39.37,
+	    kilometers: earthRadius / 1000,
+	    kilometres: earthRadius / 1000,
+	    meters: earthRadius,
+	    metres: earthRadius,
+	    miles: earthRadius / 1609.344,
+	    millimeters: earthRadius * 1000,
+	    millimetres: earthRadius * 1000,
+	    nauticalmiles: earthRadius / 1852,
+	    radians: 1,
+	    yards: earthRadius * 1.0936,
+	};
+	/**
+	 * Wraps a GeoJSON {@link Geometry} in a GeoJSON {@link Feature}.
+	 *
+	 * @name feature
+	 * @param {Geometry} geometry input geometry
+	 * @param {Object} [properties={}] an Object of key-value pairs to add as properties
+	 * @param {Object} [options={}] Optional Parameters
+	 * @param {Array<number>} [options.bbox] Bounding Box Array [west, south, east, north] associated with the Feature
+	 * @param {string|number} [options.id] Identifier associated with the Feature
+	 * @returns {Feature} a GeoJSON Feature
+	 * @example
+	 * var geometry = {
+	 *   "type": "Point",
+	 *   "coordinates": [110, 50]
+	 * };
+	 *
+	 * var feature = turf.feature(geometry);
+	 *
+	 * //=feature
+	 */
+	function feature(geom, properties, options) {
+	    if (options === void 0) { options = {}; }
+	    var feat = { type: "Feature" };
+	    if (options.id === 0 || options.id) {
+	        feat.id = options.id;
+	    }
+	    if (options.bbox) {
+	        feat.bbox = options.bbox;
+	    }
+	    feat.properties = properties || {};
+	    feat.geometry = geom;
+	    return feat;
+	}
+	/**
+	 * Creates a {@link Point} {@link Feature} from a Position.
+	 *
+	 * @name point
+	 * @param {Array<number>} coordinates longitude, latitude position (each in decimal degrees)
+	 * @param {Object} [properties={}] an Object of key-value pairs to add as properties
+	 * @param {Object} [options={}] Optional Parameters
+	 * @param {Array<number>} [options.bbox] Bounding Box Array [west, south, east, north] associated with the Feature
+	 * @param {string|number} [options.id] Identifier associated with the Feature
+	 * @returns {Feature<Point>} a Point feature
+	 * @example
+	 * var point = turf.point([-75.343, 39.984]);
+	 *
+	 * //=point
+	 */
+	function point(coordinates, properties, options) {
+	    if (options === void 0) { options = {}; }
+	    if (!coordinates) {
+	        throw new Error("coordinates is required");
+	    }
+	    if (!Array.isArray(coordinates)) {
+	        throw new Error("coordinates must be an Array");
+	    }
+	    if (coordinates.length < 2) {
+	        throw new Error("coordinates must be at least 2 numbers long");
+	    }
+	    if (!isNumber(coordinates[0]) || !isNumber(coordinates[1])) {
+	        throw new Error("coordinates must contain numbers");
+	    }
+	    var geom = {
+	        type: "Point",
+	        coordinates: coordinates,
+	    };
+	    return feature(geom, properties, options);
+	}
+	/**
+	 * Convert a distance measurement (assuming a spherical Earth) from radians to a more friendly unit.
+	 * Valid units: miles, nauticalmiles, inches, yards, meters, metres, kilometers, centimeters, feet
+	 *
+	 * @name radiansToLength
+	 * @param {number} radians in radians across the sphere
+	 * @param {string} [units="kilometers"] can be degrees, radians, miles, inches, yards, metres,
+	 * meters, kilometres, kilometers.
+	 * @returns {number} distance
+	 */
+	function radiansToLength(radians, units) {
+	    if (units === void 0) { units = "kilometers"; }
+	    var factor = factors[units];
+	    if (!factor) {
+	        throw new Error(units + " units is invalid");
+	    }
+	    return radians * factor;
+	}
+	/**
+	 * Converts any bearing angle from the north line direction (positive clockwise)
+	 * and returns an angle between 0-360 degrees (positive clockwise), 0 being the north line
+	 *
+	 * @name bearingToAzimuth
+	 * @param {number} bearing angle, between -180 and +180 degrees
+	 * @returns {number} angle between 0 and 360 degrees
+	 */
+	function bearingToAzimuth(bearing) {
+	    var angle = bearing % 360;
+	    if (angle < 0) {
+	        angle += 360;
+	    }
+	    return angle;
+	}
+	/**
+	 * Converts an angle in radians to degrees
+	 *
+	 * @name radiansToDegrees
+	 * @param {number} radians angle in radians
+	 * @returns {number} degrees between 0 and 360 degrees
+	 */
+	function radiansToDegrees(radians) {
+	    var degrees = radians % (2 * Math.PI);
+	    return (degrees * 180) / Math.PI;
+	}
+	/**
+	 * Converts an angle in degrees to radians
+	 *
+	 * @name degreesToRadians
+	 * @param {number} degrees angle between 0 and 360 degrees
+	 * @returns {number} angle in radians
+	 */
+	function degreesToRadians(degrees) {
+	    var radians = degrees % 360;
+	    return (radians * Math.PI) / 180;
+	}
+	/**
+	 * isNumber
+	 *
+	 * @param {*} num Number to validate
+	 * @returns {boolean} true/false
+	 * @example
+	 * turf.isNumber(123)
+	 * //=true
+	 * turf.isNumber('foo')
+	 * //=false
+	 */
+	function isNumber(num) {
+	    return !isNaN(num) && num !== null && !Array.isArray(num);
+	}
+	/**
+	 * isObject
+	 *
+	 * @param {*} input variable to validate
+	 * @returns {boolean} true/false
+	 * @example
+	 * turf.isObject({elevation: 10})
+	 * //=true
+	 * turf.isObject('foo')
+	 * //=false
+	 */
+	function isObject(input) {
+	    return !!input && input.constructor === Object;
+	}
+
+	/**
+	 * Callback for coordEach
+	 *
+	 * @callback coordEachCallback
+	 * @param {Array<number>} currentCoord The current coordinate being processed.
+	 * @param {number} coordIndex The current index of the coordinate being processed.
+	 * @param {number} featureIndex The current index of the Feature being processed.
+	 * @param {number} multiFeatureIndex The current index of the Multi-Feature being processed.
+	 * @param {number} geometryIndex The current index of the Geometry being processed.
+	 */
+
+	/**
+	 * Iterate over coordinates in any GeoJSON object, similar to Array.forEach()
+	 *
+	 * @name coordEach
+	 * @param {FeatureCollection|Feature|Geometry} geojson any GeoJSON object
+	 * @param {Function} callback a method that takes (currentCoord, coordIndex, featureIndex, multiFeatureIndex)
+	 * @param {boolean} [excludeWrapCoord=false] whether or not to include the final coordinate of LinearRings that wraps the ring in its iteration.
+	 * @returns {void}
+	 * @example
+	 * var features = turf.featureCollection([
+	 *   turf.point([26, 37], {"foo": "bar"}),
+	 *   turf.point([36, 53], {"hello": "world"})
+	 * ]);
+	 *
+	 * turf.coordEach(features, function (currentCoord, coordIndex, featureIndex, multiFeatureIndex, geometryIndex) {
+	 *   //=currentCoord
+	 *   //=coordIndex
+	 *   //=featureIndex
+	 *   //=multiFeatureIndex
+	 *   //=geometryIndex
+	 * });
+	 */
+	function coordEach(geojson, callback, excludeWrapCoord) {
+	  // Handles null Geometry -- Skips this GeoJSON
+	  if (geojson === null) return;
+	  var j,
+	    k,
+	    l,
+	    geometry,
+	    stopG,
+	    coords,
+	    geometryMaybeCollection,
+	    wrapShrink = 0,
+	    coordIndex = 0,
+	    isGeometryCollection,
+	    type = geojson.type,
+	    isFeatureCollection = type === "FeatureCollection",
+	    isFeature = type === "Feature",
+	    stop = isFeatureCollection ? geojson.features.length : 1;
+
+	  // This logic may look a little weird. The reason why it is that way
+	  // is because it's trying to be fast. GeoJSON supports multiple kinds
+	  // of objects at its root: FeatureCollection, Features, Geometries.
+	  // This function has the responsibility of handling all of them, and that
+	  // means that some of the `for` loops you see below actually just don't apply
+	  // to certain inputs. For instance, if you give this just a
+	  // Point geometry, then both loops are short-circuited and all we do
+	  // is gradually rename the input until it's called 'geometry'.
+	  //
+	  // This also aims to allocate as few resources as possible: just a
+	  // few numbers and booleans, rather than any temporary arrays as would
+	  // be required with the normalization approach.
+	  for (var featureIndex = 0; featureIndex < stop; featureIndex++) {
+	    geometryMaybeCollection = isFeatureCollection
+	      ? geojson.features[featureIndex].geometry
+	      : isFeature
+	      ? geojson.geometry
+	      : geojson;
+	    isGeometryCollection = geometryMaybeCollection
+	      ? geometryMaybeCollection.type === "GeometryCollection"
+	      : false;
+	    stopG = isGeometryCollection
+	      ? geometryMaybeCollection.geometries.length
+	      : 1;
+
+	    for (var geomIndex = 0; geomIndex < stopG; geomIndex++) {
+	      var multiFeatureIndex = 0;
+	      var geometryIndex = 0;
+	      geometry = isGeometryCollection
+	        ? geometryMaybeCollection.geometries[geomIndex]
+	        : geometryMaybeCollection;
+
+	      // Handles null Geometry -- Skips this geometry
+	      if (geometry === null) continue;
+	      coords = geometry.coordinates;
+	      var geomType = geometry.type;
+
+	      wrapShrink =
+	        excludeWrapCoord &&
+	        (geomType === "Polygon" || geomType === "MultiPolygon")
+	          ? 1
+	          : 0;
+
+	      switch (geomType) {
+	        case null:
+	          break;
+	        case "Point":
+	          if (
+	            callback(
+	              coords,
+	              coordIndex,
+	              featureIndex,
+	              multiFeatureIndex,
+	              geometryIndex
+	            ) === false
+	          )
+	            return false;
+	          coordIndex++;
+	          multiFeatureIndex++;
+	          break;
+	        case "LineString":
+	        case "MultiPoint":
+	          for (j = 0; j < coords.length; j++) {
+	            if (
+	              callback(
+	                coords[j],
+	                coordIndex,
+	                featureIndex,
+	                multiFeatureIndex,
+	                geometryIndex
+	              ) === false
+	            )
+	              return false;
+	            coordIndex++;
+	            if (geomType === "MultiPoint") multiFeatureIndex++;
+	          }
+	          if (geomType === "LineString") multiFeatureIndex++;
+	          break;
+	        case "Polygon":
+	        case "MultiLineString":
+	          for (j = 0; j < coords.length; j++) {
+	            for (k = 0; k < coords[j].length - wrapShrink; k++) {
+	              if (
+	                callback(
+	                  coords[j][k],
+	                  coordIndex,
+	                  featureIndex,
+	                  multiFeatureIndex,
+	                  geometryIndex
+	                ) === false
+	              )
+	                return false;
+	              coordIndex++;
+	            }
+	            if (geomType === "MultiLineString") multiFeatureIndex++;
+	            if (geomType === "Polygon") geometryIndex++;
+	          }
+	          if (geomType === "Polygon") multiFeatureIndex++;
+	          break;
+	        case "MultiPolygon":
+	          for (j = 0; j < coords.length; j++) {
+	            geometryIndex = 0;
+	            for (k = 0; k < coords[j].length; k++) {
+	              for (l = 0; l < coords[j][k].length - wrapShrink; l++) {
+	                if (
+	                  callback(
+	                    coords[j][k][l],
+	                    coordIndex,
+	                    featureIndex,
+	                    multiFeatureIndex,
+	                    geometryIndex
+	                  ) === false
+	                )
+	                  return false;
+	                coordIndex++;
+	              }
+	              geometryIndex++;
+	            }
+	            multiFeatureIndex++;
+	          }
+	          break;
+	        case "GeometryCollection":
+	          for (j = 0; j < geometry.geometries.length; j++)
+	            if (
+	              coordEach(geometry.geometries[j], callback, excludeWrapCoord) ===
+	              false
+	            )
+	              return false;
+	          break;
+	        default:
+	          throw new Error("Unknown Geometry Type");
+	      }
+	    }
+	  }
+	}
+
+	/**
+	 * Takes one or more features and calculates the centroid using the mean of all vertices.
+	 * This lessens the effect of small islands and artifacts when calculating the centroid of a set of polygons.
+	 *
+	 * @name centroid
+	 * @param {GeoJSON} geojson GeoJSON to be centered
+	 * @param {Object} [options={}] Optional Parameters
+	 * @param {Object} [options.properties={}] an Object that is used as the {@link Feature}'s properties
+	 * @returns {Feature<Point>} the centroid of the input features
+	 * @example
+	 * var polygon = turf.polygon([[[-81, 41], [-88, 36], [-84, 31], [-80, 33], [-77, 39], [-81, 41]]]);
+	 *
+	 * var centroid = turf.centroid(polygon);
+	 *
+	 * //addToMap
+	 * var addToMap = [polygon, centroid]
+	 */
+	function centroid(geojson, options) {
+	    if (options === void 0) { options = {}; }
+	    var xSum = 0;
+	    var ySum = 0;
+	    var len = 0;
+	    coordEach(geojson, function (coord) {
+	        xSum += coord[0];
+	        ySum += coord[1];
+	        len++;
+	    }, true);
+	    return point([xSum / len, ySum / len], options.properties);
+	}
+
 	class Picture {
 	    constructor(options) {
 	        this.id = options.id;
@@ -199,14 +601,12 @@
 	    }
 	    get asPolygon() {
 	        return {
-	            type: 'FeatureCollection',
-	            features: [
-	                {
-	                    type: 'Feature',
-	                    properties: { id: this.id },
-	                    geometry: { type: 'Polygon', coordinates: [[...this.coordinates, this.coordinates[0]]] },
-	                },
-	            ],
+	            type: 'Feature',
+	            properties: { id: this.id },
+	            geometry: {
+	                type: 'Polygon',
+	                coordinates: [[...this.coordinates, this.coordinates[0]]],
+	            },
 	        };
 	    }
 	    get asPoints() {
@@ -231,13 +631,7 @@
 	            source: { type: 'geojson', data: this.asPolygon },
 	        };
 	    }
-	    get pointsSource() {
-	        return {
-	            id: `${this.id}-points`,
-	            source: { type: 'geojson', data: this.asPoints },
-	        };
-	    }
-	    get rasterLayer() {
+	    get asRasterLayer() {
 	        return {
 	            id: `${this.id}-raster`,
 	            type: 'raster',
@@ -245,7 +639,7 @@
 	            paint: { 'raster-fade-duration': 0, 'raster-opacity': 0.5 },
 	        };
 	    }
-	    get fillLayer() {
+	    get asFillLayer() {
 	        return ({
 	            id: `${this.id}-fill`,
 	            type: 'fill',
@@ -253,7 +647,7 @@
 	            paint: { 'fill-opacity': 0 },
 	        });
 	    }
-	    get contourLayer() {
+	    get asLineLayer() {
 	        return ({
 	            id: `${this.id}-contour`,
 	            type: 'line',
@@ -269,11 +663,11 @@
 	            },
 	        });
 	    }
-	    get knobsLayer() {
+	    get asCircleLayer() {
 	        return ({
-	            id: `${this.id}-knobs`,
+	            id: `${this.id}-circle`,
 	            type: 'circle',
-	            source: `${this.id}-points`,
+	            source: `${this.id}-polygon`,
 	            paint: {
 	                'circle-radius': 5,
 	                'circle-color': 'rgb(61, 90, 254)',
@@ -282,8 +676,8 @@
 	            },
 	        });
 	    }
-	    get ratio() {
-	        return this.width / this.height;
+	    get centroid() {
+	        return centroid(this.asPolygon);
 	    }
 	    oppositePointTo(index) {
 	        if (index === 0)
@@ -392,13 +786,13 @@
 	        this.onPointerLeave = () => {
 	            this.map.getCanvas().style.cursor = Cursor.Default;
 	        };
-	        this.map.on('mouseenter', this.picture.fillLayer.id, this.onPointerEnter);
-	        this.map.on('mouseleave', this.picture.fillLayer.id, this.onPointerLeave);
-	        this.map.on('mousedown', this.picture.fillLayer.id, this.onPointerDown);
 	        this.onPointerEnter = this.onPointerEnter.bind(this);
 	        this.onPointerDown = this.onPointerDown.bind(this);
 	        this.onPointerMove = this.onPointerMove.bind(this);
 	        this.onPointerUp = this.onPointerUp.bind(this);
+	        this.map.on('mouseenter', this.picture.asFillLayer.id, this.onPointerEnter);
+	        this.map.on('mouseleave', this.picture.asFillLayer.id, this.onPointerLeave);
+	        this.map.on('mousedown', this.picture.asFillLayer.id, this.onPointerDown);
 	    }
 	    static get button() {
 	        return (new Button()).setIcon(icon$2());
@@ -411,7 +805,7 @@
 	        this.startPosition = event.lngLat;
 	        this.map.getCanvas().style.cursor = Cursor.Grabbing;
 	        this.map.on('mousemove', this.onPointerMove);
-	        this.map.setLayoutProperty(this.picture.contourLayer.id, 'visibility', Visibility.None);
+	        this.map.setLayoutProperty(this.picture.asLineLayer.id, 'visibility', Visibility.None);
 	        document.addEventListener('pointerup', this.onPointerUp, { once: true });
 	    }
 	    onPointerMove(event) {
@@ -426,15 +820,15 @@
 	    onPointerUp() {
 	        this.map.getCanvas().style.cursor = Cursor.Move;
 	        this.map.off('mousemove', this.onPointerMove);
-	        this.map.setLayoutProperty(this.picture.contourLayer.id, 'visibility', Visibility.Visible);
+	        this.map.setLayoutProperty(this.picture.asLineLayer.id, 'visibility', Visibility.Visible);
 	    }
 	    destroy() {
 	        this.startPosition = undefined;
 	        this.map.getCanvas().style.cursor = Cursor.Default;
 	        this.map.off('mousemove', this.onPointerMove);
-	        this.map.off('mouseenter', this.picture.fillLayer.id, this.onPointerEnter);
-	        this.map.off('mouseleave', this.picture.fillLayer.id, this.onPointerLeave);
-	        this.map.off('mousedown', this.picture.fillLayer.id, this.onPointerDown);
+	        this.map.off('mouseenter', this.picture.asFillLayer.id, this.onPointerEnter);
+	        this.map.off('mouseleave', this.picture.asFillLayer.id, this.onPointerLeave);
+	        this.map.off('mousedown', this.picture.asFillLayer.id, this.onPointerDown);
 	        document.removeEventListener('pointerup', this.onPointerUp);
 	    }
 	}
@@ -460,66 +854,274 @@
 	class ResizeMode extends BaseMode {
 	    constructor(map, picture, onUpdate) {
 	        super(map, picture, onUpdate);
-	        this.onPointerMove = (event) => {
-	            if (this.currentIndex === undefined)
-	                return;
-	            const pointA = this.map.project(this.picture.position[this.currentIndex]);
-	            const pointB = this.map.project(this.picture.position[this.picture.oppositePointTo(this.currentIndex)]);
-	            const pointP = this.map.project(event.lngLat);
-	            const closestPoint = closestLinePoint([pointA.x, pointA.y], [pointB.x, pointB.y], [pointP.x, pointP.y]);
-	            const closestLngLat = this.map.unproject(closestPoint);
-	            const scaledPosition = this.picture.position;
-	            scaledPosition[this.currentIndex] = new mapboxGl.exports.LngLat(closestLngLat.lng, closestLngLat.lat);
-	            if (this.currentIndex === 0) {
-	                scaledPosition[1] = new mapboxGl.exports.LngLat(scaledPosition[1].lng, closestLngLat.lat);
-	                scaledPosition[3] = new mapboxGl.exports.LngLat(closestLngLat.lng, scaledPosition[3].lat);
-	            }
-	            else if (this.currentIndex === 1) {
-	                scaledPosition[0] = new mapboxGl.exports.LngLat(scaledPosition[0].lng, closestLngLat.lat);
-	                scaledPosition[2] = new mapboxGl.exports.LngLat(closestLngLat.lng, scaledPosition[2].lat);
-	            }
-	            else if (this.currentIndex === 2) {
-	                scaledPosition[3] = new mapboxGl.exports.LngLat(scaledPosition[3].lng, closestLngLat.lat);
-	                scaledPosition[1] = new mapboxGl.exports.LngLat(closestLngLat.lng, scaledPosition[1].lat);
-	            }
-	            else if (this.currentIndex === 3) {
-	                scaledPosition[2] = new mapboxGl.exports.LngLat(scaledPosition[2].lng, closestLngLat.lat);
-	                scaledPosition[0] = new mapboxGl.exports.LngLat(closestLngLat.lng, scaledPosition[0].lat);
-	            }
-	            this.onUpdate(scaledPosition);
-	        };
-	        this.onPointerUp = () => {
-	            this.currentIndex = undefined;
-	            this.map.getCanvas().style.cursor = Cursor.Default;
-	            this.map.off('mousemove', this.onPointerMove);
-	            this.map.setLayoutProperty(this.picture.knobsLayer.id, 'visibility', Visibility.Visible);
-	            this.map.setLayoutProperty(this.picture.contourLayer.id, 'visibility', Visibility.Visible);
-	        };
-	        this.onPointerDown = (event) => {
-	            event.preventDefault();
-	            if (!this.picture)
-	                return;
-	            this.map.getCanvas().style.cursor = Cursor.Grabbing;
-	            const features = event.features;
-	            this.currentIndex = features[0].properties.index;
-	            this.map.on('mousemove', this.onPointerMove);
-	            this.map.setLayoutProperty(this.picture.knobsLayer.id, 'visibility', Visibility.None);
-	            this.map.setLayoutProperty(this.picture.contourLayer.id, 'visibility', Visibility.None);
-	            document.addEventListener('pointerup', this.onPointerUp, { once: true });
-	        };
-	        this.map.addLayer(this.picture.knobsLayer);
-	        this.map.on('mousedown', this.picture.knobsLayer.id, this.onPointerDown);
+	        this.onPointerDown = this.onPointerDown.bind(this);
+	        this.onPointerMove = this.onPointerMove.bind(this);
+	        this.onPointerUp = this.onPointerUp.bind(this);
+	        this.map.addLayer(this.picture.asCircleLayer);
+	        this.map.on('mousedown', this.picture.asCircleLayer.id, this.onPointerDown);
 	    }
 	    static get button() {
 	        return (new Button()).setIcon(icon$1());
 	    }
+	    onPointerDown(event) {
+	        event.preventDefault();
+	        if (!this.picture)
+	            return;
+	        this.map.getCanvas().style.cursor = Cursor.Grabbing;
+	        const features = event.features;
+	        this.currentIndex = features[0].properties.index;
+	        this.map.on('mousemove', this.onPointerMove);
+	        this.map.setLayoutProperty(this.picture.asCircleLayer.id, 'visibility', Visibility.None);
+	        this.map.setLayoutProperty(this.picture.asLineLayer.id, 'visibility', Visibility.None);
+	        document.addEventListener('pointerup', this.onPointerUp, { once: true });
+	    }
+	    onPointerMove(event) {
+	        if (this.currentIndex === undefined)
+	            return;
+	        const pointA = this.map.project(this.picture.position[this.currentIndex]);
+	        const pointB = this.map.project(this.picture.position[this.picture.oppositePointTo(this.currentIndex)]);
+	        const pointP = this.map.project(event.lngLat);
+	        const closestPoint = closestLinePoint([pointA.x, pointA.y], [pointB.x, pointB.y], [pointP.x, pointP.y]);
+	        const closestLngLat = this.map.unproject(closestPoint);
+	        const scaledPosition = this.picture.position;
+	        scaledPosition[this.currentIndex] = new mapboxGl.exports.LngLat(closestLngLat.lng, closestLngLat.lat);
+	        if (this.currentIndex === 0) {
+	            scaledPosition[1] = new mapboxGl.exports.LngLat(scaledPosition[1].lng, closestLngLat.lat);
+	            scaledPosition[3] = new mapboxGl.exports.LngLat(closestLngLat.lng, scaledPosition[3].lat);
+	        }
+	        else if (this.currentIndex === 1) {
+	            scaledPosition[0] = new mapboxGl.exports.LngLat(scaledPosition[0].lng, closestLngLat.lat);
+	            scaledPosition[2] = new mapboxGl.exports.LngLat(closestLngLat.lng, scaledPosition[2].lat);
+	        }
+	        else if (this.currentIndex === 2) {
+	            scaledPosition[3] = new mapboxGl.exports.LngLat(scaledPosition[3].lng, closestLngLat.lat);
+	            scaledPosition[1] = new mapboxGl.exports.LngLat(closestLngLat.lng, scaledPosition[1].lat);
+	        }
+	        else if (this.currentIndex === 3) {
+	            scaledPosition[2] = new mapboxGl.exports.LngLat(scaledPosition[2].lng, closestLngLat.lat);
+	            scaledPosition[0] = new mapboxGl.exports.LngLat(closestLngLat.lng, scaledPosition[0].lat);
+	        }
+	        this.onUpdate(scaledPosition);
+	    }
+	    onPointerUp() {
+	        this.currentIndex = undefined;
+	        this.map.getCanvas().style.cursor = Cursor.Default;
+	        this.map.off('mousemove', this.onPointerMove);
+	        this.map.setLayoutProperty(this.picture.asCircleLayer.id, 'visibility', Visibility.Visible);
+	        this.map.setLayoutProperty(this.picture.asLineLayer.id, 'visibility', Visibility.Visible);
+	    }
 	    destroy() {
 	        this.map.getCanvas().style.cursor = Cursor.Default;
 	        this.map.off('mousemove', this.onPointerMove);
-	        this.map.off('mousedown', this.picture.knobsLayer.id, this.onPointerDown);
+	        this.map.off('mousedown', this.picture.asCircleLayer.id, this.onPointerDown);
 	        document.removeEventListener('pointerup', this.onPointerUp);
-	        this.map.removeLayer(this.picture.knobsLayer.id);
+	        this.map.removeLayer(this.picture.asCircleLayer.id);
 	    }
+	}
+
+	/**
+	 * Unwrap a coordinate from a Point Feature, Geometry or a single coordinate.
+	 *
+	 * @name getCoord
+	 * @param {Array<number>|Geometry<Point>|Feature<Point>} coord GeoJSON Point or an Array of numbers
+	 * @returns {Array<number>} coordinates
+	 * @example
+	 * var pt = turf.point([10, 10]);
+	 *
+	 * var coord = turf.getCoord(pt);
+	 * //= [10, 10]
+	 */
+	function getCoord(coord) {
+	    if (!coord) {
+	        throw new Error("coord is required");
+	    }
+	    if (!Array.isArray(coord)) {
+	        if (coord.type === "Feature" &&
+	            coord.geometry !== null &&
+	            coord.geometry.type === "Point") {
+	            return coord.geometry.coordinates;
+	        }
+	        if (coord.type === "Point") {
+	            return coord.coordinates;
+	        }
+	    }
+	    if (Array.isArray(coord) &&
+	        coord.length >= 2 &&
+	        !Array.isArray(coord[0]) &&
+	        !Array.isArray(coord[1])) {
+	        return coord;
+	    }
+	    throw new Error("coord must be GeoJSON Point or an Array of numbers");
+	}
+
+	// http://en.wikipedia.org/wiki/Haversine_formula
+	// http://www.movable-type.co.uk/scripts/latlong.html
+	/**
+	 * Takes two {@link Point|points} and finds the geographic bearing between them,
+	 * i.e. the angle measured in degrees from the north line (0 degrees)
+	 *
+	 * @name bearing
+	 * @param {Coord} start starting Point
+	 * @param {Coord} end ending Point
+	 * @param {Object} [options={}] Optional parameters
+	 * @param {boolean} [options.final=false] calculates the final bearing if true
+	 * @returns {number} bearing in decimal degrees, between -180 and 180 degrees (positive clockwise)
+	 * @example
+	 * var point1 = turf.point([-75.343, 39.984]);
+	 * var point2 = turf.point([-75.534, 39.123]);
+	 *
+	 * var bearing = turf.bearing(point1, point2);
+	 *
+	 * //addToMap
+	 * var addToMap = [point1, point2]
+	 * point1.properties['marker-color'] = '#f00'
+	 * point2.properties['marker-color'] = '#0f0'
+	 * point1.properties.bearing = bearing
+	 */
+	function bearing(start, end, options) {
+	    if (options === void 0) { options = {}; }
+	    // Reverse calculation
+	    if (options.final === true) {
+	        return calculateFinalBearing(start, end);
+	    }
+	    var coordinates1 = getCoord(start);
+	    var coordinates2 = getCoord(end);
+	    var lon1 = degreesToRadians(coordinates1[0]);
+	    var lon2 = degreesToRadians(coordinates2[0]);
+	    var lat1 = degreesToRadians(coordinates1[1]);
+	    var lat2 = degreesToRadians(coordinates2[1]);
+	    var a = Math.sin(lon2 - lon1) * Math.cos(lat2);
+	    var b = Math.cos(lat1) * Math.sin(lat2) -
+	        Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1);
+	    return radiansToDegrees(Math.atan2(a, b));
+	}
+	/**
+	 * Calculates Final Bearing
+	 *
+	 * @private
+	 * @param {Coord} start starting Point
+	 * @param {Coord} end ending Point
+	 * @returns {number} bearing
+	 */
+	function calculateFinalBearing(start, end) {
+	    // Swap start & end
+	    var bear = bearing(end, start);
+	    bear = (bear + 180) % 360;
+	    return bear;
+	}
+
+	// https://en.wikipedia.org/wiki/Rhumb_line
+	/**
+	 * Takes two {@link Point|points} and finds the bearing angle between them along a Rhumb line
+	 * i.e. the angle measured in degrees start the north line (0 degrees)
+	 *
+	 * @name rhumbBearing
+	 * @param {Coord} start starting Point
+	 * @param {Coord} end ending Point
+	 * @param {Object} [options] Optional parameters
+	 * @param {boolean} [options.final=false] calculates the final bearing if true
+	 * @returns {number} bearing from north in decimal degrees, between -180 and 180 degrees (positive clockwise)
+	 * @example
+	 * var point1 = turf.point([-75.343, 39.984], {"marker-color": "#F00"});
+	 * var point2 = turf.point([-75.534, 39.123], {"marker-color": "#00F"});
+	 *
+	 * var bearing = turf.rhumbBearing(point1, point2);
+	 *
+	 * //addToMap
+	 * var addToMap = [point1, point2];
+	 * point1.properties.bearing = bearing;
+	 * point2.properties.bearing = bearing;
+	 */
+	function rhumbBearing(start, end, options) {
+	    if (options === void 0) { options = {}; }
+	    var bear360;
+	    if (options.final) {
+	        bear360 = calculateRhumbBearing(getCoord(end), getCoord(start));
+	    }
+	    else {
+	        bear360 = calculateRhumbBearing(getCoord(start), getCoord(end));
+	    }
+	    var bear180 = bear360 > 180 ? -(360 - bear360) : bear360;
+	    return bear180;
+	}
+	/**
+	 * Returns the bearing from ‘this’ point to destination point along a rhumb line.
+	 * Adapted from Geodesy: https://github.com/chrisveness/geodesy/blob/master/latlon-spherical.js
+	 *
+	 * @private
+	 * @param   {Array<number>} from - origin point.
+	 * @param   {Array<number>} to - destination point.
+	 * @returns {number} Bearing in degrees from north.
+	 * @example
+	 * var p1 = new LatLon(51.127, 1.338);
+	 * var p2 = new LatLon(50.964, 1.853);
+	 * var d = p1.rhumbBearingTo(p2); // 116.7 m
+	 */
+	function calculateRhumbBearing(from, to) {
+	    // φ => phi
+	    // Δλ => deltaLambda
+	    // Δψ => deltaPsi
+	    // θ => theta
+	    var phi1 = degreesToRadians(from[1]);
+	    var phi2 = degreesToRadians(to[1]);
+	    var deltaLambda = degreesToRadians(to[0] - from[0]);
+	    // if deltaLambdaon over 180° take shorter rhumb line across the anti-meridian:
+	    if (deltaLambda > Math.PI) {
+	        deltaLambda -= 2 * Math.PI;
+	    }
+	    if (deltaLambda < -Math.PI) {
+	        deltaLambda += 2 * Math.PI;
+	    }
+	    var deltaPsi = Math.log(Math.tan(phi2 / 2 + Math.PI / 4) / Math.tan(phi1 / 2 + Math.PI / 4));
+	    var theta = Math.atan2(deltaLambda, deltaPsi);
+	    return (radiansToDegrees(theta) + 360) % 360;
+	}
+
+	/**
+	 * Finds the angle formed by two adjacent segments defined by 3 points. The result will be the (positive clockwise)
+	 * angle with origin on the `startPoint-midPoint` segment, or its explementary angle if required.
+	 *
+	 * @name angle
+	 * @param {Coord} startPoint Start Point Coordinates
+	 * @param {Coord} midPoint Mid Point Coordinates
+	 * @param {Coord} endPoint End Point Coordinates
+	 * @param {Object} [options={}] Optional parameters
+	 * @param {boolean} [options.explementary=false] Returns the explementary angle instead (360 - angle)
+	 * @param {boolean} [options.mercator=false] if calculations should be performed over Mercator or WGS84 projection
+	 * @returns {number} Angle between the provided points, or its explementary.
+	 * @example
+	 * turf.angle([5, 5], [5, 6], [3, 4]);
+	 * //=45
+	 */
+	function angle(startPoint, midPoint, endPoint, options) {
+	    if (options === void 0) { options = {}; }
+	    // Optional Parameters
+	    if (!isObject(options)) {
+	        throw new Error("options is invalid");
+	    }
+	    // Validation
+	    if (!startPoint) {
+	        throw new Error("startPoint is required");
+	    }
+	    if (!midPoint) {
+	        throw new Error("midPoint is required");
+	    }
+	    if (!endPoint) {
+	        throw new Error("endPoint is required");
+	    }
+	    // Rename to shorter variables
+	    var A = startPoint;
+	    var O = midPoint;
+	    var B = endPoint;
+	    // Main
+	    var azimuthAO = bearingToAzimuth(options.mercator !== true ? bearing(A, O) : rhumbBearing(A, O));
+	    var azimuthBO = bearingToAzimuth(options.mercator !== true ? bearing(B, O) : rhumbBearing(B, O));
+	    var angleAO = Math.abs(azimuthAO - azimuthBO);
+	    // Explementary angle
+	    if (options.explementary === true) {
+	        return 360 - angleAO;
+	    }
+	    return angleAO;
 	}
 
 	const svg$6 = `<svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 24 24">
@@ -531,13 +1133,48 @@
 	class RotateMode extends BaseMode {
 	    constructor(map, picture, onUpdate) {
 	        super(map, picture, onUpdate);
-	        this.map.addLayer(this.picture.knobsLayer);
+	        this.onPointerDown = this.onPointerDown.bind(this);
+	        this.onPointerMove = this.onPointerMove.bind(this);
+	        this.onPointerUp = this.onPointerUp.bind(this);
+	        this.map.addLayer(this.picture.asCircleLayer);
+	        this.map.on('mousedown', this.picture.asCircleLayer.id, this.onPointerDown);
 	    }
 	    static get button() {
 	        return (new Button()).setIcon(icon());
 	    }
+	    onPointerDown(event) {
+	        event.preventDefault();
+	        console.log('222', this.picture);
+	        if (!this.picture)
+	            return;
+	        this.map.getCanvas().style.cursor = Cursor.Grabbing;
+	        this.startPosition = event.lngLat;
+	        this.map.on('mousemove', this.onPointerMove);
+	        this.map.setLayoutProperty(this.picture.asCircleLayer.id, 'visibility', Visibility.None);
+	        this.map.setLayoutProperty(this.picture.asLineLayer.id, 'visibility', Visibility.None);
+	        document.addEventListener('pointerup', this.onPointerUp, { once: true });
+	    }
+	    onPointerMove(event) {
+	        if (!this.startPosition)
+	            throw Error('start position is expected');
+	        const currentPosition = event.lngLat;
+	        // const coords = this.picture.position.map((p) => p.toArray());
+	        // console.log(coords);
+	        // console.log(this.picture.centroid);
+	        // console.log(currentPosition.toArray());
+	        console.log(angle(currentPosition.toArray(), this.picture.centroid, this.startPosition.toArray()));
+	        // const deltaLng = this.startPosition.lng - currentPosition.lng;
+	        // const deltaLat = this.startPosition.lat - currentPosition.lat;
+	        // this.onUpdate(this.picture.position.map((p) => new LngLat(p.lng - deltaLng, p.lat - deltaLat)) as PicturePosition);
+	        // this.startPosition = currentPosition;
+	    }
+	    onPointerUp() {
+	        this.map.getCanvas().style.cursor = Cursor.Move;
+	        this.map.off('mousemove', this.onPointerMove);
+	        this.map.setLayoutProperty(this.picture.asLineLayer.id, 'visibility', Visibility.Visible);
+	    }
 	    destroy() {
-	        this.map.removeLayer(this.picture.knobsLayer.id);
+	        this.map.removeLayer(this.picture.asCircleLayer.id);
 	    }
 	}
 
@@ -578,7 +1215,7 @@
 	    }
 	    onMapClick(event) {
 	        var _a;
-	        const pictureFillLayersId = this.pictures.map((p) => p.fillLayer.id);
+	        const pictureFillLayersId = this.pictures.map((p) => p.asFillLayer.id);
 	        const features = this.map.queryRenderedFeatures(event.point, { layers: pictureFillLayersId });
 	        if (features.length) {
 	            this.selectPicture((_a = features[0].properties) === null || _a === void 0 ? void 0 : _a.id);
@@ -638,9 +1275,9 @@
 	    drawPicture(picture) {
 	        this.map.addSource(picture.imageSource.id, picture.imageSource.source);
 	        this.map.addSource(picture.polygonSource.id, picture.polygonSource.source);
-	        this.map.addSource(picture.pointsSource.id, picture.pointsSource.source);
-	        this.map.addLayer(picture.rasterLayer);
-	        this.map.addLayer(picture.fillLayer);
+	        // this.map.addSource(picture.pointsSource.id, picture.pointsSource.source);
+	        this.map.addLayer(picture.asRasterLayer);
+	        this.map.addLayer(picture.asFillLayer);
 	    }
 	    selectPicture(pictureId) {
 	        var _a, _b;
@@ -656,7 +1293,7 @@
 	        }
 	        this.activePicture = picture;
 	        this.buttons.forEach((button) => button.setDisabled(false));
-	        this.map.addLayer(this.activePicture.contourLayer);
+	        this.map.addLayer(this.activePicture.asLineLayer);
 	        this.map.fire('picture.select', this.activePicture);
 	        document.addEventListener('keydown', this.keyDownListener);
 	    }
@@ -664,7 +1301,7 @@
 	        if (!this.activePicture)
 	            return;
 	        this.deselectMode();
-	        this.map.removeLayer(this.activePicture.contourLayer.id);
+	        this.map.removeLayer(this.activePicture.asLineLayer.id);
 	        this.map.fire('picture.deselect', this.activePicture);
 	        this.activePicture = undefined;
 	        this.buttons.forEach((button) => button.setDisabled(true));
@@ -694,7 +1331,7 @@
 	        selectedPicture.position = position;
 	        this.map.getSource(selectedPicture.imageSource.id).setCoordinates(selectedPicture.coordinates);
 	        this.map.getSource(selectedPicture.polygonSource.id).setData(selectedPicture.asPolygon);
-	        this.map.getSource(selectedPicture.pointsSource.id).setData(selectedPicture.asPoints);
+	        // (this.map.getSource(selectedPicture.pointsSource.id) as GeoJSONSource).setData(selectedPicture.asPoints);
 	        this.map.fire('picture.update', this.activePicture);
 	    }
 	    setLock(pictureId, value) {
@@ -999,104 +1636,6 @@
 	            return languageCode;
 	        return 'mul';
 	    }
-	}
-
-	/**
-	 * @module helpers
-	 */
-	/**
-	 * Earth Radius used with the Harvesine formula and approximates using a spherical (non-ellipsoid) Earth.
-	 *
-	 * @memberof helpers
-	 * @type {number}
-	 */
-	var earthRadius = 6371008.8;
-	/**
-	 * Unit of measurement factors using a spherical (non-ellipsoid) earth radius.
-	 *
-	 * @memberof helpers
-	 * @type {Object}
-	 */
-	var factors = {
-	    centimeters: earthRadius * 100,
-	    centimetres: earthRadius * 100,
-	    degrees: earthRadius / 111325,
-	    feet: earthRadius * 3.28084,
-	    inches: earthRadius * 39.37,
-	    kilometers: earthRadius / 1000,
-	    kilometres: earthRadius / 1000,
-	    meters: earthRadius,
-	    metres: earthRadius,
-	    miles: earthRadius / 1609.344,
-	    millimeters: earthRadius * 1000,
-	    millimetres: earthRadius * 1000,
-	    nauticalmiles: earthRadius / 1852,
-	    radians: 1,
-	    yards: earthRadius * 1.0936,
-	};
-	/**
-	 * Convert a distance measurement (assuming a spherical Earth) from radians to a more friendly unit.
-	 * Valid units: miles, nauticalmiles, inches, yards, meters, metres, kilometers, centimeters, feet
-	 *
-	 * @name radiansToLength
-	 * @param {number} radians in radians across the sphere
-	 * @param {string} [units="kilometers"] can be degrees, radians, miles, inches, yards, metres,
-	 * meters, kilometres, kilometers.
-	 * @returns {number} distance
-	 */
-	function radiansToLength(radians, units) {
-	    if (units === void 0) { units = "kilometers"; }
-	    var factor = factors[units];
-	    if (!factor) {
-	        throw new Error(units + " units is invalid");
-	    }
-	    return radians * factor;
-	}
-	/**
-	 * Converts an angle in degrees to radians
-	 *
-	 * @name degreesToRadians
-	 * @param {number} degrees angle between 0 and 360 degrees
-	 * @returns {number} angle in radians
-	 */
-	function degreesToRadians(degrees) {
-	    var radians = degrees % 360;
-	    return (radians * Math.PI) / 180;
-	}
-
-	/**
-	 * Unwrap a coordinate from a Point Feature, Geometry or a single coordinate.
-	 *
-	 * @name getCoord
-	 * @param {Array<number>|Geometry<Point>|Feature<Point>} coord GeoJSON Point or an Array of numbers
-	 * @returns {Array<number>} coordinates
-	 * @example
-	 * var pt = turf.point([10, 10]);
-	 *
-	 * var coord = turf.getCoord(pt);
-	 * //= [10, 10]
-	 */
-	function getCoord(coord) {
-	    if (!coord) {
-	        throw new Error("coord is required");
-	    }
-	    if (!Array.isArray(coord)) {
-	        if (coord.type === "Feature" &&
-	            coord.geometry !== null &&
-	            coord.geometry.type === "Point") {
-	            return coord.geometry.coordinates;
-	        }
-	        if (coord.type === "Point") {
-	            return coord.coordinates;
-	        }
-	    }
-	    if (Array.isArray(coord) &&
-	        coord.length >= 2 &&
-	        !Array.isArray(coord[0]) &&
-	        !Array.isArray(coord[1])) {
-	        return coord;
-	    }
-	    throw new Error("coord must be GeoJSON Point or an Array of numbers");
 	}
 
 	//http://en.wikipedia.org/wiki/Haversine_formula

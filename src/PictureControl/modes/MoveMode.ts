@@ -13,13 +13,13 @@ class MoveMode extends BaseMode {
 
   constructor(map: Map, picture: Picture, onUpdate: OnUpdate) {
     super(map, picture, onUpdate);
-    this.map.on('mouseenter', this.picture.fillLayer.id, this.onPointerEnter);
-    this.map.on('mouseleave', this.picture.fillLayer.id, this.onPointerLeave);
-    this.map.on('mousedown', this.picture.fillLayer.id, this.onPointerDown);
     this.onPointerEnter = this.onPointerEnter.bind(this);
     this.onPointerDown = this.onPointerDown.bind(this);
     this.onPointerMove = this.onPointerMove.bind(this);
     this.onPointerUp = this.onPointerUp.bind(this);
+    this.map.on('mouseenter', this.picture.asFillLayer.id, this.onPointerEnter);
+    this.map.on('mouseleave', this.picture.asFillLayer.id, this.onPointerLeave);
+    this.map.on('mousedown', this.picture.asFillLayer.id, this.onPointerDown);
   }
 
   onPointerEnter() {
@@ -31,7 +31,7 @@ class MoveMode extends BaseMode {
     this.startPosition = event.lngLat;
     this.map.getCanvas().style.cursor = Cursor.Grabbing;
     this.map.on('mousemove', this.onPointerMove);
-    this.map.setLayoutProperty(this.picture.contourLayer.id, 'visibility', Visibility.None);
+    this.map.setLayoutProperty(this.picture.asLineLayer.id, 'visibility', Visibility.None);
     document.addEventListener('pointerup', this.onPointerUp, { once: true });
   }
 
@@ -47,7 +47,7 @@ class MoveMode extends BaseMode {
   onPointerUp() {
     this.map.getCanvas().style.cursor = Cursor.Move;
     this.map.off('mousemove', this.onPointerMove);
-    this.map.setLayoutProperty(this.picture.contourLayer.id, 'visibility', Visibility.Visible);
+    this.map.setLayoutProperty(this.picture.asLineLayer.id, 'visibility', Visibility.Visible);
   }
 
   onPointerLeave = () => {
@@ -58,9 +58,9 @@ class MoveMode extends BaseMode {
     this.startPosition = undefined;
     this.map.getCanvas().style.cursor = Cursor.Default;
     this.map.off('mousemove', this.onPointerMove);
-    this.map.off('mouseenter', this.picture.fillLayer.id, this.onPointerEnter);
-    this.map.off('mouseleave', this.picture.fillLayer.id, this.onPointerLeave);
-    this.map.off('mousedown', this.picture.fillLayer.id, this.onPointerDown);
+    this.map.off('mouseenter', this.picture.asFillLayer.id, this.onPointerEnter);
+    this.map.off('mouseleave', this.picture.asFillLayer.id, this.onPointerLeave);
+    this.map.off('mousedown', this.picture.asFillLayer.id, this.onPointerDown);
     document.removeEventListener('pointerup', this.onPointerUp);
   }
 }

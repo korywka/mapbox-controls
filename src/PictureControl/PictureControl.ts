@@ -43,7 +43,7 @@ export default class PictureControl extends Base {
   }
 
   onMapClick(event: MapMouseEvent) {
-    const pictureFillLayersId = this.pictures.map((p) => p.fillLayer.id);
+    const pictureFillLayersId = this.pictures.map((p) => p.asFillLayer.id);
     const features = this.map.queryRenderedFeatures(event.point, { layers: pictureFillLayersId });
     if (features.length) {
       this.selectPicture(features[0].properties?.id as string);
@@ -103,9 +103,9 @@ export default class PictureControl extends Base {
   drawPicture(picture: Picture) {
     this.map.addSource(picture.imageSource.id, picture.imageSource.source);
     this.map.addSource(picture.polygonSource.id, picture.polygonSource.source);
-    this.map.addSource(picture.pointsSource.id, picture.pointsSource.source);
-    this.map.addLayer(picture.rasterLayer);
-    this.map.addLayer(picture.fillLayer);
+    // this.map.addSource(picture.pointsSource.id, picture.pointsSource.source);
+    this.map.addLayer(picture.asRasterLayer);
+    this.map.addLayer(picture.asFillLayer);
   }
 
   selectPicture(pictureId: string) {
@@ -121,7 +121,7 @@ export default class PictureControl extends Base {
     }
     this.activePicture = picture;
     this.buttons.forEach((button) => button.setDisabled(false));
-    this.map.addLayer(this.activePicture.contourLayer);
+    this.map.addLayer(this.activePicture.asLineLayer);
     this.map.fire('picture.select', this.activePicture);
     document.addEventListener('keydown', this.keyDownListener);
   }
@@ -129,7 +129,7 @@ export default class PictureControl extends Base {
   deselectPicture() {
     if (!this.activePicture) return;
     this.deselectMode();
-    this.map.removeLayer(this.activePicture.contourLayer.id);
+    this.map.removeLayer(this.activePicture.asLineLayer.id);
     this.map.fire('picture.deselect', this.activePicture);
     this.activePicture = undefined;
     this.buttons.forEach((button) => button.setDisabled(true));
@@ -161,7 +161,7 @@ export default class PictureControl extends Base {
     selectedPicture.position = position;
     (this.map.getSource(selectedPicture.imageSource.id) as ImageSource).setCoordinates(selectedPicture.coordinates);
     (this.map.getSource(selectedPicture.polygonSource.id) as GeoJSONSource).setData(selectedPicture.asPolygon);
-    (this.map.getSource(selectedPicture.pointsSource.id) as GeoJSONSource).setData(selectedPicture.asPoints);
+    // (this.map.getSource(selectedPicture.pointsSource.id) as GeoJSONSource).setData(selectedPicture.asPoints);
     this.map.fire('picture.update', this.activePicture);
   }
 

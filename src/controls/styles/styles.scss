@@ -1,0 +1,21 @@
+.mapbox-control-styles {
+  display: flex;
+  overflow: hidden;
+
+  button {
+    width: auto;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+
+    // overwrite mapbox styles on focus
+    &:focus:first-child,
+    &:focus:last-child {
+      border-radius: 0;
+    }
+
+    & + button {
+      border: none;
+    }
+  }
+}

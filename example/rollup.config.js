@@ -5,7 +5,7 @@ export default [
   {
     input: 'example/example.js',
     output: {
-      file: 'example/example.bundle.js',
+      file: 'example/example.min.js',
       format: 'iife',
       sourcemap: true,
     },

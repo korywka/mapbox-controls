@@ -1,6 +1,5 @@
 {
   "extends": [
-    "eslint-config-for-javascript",
-    "eslint-config-for-typescript"
+    "eslint-config-ecmascript"
   ]
 }

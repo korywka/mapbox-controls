@@ -9,12 +9,12 @@ try {
     const sourceUrl = new URL(`svg/${file}`, base);
     const sourceContent = await readFile(sourceUrl, 'utf8');
     const filename = file.split('.')[0];
-    const targetFilename = `${filename}.ts`;
-    const targetUrl = new URL(`ts/${targetFilename}`, base);
+    const targetFilename = `${filename}.js`;
+    const targetUrl = new URL(`js/${targetFilename}`, base);
     await writeFile(targetUrl, [
       `const svg = \`${sourceContent}\`;`,
       '',
-      'export default () => (new DOMParser().parseFromString(svg, \'image/svg+xml\')).firstChild as SVGElement;',
+      'export default () => /** @type SVGElement */ ((new DOMParser().parseFromString(svg, \'image/svg+xml\')).firstChild);',
       '',
     ].join('\n'));
   }

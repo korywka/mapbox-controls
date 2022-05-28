@@ -1,19 +1,19 @@
 import mapboxgl from 'mapbox-gl';
+
 import {
   CompassControl,
-  PictureControl,
+  // PictureControl,
   InspectControl,
   LanguageControl,
   RulerControl,
   StylesControl,
   ZoomControl,
   TooltipControl,
-} from '../lib'
-
-mapboxgl.accessToken = 'pk.eyJ1Ijoia29yeXdrYSIsImEiOiJja2p1ajdlOWozMnF2MzBtajRvOTVzZDRpIn0.nnlX7TDuZ3zuGkZGr_oA3A';
+} from '../lib';
 
 const languages = document.getElementById('languages');
 const map = new mapboxgl.Map({
+  accessToken: 'pk.eyJ1Ijoia29yeXdrYSIsImEiOiJja2p1ajdlOWozMnF2MzBtajRvOTVzZDRpIn0.nnlX7TDuZ3zuGkZGr_oA3A',
   container: 'map',
   style: 'mapbox://styles/mapbox/streets-v11',
   zoom: 14,
@@ -47,14 +47,20 @@ languages.addEventListener('change', () => {
 
 /* Style */
 map.addControl(new StylesControl({
-  onChange: () => languages.value = '',
+  onChange: () => {
+    languages.value = '';
+  },
 }), 'top-left');
 
 /* Zoom */
 map.addControl(new ZoomControl(), 'bottom-right');
 
 /* Ruler */
-map.addControl(new RulerControl(), 'bottom-right');
+map.addControl(new RulerControl({
+  markerCSS: {
+    borderColor: 'red',
+  },
+}), 'bottom-right');
 map.on('ruler.on', () => console.log('%cruler.on', 'color: #3D5AFE'));
 map.on('ruler.off', () => console.log('%cruler.off', 'color: #3D5AFE'));
 map.on('ruler.change', (params) => {
@@ -69,12 +75,12 @@ map.addControl(new InspectControl({ console: true }), 'bottom-right');
 map.addControl(new CompassControl(), 'bottom-right');
 
 /* Image */
-const pictureControl = new PictureControl();
-map.addControl(pictureControl, 'bottom-right');
-map.on('picture.add', (image) => console.log('%cpicture.add', 'color: #3D5AFE', image) );
-map.on('picture.select', (image) => console.log('%cpicture.select', 'color: #3D5AFE', image) );
-map.on('picture.update', (image) => console.log('%cpicture.update', 'color: #3D5AFE', image) );
-map.on('picture.deselect', (image) => console.log('%cpicture.deselect', 'color: #3D5AFE', image) );
+// const pictureControl = new PictureControl();
+// map.addControl(pictureControl, 'bottom-right');
+// map.on('picture.add', (image) => console.log('%cpicture.add', 'color: #3D5AFE', image) );
+// map.on('picture.select', (image) => console.log('%cpicture.select', 'color: #3D5AFE', image) );
+// map.on('picture.update', (image) => console.log('%cpicture.update', 'color: #3D5AFE', image) );
+// map.on('picture.deselect', (image) => console.log('%cpicture.deselect', 'color: #3D5AFE', image) );
 // map.on('style.load', () => {
 //   imageControl.addImage('https://img.lunstatic.net/building-800x600/41771.jpg', {
 //     position: [
@@ -92,6 +98,7 @@ map.addControl(new TooltipControl({
   layer: '$fill',
   getContent: (event) => {
     const coords = event.lngLat;
+
     return `Tooltip Example: ${coords.lng.toFixed(6)}, ${coords.lat.toFixed(6)}`;
   },
 }));

@@ -1,5 +1,4 @@
-@import "Button/Button";
-@import "PictureControl/PictureControl";
-@import "InspectControl/InspectControl";
-@import "StylesControl/StylesControl";
-@import "TooltipControl/TooltipControl";
+@import "base/base.scss";
+@import "controls/inspect/inspect.scss";
+@import "controls/styles/styles.scss";
+@import "controls/tooltip/tooltip.scss";

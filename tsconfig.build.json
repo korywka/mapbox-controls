@@ -7,7 +7,10 @@
     "module": "esnext",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
-    "noEmit": true
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "lib"
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["src/icons/convert.js"]
 }

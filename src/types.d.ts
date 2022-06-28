@@ -1,4 +1,13 @@
+import { LngLat, PointLike } from 'mapbox-gl';
+import { FeatureCollection, Point, Polygon } from 'geojson';
+
 export type Strings = { [key: string]: string };
+
+export type PolygonsGeometry = FeatureCollection<Polygon>;
+
+export type PointsGeometry = FeatureCollection<Point>;
+
+export type BBox = [PointLike, PointLike];
 
 export type ButtonOptions = {
     icon?: SVGElement
@@ -52,4 +61,17 @@ export interface TooltipOptions {
 }
 
 export interface ZoomOptions extends BaseOptions {
+}
+
+export interface RasterOptions extends BaseOptions {
+}
+
+export type RasterPicturePosition = [LngLat, LngLat, LngLat, LngLat];
+
+export interface RasterPictureOptions {
+    id: string
+    url: string
+    width: number
+    height: number
+    position: RasterPicturePosition
 }

@@ -2,7 +2,7 @@ import mapboxgl from 'mapbox-gl';
 
 import {
   CompassControl,
-  // PictureControl,
+  RasterControl,
   InspectControl,
   LanguageControl,
   RulerControl,
@@ -12,6 +12,7 @@ import {
 } from '../lib';
 
 const languages = document.getElementById('languages');
+
 const map = new mapboxgl.Map({
   accessToken: 'pk.eyJ1Ijoia29yeXdrYSIsImEiOiJja2p1ajdlOWozMnF2MzBtajRvOTVzZDRpIn0.nnlX7TDuZ3zuGkZGr_oA3A',
   container: 'map',
@@ -74,23 +75,21 @@ map.addControl(new InspectControl({ console: true }), 'bottom-right');
 /* Compass */
 map.addControl(new CompassControl(), 'bottom-right');
 
-/* Image */
-// const pictureControl = new PictureControl();
-// map.addControl(pictureControl, 'bottom-right');
-// map.on('picture.add', (image) => console.log('%cpicture.add', 'color: #3D5AFE', image) );
-// map.on('picture.select', (image) => console.log('%cpicture.select', 'color: #3D5AFE', image) );
-// map.on('picture.update', (image) => console.log('%cpicture.update', 'color: #3D5AFE', image) );
-// map.on('picture.deselect', (image) => console.log('%cpicture.deselect', 'color: #3D5AFE', image) );
-// map.on('style.load', () => {
-//   imageControl.addImage('https://img.lunstatic.net/building-800x600/41771.jpg', {
-//     position: [
-//       new mapboxgl.LngLat(30.500998190307115, 50.46018203970871),
-//       new mapboxgl.LngLat(30.545801809692108, 50.46018203970871),
-//       new mapboxgl.LngLat(30.545801809692108, 50.44001581151167),
-//       new mapboxgl.LngLat(30.500998190307115, 50.44001581151167),
-//     ],
-//   });
-// });
+/* Raster */
+const rasterControl = new RasterControl();
+map.addControl(rasterControl, 'bottom-right');
+map.on('picture.add', (image) => console.log('%cpicture.add', 'color: #3D5AFE', image));
+map.on('picture.select', (image) => console.log('%cpicture.select', 'color: #3D5AFE', image));
+map.on('picture.update', (image) => console.log('%cpicture.update', 'color: #3D5AFE', image));
+map.on('picture.deselect', (image) => console.log('%cpicture.deselect', 'color: #3D5AFE', image));
+map.on('style.load', () => {
+  rasterControl.addPicture('https://img.lunstatic.net/building-1600x1200/49243.jpg', [
+    new mapboxgl.LngLat(30.500998190307115, 50.46018203970871),
+    new mapboxgl.LngLat(30.545801809692108, 50.46018203970871),
+    new mapboxgl.LngLat(30.545801809692108, 50.44001581151167),
+    new mapboxgl.LngLat(30.500998190307115, 50.44001581151167),
+  ]);
+});
 
 
 /* Tooltip */

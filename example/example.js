@@ -84,10 +84,10 @@ map.on('picture.update', (image) => console.log('%cpicture.update', 'color: #3D5
 map.on('picture.deselect', (image) => console.log('%cpicture.deselect', 'color: #3D5AFE', image));
 map.on('style.load', () => {
   rasterControl.addPicture('https://img.lunstatic.net/building-1600x1200/49243.jpg', [
-    new mapboxgl.LngLat(30.500998190307115, 50.46018203970871),
-    new mapboxgl.LngLat(30.545801809692108, 50.46018203970871),
-    new mapboxgl.LngLat(30.545801809692108, 50.44001581151167),
-    new mapboxgl.LngLat(30.500998190307115, 50.44001581151167),
+    [30.500998190307115, 50.46018203970871],
+    [30.545801809692108, 50.46018203970871],
+    [30.545801809692108, 50.44001581151167],
+    [30.500998190307115, 50.44001581151167],
   ]);
 });
 

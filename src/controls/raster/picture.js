@@ -2,7 +2,7 @@ import centroid from '@turf/centroid';
 
 export default class Picture {
   /**
-   * @param {import('../../types').RasterPictureOptions} options
+   * @param {import('../../types').Raster.PictureOptions} options
    */
   constructor(options) {
     this.id = options.id;
@@ -13,65 +13,69 @@ export default class Picture {
     this.locked = false;
   }
 
-  get coordinates() {
-    return this.position.map((p) => [p.lng, p.lat]);
-  }
-
   get centroid() {
-    return centroid(this.asPolygonGeometry);
+    return centroid(this.asJSONPolygon);
   }
 
   /**
-   * @return {import('../../types').PolygonsGeometry}
+   * @return {import('../../types').Raster.Polygon}
    */
-  get asPolygonGeometry() {
+  get asJSONPolygon() {
     return {
-      type: 'FeatureCollection',
-      features: [{
-        type: 'Feature',
-        properties: { id: this.id },
-        geometry: {
-          type: 'Polygon',
-          coordinates: [[...this.coordinates, this.coordinates[0]]],
-        },
-      }],
+      type: 'Feature',
+      properties: { id: this.id },
+      geometry: {
+        type: 'Polygon',
+        coordinates: [[...this.position, this.position[0]]],
+      },
     };
   }
 
   /**
-   * @return {import('../../types').PointsGeometry}
+   * @return {import('../../types').Raster.Points}
    */
-  get asPointsGeometry() {
+  get asJSONPoints() {
     return {
       type: 'FeatureCollection',
-      features: this.coordinates.map((point, i) => ({
+      features: this.position.map((coordinates, index) => ({
         type: 'Feature',
-        properties: { index: i },
-        geometry: { type: 'Point', coordinates: point },
+        properties: { index },
+        geometry: {
+          type: 'Point',
+          coordinates,
+        },
       })),
     };
   }
 
-  get imageSourceId() {
-    return `${this.id}-image`;
-  }
-
   /**
-   * @return {import('mapbox-gl').ImageSourceRaw}
+   * @return {{ id: string, data: import('mapbox-gl').ImageSourceRaw }}
    */
   get imageSource() {
-    return { type: 'image', url: this.url, coordinates: this.coordinates };
-  }
-
-  get polygonSourceId() {
-    return `${this.id}-polygon`;
+    return {
+      id: `${this.id}-image`,
+      data: { type: 'image', url: this.url, coordinates: this.position },
+    };
   }
 
   /**
-   * @return {import('mapbox-gl').GeoJSONSourceRaw}
+   * @return {{ id: string, data: import('mapbox-gl').GeoJSONSourceRaw }}
    */
   get polygonSource() {
-    return { type: 'geojson', data: this.asPolygonGeometry };
+    return {
+      id: `${this.id}-polygon`,
+      data: { type: 'geojson', data: this.asJSONPolygon },
+    };
+  }
+
+  /**
+   * @return {{ id: string, data: import('mapbox-gl').GeoJSONSourceRaw }}
+   */
+  get pointsSource() {
+    return {
+      id: `${this.id}-points`,
+      data: { type: 'geojson', data: this.asJSONPoints },
+    };
   }
 
   /**
@@ -81,7 +85,7 @@ export default class Picture {
     return {
       id: `${this.id}-raster`,
       type: 'raster',
-      source: this.imageSourceId,
+      source: this.imageSource.id,
       paint: { 'raster-fade-duration': 0, 'raster-opacity': 0.5 },
     };
   }
@@ -93,7 +97,7 @@ export default class Picture {
     return ({
       id: `${this.id}-fill`,
       type: 'fill',
-      source: this.polygonSourceId,
+      source: this.polygonSource.id,
       paint: { 'fill-opacity': 0 },
     });
   }
@@ -105,7 +109,7 @@ export default class Picture {
     return ({
       id: `${this.id}-contour`,
       type: 'line',
-      source: this.polygonSourceId,
+      source: this.polygonSource.id,
       layout: {
         'line-cap': 'round',
         'line-join': 'round',
@@ -125,7 +129,7 @@ export default class Picture {
     return ({
       id: `${this.id}-knobs`,
       type: 'circle',
-      source: this.polygonSourceId,
+      source: this.pointsSource.id,
       paint: {
         'circle-radius': 5,
         'circle-color': 'rgb(61, 90, 254)',
@@ -136,22 +140,10 @@ export default class Picture {
   }
 
   /**
-   * @param {number} index
-   * @return {number}
-   */
-  oppositeKnobTo(index) {
-    if (index === 0) return 2;
-    if (index === 1) return 3;
-    if (index === 2) return 0;
-    if (index === 3) return 1;
-    throw Error('invalid corner index');
-  }
-
-  /**
    * @param {import('mapbox-gl').Map} map
    * @param {number} width
    * @param {number} height
-   * @return {import('../../types').RasterPicturePosition}
+   * @return {import('../../types').Raster.Position}
    */
   static centerMapPosition(map, width, height) {
     if (!width || !height) throw Error('image is not loaded');
@@ -175,10 +167,10 @@ export default class Picture {
     map.setPitch(0); // reset pitch for correct projection
 
     return [
-      map.unproject(position[0]),
-      map.unproject(position[1]),
-      map.unproject(position[2]),
-      map.unproject(position[3]),
+      /** @type [number, number] */ (map.unproject(position[0]).toArray()),
+      /** @type [number, number] */ (map.unproject(position[1]).toArray()),
+      /** @type [number, number] */ (map.unproject(position[2]).toArray()),
+      /** @type [number, number] */ (map.unproject(position[3]).toArray()),
     ];
   }
 }

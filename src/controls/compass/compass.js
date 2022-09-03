@@ -3,7 +3,7 @@ import iconPointer from '../../icons/js/pointer.js';
 
 export default class Compass extends Base {
   /**
-   * @param {import('../../types').CompassOptions=} options
+   * @param {import('../../types').Compass.Options=} options
    */
   constructor(options) {
     super(options);

@@ -1,16 +1,18 @@
-import { LngLat } from 'mapbox-gl';
+import bearing from '@turf/bearing';
+import distance from '@turf/distance';
+import transformTranslate from '@turf/transform-translate';
 
 /**
  * @param {import('mapbox-gl').Map} map
  * @param {import('../picture').default} picture
- * @param {(position: import('../../../types').RasterPicturePosition) => void} onUpdate
+ * @param {(position: import('../../../types').Raster.Position) => void} onUpdate
+ * @return {() => void}
  */
-export function moveMode(map, picture, onUpdate) {
-  /** @type {import('mapbox-gl').LngLat | undefined} */
+export default function move(map, picture, onUpdate) {
+  /** @type {number[] | undefined} */
   let startPosition;
 
-  console.log('hhh');
-
+  map.addLayer(picture.contourLayer);
   map.on('mouseenter', picture.fillLayer.id, onPointerEnter);
   map.on('mouseleave', picture.fillLayer.id, onPointerLeave);
   map.on('mousedown', picture.fillLayer.id, onPointerDown);
@@ -28,7 +30,7 @@ export function moveMode(map, picture, onUpdate) {
    */
   function onPointerDown(event) {
     event.preventDefault();
-    startPosition = event.lngLat;
+    startPosition = [event.lngLat.lng, event.lngLat.lat];
     map.getCanvas().style.cursor = 'grabbing';
     map.on('mousemove', onPointerMove);
     map.setLayoutProperty(picture.contourLayer.id, 'visibility', 'none');
@@ -40,11 +42,22 @@ export function moveMode(map, picture, onUpdate) {
    */
   function onPointerMove(event) {
     if (!startPosition) throw Error('start position is expected');
-    const currentPosition = event.lngLat;
-    const deltaLng = startPosition.lng - currentPosition.lng;
-    const deltaLat = startPosition.lat - currentPosition.lat;
-    const position = picture.position.map((p) => new LngLat(p.lng - deltaLng, p.lat - deltaLat));
+    const currentPosition = [event.lngLat.lng, event.lngLat.lat];
+    const bearingBetween = bearing(startPosition, currentPosition);
+    const distanceBetween = distance(startPosition, currentPosition);
+    const translated = transformTranslate(picture.asJSONPolygon, distanceBetween, bearingBetween);
+    const translatedCoordinates = translated.geometry.coordinates[0];
+
+    /** @type {import('../../../types').Raster.Position} */
+    const position = [
+      [translatedCoordinates[0][0], translatedCoordinates[0][1]],
+      [translatedCoordinates[1][0], translatedCoordinates[1][1]],
+      [translatedCoordinates[2][0], translatedCoordinates[2][1]],
+      [translatedCoordinates[3][0], translatedCoordinates[3][1]],
+    ];
+
     onUpdate(position);
+
     startPosition = currentPosition;
   }
 
@@ -56,6 +69,7 @@ export function moveMode(map, picture, onUpdate) {
 
   return function () {
     startPosition = undefined;
+    map.removeLayer(picture.contourLayer.id);
     map.getCanvas().style.cursor = '';
     map.off('mousemove', onPointerMove);
     map.off('mouseenter', picture.fillLayer.id, onPointerEnter);

@@ -9,7 +9,10 @@
     "allowSyntheticDefaultImports": true,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "outDir": "lib"
+    "outDir": "lib",
+    "paths": {
+      "@types": ["./src/types"]
+    }
   },
   "include": ["src"],
   "exclude": ["src/icons/convert.js"]

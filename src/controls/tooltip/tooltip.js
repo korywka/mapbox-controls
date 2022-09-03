@@ -2,7 +2,7 @@ import Base from '../../base/base.js';
 
 export default class Tooltip extends Base {
   /**
-   * @param {import('../../types').TooltipOptions=} options
+   * @param {import('../../types').Tooltip.Options=} options
    */
   constructor(options) {
     super();

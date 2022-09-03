@@ -7,7 +7,7 @@ const SUPPORTED_LANGUAGES = ['en', 'es', 'fr', 'de', 'ru', 'zh', 'pt', 'ar', 'ja
 
 export default class Language extends Base {
   /**
-   * @param {import('../../types').LanguageOptions=} options
+   * @param {import('../../types').Language.Options=} options
    */
   constructor(options) {
     super();
@@ -83,9 +83,9 @@ export default class Language extends Base {
   }
 
   /**
-   * @param {string | import('mapbox-gl').StyleFunction | import('mapbox-gl').Expression} field
+   * @param {import('../../types').Language.TextField} field
    * @param {string} languageKey
-   * @returns {string | import('mapbox-gl').StyleFunction | import('mapbox-gl').Expression}
+   * @returns {import('../../types').Language.TextField}
    */
   localizeTextField(field, languageKey) {
     // string

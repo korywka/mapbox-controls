@@ -11,7 +11,7 @@ const SOURCE_MARKER = 'controls-source-marker';
 
 export default class Ruler extends Base {
   /**
-   * @param {import('../../types').RulerOptions=} options
+   * @param {import('../../types').Ruler.Options=} options
    */
   constructor(options) {
     super();

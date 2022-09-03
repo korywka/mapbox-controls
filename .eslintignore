@@ -1,3 +1,3 @@
-src/icons/convert.js
-src/types.d.ts
+**/*.d.ts
 lib
+src/icons/convert.js

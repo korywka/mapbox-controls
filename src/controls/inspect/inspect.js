@@ -4,7 +4,7 @@ import popup from './popup.js';
 
 export default class Inspect extends Base {
   /**
-   * @param {import('../../types').InspectOptions=} options
+   * @param {import('../../types').Inspect.Options=} options
    */
   constructor(options) {
     super();

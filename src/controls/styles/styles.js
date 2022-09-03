@@ -2,7 +2,7 @@ import Base from '../../base/Base.js';
 
 export default class Styles extends Base {
   /**
-   * @param {import('../../types').StylesOptions=} options
+   * @param {import('@types').Styles.Options=} options
    */
   constructor(options) {
     super();

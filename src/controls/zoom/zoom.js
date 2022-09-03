@@ -4,7 +4,7 @@ import iconMinus from '../../icons/js/minus.js';
 
 export default class Zoom extends Base {
   /**
-   * @param {import('../../types').ZoomOptions=} options
+   * @param {import('../../types').Zoom.Options=} options
    */
   constructor(options) {
     super(options);

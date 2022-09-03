@@ -2,11 +2,10 @@ import en from '../srtings/en.js';
 
 class Base {
   /**
-   * @param {import('../types').BaseOptions=} options
+   * @param {import('../types').Base.Options=} options
    */
   constructor(options) {
-    /** @type {import('mapbox-gl').Map} */
-    this.map; // eslint-disable-line no-unused-expressions
+    this.map = /** @type {import('mapbox-gl').Map} */({});
     this.node = document.createElement('div');
     this.node.classList.add('mapboxgl-ctrl');
     this.node.classList.add('mapboxgl-ctrl-group');
@@ -15,7 +14,7 @@ class Base {
   }
 
   /**
-   * @param {import('../types').ButtonOptions=} options
+   * @param {import('../types').Base.Button=} options
    * @returns {HTMLButtonElement}
    */
   static createButton(options = {}) {
@@ -72,13 +71,6 @@ class Base {
 
   $onRemove() {
     // extend
-  }
-
-  /**
-   * @param {import('../types').Strings} json
-   */
-  setStrings(json) {
-    this.strings = json;
   }
 
   /**

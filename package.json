@@ -1,48 +1,13 @@
 {
   "name": "mapbox-gl-controls",
-  "description": "Controls for mapbox-gl",
-  "version": "3.0.0",
-  "type": "module",
-  "main": "./lib/index.js",
-  "types": "./lib/index.d.ts",
+  "private": true,
   "scripts": {
-    "ci": "tsc && eslint src --fix",
-    "icons": "node src/icons/convert.js",
-    "dev": "npm run dev:lib & npm run dev:styles & npm run dev:example",
-    "dev:lib": "npx swc src --out-dir lib --watch",
-    "dev:styles": "sass --watch src/index.scss:lib/controls.css",
-    "dev:example": "rollup --config example/rollup.config.js --watch",
-    "build": "npm run build:lib && npm run build:styles && npm run build:types && npm run build:example",
-    "build:lib": "npx swc src --out-dir lib",
-    "build:styles": "sass src/index.scss:lib/controls.css --no-source-map",
-    "build:example": "rollup --config example/rollup.config.js",
-    "build:types": "tsc -p tsconfig.build.json"
+    "lint": "eslint packages --fix"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "22.0.2",
-    "@rollup/plugin-node-resolve": "13.3.0",
-    "@swc/cli": "0.1.57",
-    "@swc/core": "1.2.244",
-    "@types/geojson": "7946.0.10",
-    "@types/mapbox-gl": "2.7.5",
-    "@types/node": "18.7.13",
     "eslint": "8.22.0",
-    "eslint-config-ecmascript": "1.1.2",
-    "mapbox-gl": "2.10.0",
-    "rollup": "2.78.1",
-    "sass": "1.54.5",
-    "typescript": "4.8.2"
-  },
-  "dependencies": {
-    "@turf/turf": "^6.5.0"
-  },
-  "peerDependencies": {
-    "mapbox-gl": ">=1.0.0 <3.0.0"
-  },
-  "homepage": "https://korywka.github.io/mapbox-gl-controls/",
-  "repository": "korywka/mapbox-gl-controls",
-  "keywords": [
-    "mapbox"
-  ],
-  "license": "MIT"
+    "eslint-config-ecmascript": "2.5.0",
+    "pnpm": "8.7.1",
+    "typescript": "5.2.2"
+  }
 }

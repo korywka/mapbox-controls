@@ -1,0 +1,34 @@
+{
+	"name": "@mapbox-controls/ruler",
+	"version": "0.0.1",
+	"description": "Measure distance on map",
+	"type": "module",
+	"main": "./src/index.js",
+	"scripts": {
+		"build": "tsc"
+	},
+	"dependencies": {
+		"@mapbox-controls/helpers": "0.0.1",
+		"@turf/distance": "7.0.0-alpha.0",
+		"@turf/helpers": "7.0.0-alpha.0"
+	},
+	"devDependencies": {
+		"@types/geojson": "7946.0.10",
+		"@types/mapbox-gl": "2.7.13",
+		"mapbox-gl": "3.0.0-beta.1"
+	},
+	"peerDependencies": {
+		"mapbox-gl": ">=1.0.0 <4.0.0"
+	},
+	"types": "./types/index.d.ts",
+	"files": [
+		"src",
+		"types"
+	],
+	"publishConfig": {
+		"access": "public",
+		"registry": "https://registry.npmjs.org/"
+	},
+	"repository": "korywka/mapbox-gl-controls",
+	"license": "MIT"
+}

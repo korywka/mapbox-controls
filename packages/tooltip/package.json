@@ -1,0 +1,28 @@
+{
+	"name": "@mapbox-controls/tooltip",
+	"version": "0.0.1",
+	"description": "Display tooltip on hover",
+	"type": "module",
+	"main": "./src/index.js",
+	"scripts": {
+		"build": "tsc"
+	},
+	"devDependencies": {
+		"@types/mapbox-gl": "2.7.13",
+		"mapbox-gl": "3.0.0-beta.1"
+	},
+	"peerDependencies": {
+		"mapbox-gl": ">=1.0.0 <4.0.0"
+	},
+	"types": "./types/index.d.ts",
+	"files": [
+		"src",
+		"types"
+	],
+	"publishConfig": {
+		"access": "public",
+		"registry": "https://registry.npmjs.org/"
+	},
+	"repository": "korywka/mapbox-gl-controls",
+	"license": "MIT"
+}

@@ -1,0 +1,46 @@
+.mapbox-ctrl-styles-expanded {
+	display: flex;
+}
+
+.mapbox-ctrl-styles-expanded button {
+	width: auto;
+	padding: 0 8px;
+}
+
+.mapboxgl-ctrl-group.mapbox-ctrl-styles-expanded button {
+	border-radius: 0;
+}
+
+.mapboxgl-ctrl-group.mapbox-ctrl-styles-expanded button:first-child {
+	border-radius: 4px 0 0 4px;
+}
+
+.mapboxgl-ctrl-group.mapbox-ctrl-styles-expanded button:last-child {
+	border-radius: 0 4px 4px 0;
+}
+
+.mapbox-ctrl-styles-expanded button+button {
+	border: none;
+}
+
+.mapbox-ctrl-styles-expanded button.-active {
+	background: rgba(0, 0, 0, 0.05);
+}
+
+.mapbox-ctrl-styles-compact button {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #505050;
+}
+
+.mapbox-ctrl-styles-compact select {
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	opacity: 0;
+	cursor: pointer;
+}

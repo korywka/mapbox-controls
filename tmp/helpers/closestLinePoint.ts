@@ -1,2 +1,0 @@
-type P = [number, number];
-

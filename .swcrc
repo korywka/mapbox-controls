@@ -1,6 +1,0 @@
-{
-  "exclude": ["src/icons/convert.js", "src/types.d.ts"],
-  "jsc": {
-    "target": "es2015"
-  }
-}

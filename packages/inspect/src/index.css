@@ -1,0 +1,87 @@
+.mapbox-ctrl-inspect button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #505050;
+}
+
+.mapbox-ctrl-inspect button.-active {
+	color: #4264fb;
+}
+
+.mapbox-ctrl-inspect-popup {
+	position: absolute;
+	padding: 8px;
+	border-radius: 4px;
+	background: #fff;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+	font-family: sans-serif;
+	white-space: nowrap;
+	transform: translate(-50%, 5px);
+}
+
+.mapbox-ctrl-inspect-popup::before {
+	content: '';
+	width: 0;
+	height: 0;
+	position: absolute;
+	bottom: 100%;
+	left: 50%;
+	transform: translate(-50%, 0);
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-bottom: 5px solid #fff;
+}
+
+.mapbox-ctrl-inspect-popup header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-size: 12px;
+}
+
+.mapbox-ctrl-inspect-popup nav {
+	margin: 0 auto;
+}
+
+.mapbox-ctrl-inspect-popup button {
+	flex: none;
+	padding: 4px 12px;
+	border-radius: 4px;
+	border: none;
+	background: none;
+	font-family: sans-serif;
+	font-size: 16px;
+	color: #4264fb;
+	cursor: pointer;
+}
+
+.mapbox-ctrl-inspect-popup table {
+	width: 100%;
+	min-width: 200px;
+	max-width: 400px;
+	border-collapse: collapse;
+}
+
+.mapbox-ctrl-inspect-popup tr:not(:last-child) td,
+.mapbox-ctrl-inspect-popup tr:not(:last-child) th {
+	border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.mapbox-ctrl-inspect-popup th,
+.mapbox-ctrl-inspect-popup td {
+	width: 50%;
+	padding: 5px;
+	white-space: break-spaces;
+}
+
+.mapbox-ctrl-inspect-popup th {
+	text-align: right;
+	font-weight: 600;
+}
+
+.mapbox-ctrl-inspect-popup td[colspan="2"] {
+	text-align: center;
+	color: #4264fb;
+	font-weight: 600;
+}

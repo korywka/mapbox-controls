@@ -1,0 +1,16 @@
+.mapbox-ctrl-tooltip {
+	padding: 5px 7px;
+	background: #fff;
+	border-radius: 2px;
+	position: absolute;
+	transform: translate(-50%, 0);
+	margin-top: 24px;
+	font-size: 14px;
+	white-space: nowrap;
+	/* show tooltip over control buttons which z-index is 2 */
+	z-index: 3;
+}
+
+.mapbox-ctrl-tooltip:empty {
+	display: none;
+}

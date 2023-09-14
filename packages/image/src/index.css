@@ -1,0 +1,29 @@
+.mapbox-ctrl-image button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #505050;
+	cursor: pointer;
+}
+
+.mapbox-ctrl-image button.-active {
+	color: #4264fb;
+}
+
+.mapbox-ctrl-image button:disabled {
+	opacity: 0.5;
+}
+
+.mapbox-ctrl-image-add {
+	position: relative;
+	display: contents;
+}
+
+.mapbox-ctrl-image input[type="file"] {
+	opacity: 0;
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 1px;
+	height: 1px;
+}

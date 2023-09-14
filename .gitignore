@@ -5,11 +5,5 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# ide
-.idea/
-
 # osx
 .DS_Store
-
-# build
-lib/

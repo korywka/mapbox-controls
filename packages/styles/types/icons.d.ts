@@ -1,5 +1,5 @@
-declare namespace _default {
+export namespace icons {
     export { layers };
 }
-export default _default;
 declare const layers: SVGElement;
+export {};

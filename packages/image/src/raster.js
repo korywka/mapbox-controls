@@ -83,7 +83,7 @@ export class Raster {
 			source: this.rasterSource.id,
 			paint: {
 				'raster-fade-duration': 0,
-				'raster-opacity': 0.5,
+				'raster-opacity': 0.4,
 			},
 		};
 	}

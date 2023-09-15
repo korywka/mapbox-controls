@@ -1,9 +1,5 @@
 export default class RulerControl {
     constructor(options?: RulerControlOptions);
-    container: HTMLDivElement;
-    isActive: boolean;
-    coordinates: [number, number][];
-    markers: import('mapbox-gl').Marker[];
     options: {
         units: import("@turf/helpers").Units;
         labelFormat: (n: number) => string;
@@ -14,6 +10,10 @@ export default class RulerControl {
         markerCSS?: Partial<CSSStyleDeclaration> | undefined;
         invisible?: boolean | undefined;
     };
+    container: HTMLDivElement;
+    isActive: boolean;
+    coordinates: [number, number][];
+    markers: import('mapbox-gl').Marker[];
     button: HTMLButtonElement | null;
     onControlButtonClick(): void;
     draw: () => void;

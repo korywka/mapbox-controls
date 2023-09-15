@@ -72,8 +72,33 @@ map.addControl(new CompassControl({ instant: true }), 'bottom-right');
 map.addControl(new InspectControl({ console: true }), 'bottom-right');
 
 map.addControl(new RulerControl(), 'bottom-right');
+map.on('ruler.on', () => console.log('Ruler activated'));
+map.on('ruler.off', () => console.log('Ruler deactivated'));
 
-map.addControl(new ImageControl(), 'bottom-right');
+const image = new ImageControl();
+map.addControl(image, 'bottom-right');
+image.addUrl('https://korywka.github.io/mapbox-controls/preview/plan.jpg', [
+	[
+		30.622053488641882,
+		50.43926060648866,
+	],
+	[
+		30.627144888757584,
+		50.43197654403531,
+	],
+	[
+		30.617797873099676,
+		50.429326551923964,
+	],
+	[
+		30.612705668630156,
+		50.436610940291615,
+	],
+]);
+map.on('image.select', ({ id }) => console.log(`Selected image ${id}`));
+map.on('image.deselect', ({ id }) => console.log(`Deselected image ${id}`));
+map.on('image.update', ({ coordinates }) => console.log('Updated position:', coordinates));
+map.on('image.mode', ({ mode }) => console.log(`Changed mode: ${mode}`));
 
 map.addControl(new TooltipControl({
 	layer: 'polygon-fill',

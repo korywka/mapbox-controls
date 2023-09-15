@@ -8,8 +8,10 @@ declare class ImageControl {
     buttonRotate: HTMLButtonElement;
     rasters: Record<string, Raster>;
     currentRaster: Raster | null;
-    currentMode: Move | Scale | null;
-    addFile(file: File): Promise<void>;
+    currentMode: Move | Scale | Rotate | null;
+    addFile(file: File, coordinates?: [number, number][] | undefined): Promise<void>;
+    addUrl(url: string, coordinates?: [number, number][] | undefined): Promise<void>;
+    addImage(image: HTMLImageElement, coordinates?: [number, number][] | undefined): Promise<void>;
     addRaster(raster: Raster): void;
     selectRaster(id: string): void;
     deselectRaster(): void;
@@ -23,3 +25,4 @@ declare class ImageControl {
 import { Raster } from './raster.js';
 import { Move } from './modes/move.js';
 import { Scale } from './modes/scale.js';
+import { Rotate } from './modes/rotate.js';

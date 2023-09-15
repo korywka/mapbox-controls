@@ -2,7 +2,7 @@
   "name": "mapbox-gl-controls",
   "private": true,
   "scripts": {
-    "lint": "eslint packages --fix"
+    "lint": "eslint packages/**/src/*.js --fix"
   },
   "devDependencies": {
     "eslint": "8.22.0",

@@ -1,5 +1,5 @@
-declare namespace _default {
+export namespace icons {
     export { compass };
 }
-export default _default;
 declare const compass: SVGElement;
+export {};

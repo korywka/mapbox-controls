@@ -1,13 +1,13 @@
 export default class LanguageControl {
     constructor(options?: LanguageControlOptions);
-    container: HTMLDivElement;
     options: {
         supportedLanguages: string[];
         language?: string | undefined;
         getLanguageKey: (language: string) => string;
         excludedLayerIds: string[];
     };
-    styleChangeListener(): void;
+    container: HTMLDivElement;
+    styleChangeListener: () => void;
     setLanguage(lang?: string | undefined): void;
     browserLanguage(): string;
     localizeTextField(field: TextField, languageKey: string): TextField;

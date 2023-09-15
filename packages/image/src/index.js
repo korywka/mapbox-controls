@@ -7,18 +7,8 @@ import { Move } from './modes/move.js';
 import { Raster } from './raster.js';
 import { icons } from './icons.js';
 
-/**
- * @typedef {{
-*  onUpdate?: (position: [number, number][]) => void
-* }} ImageControlOptions
-*/
-
 class ImageControl {
-	/**
-	 * @param {ImageControlOptions} options
-	 */
-	constructor(options = {}) {
-		this.options = { ...options };
+	constructor() {
 		this.container = controlContainer('mapbox-ctrl-image');
 		this.fileInput = createFileInput();
 		this.buttonAdd = controlButton({
@@ -55,30 +45,32 @@ class ImageControl {
 
 	/**
    * @param {File} file
+	 * @param {[number, number][]=} coordinates
    */
-	async addFile(file) {
+	async addFile(file, coordinates) {
 		const image = await readFile(file);
-		this.addImage(image);
+		this.addImage(image, coordinates);
 	}
 
 	/**
 	 * @param {string} url
+	 * @param {[number, number][]=} coordinates
 	 */
-	async addUrl(url) {
+	async addUrl(url, coordinates) {
 		const image = await readUrl(url);
-		this.addImage(image);
+		this.addImage(image, coordinates);
 	}
 
 	/**
 	 * @param {HTMLImageElement} image
+	 * @param {[number, number][]=} coordinates
 	 */
-	async addImage(image) {
+	async addImage(image, coordinates) {
 		if (!this.map) throw Error('map is undefined');
-		const coordinates = centerPosition(image, this.map);
-		const raster = new Raster(image, coordinates);
+		const position = coordinates ?? centerPosition(image, this.map);
+		const raster = new Raster(image, position);
 		this.rasters[raster.id] = raster;
 		this.addRaster(raster);
-		this.selectRaster(raster.id);
 	}
 
 	/**
@@ -104,12 +96,14 @@ class ImageControl {
 		this.buttonMove.disabled = false;
 		this.buttonScale.disabled = false;
 		this.buttonRotate.disabled = false;
+		this.map.fire('image.select', { id: this.currentRaster.id });
 	}
 
 	deselectRaster() {
 		if (!this.map) throw Error('map is undefined');
 		if (!this.currentRaster) return;
 		this.map.removeLayer(this.currentRaster.contourLayer.id);
+		this.map.fire('image.deselect', { id: this.currentRaster.id });
 		this.setMode(null);
 		this.currentRaster = null;
 		this.buttonMove.disabled = true;
@@ -130,6 +124,7 @@ class ImageControl {
 			this.buttonRotate.classList.remove('-active');
 			this.currentMode.destroy();
 			this.currentMode = null;
+			this.map.fire('image.mode', { mode: this.currentMode });
 			// click on active button just deactivates current mode
 			if (currentId === mode) return;
 		}
@@ -151,6 +146,9 @@ class ImageControl {
 				this.updateCoordinates(coordinates);
 			});
 		}
+		if (this.currentMode) {
+			this.map.fire('image.mode', { mode: this.currentMode.id });
+		}
 	}
 
 	/**
@@ -169,7 +167,7 @@ class ImageControl {
 		rasterSource.setCoordinates(raster.coordinates);
 		polygonSource.setData(raster.polygonSource.source.data);
 		pointsSource.setData(raster.pointsSource.source.data);
-		this.options.onUpdate?.(coordinates);
+		this.map.fire('image.update', { coordinates });
 	}
 
 	/**

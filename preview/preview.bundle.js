@@ -1976,7 +1976,7 @@
 				source: this.rasterSource.id,
 				paint: {
 					'raster-fade-duration': 0,
-					'raster-opacity': 0.5,
+					'raster-opacity': 0.4,
 				},
 			};
 		}
@@ -2031,7 +2031,7 @@
 		}
 	}
 
-	const image = parseSVG(`
+	const image$1 = parseSVG(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
     <path d="M0 0h24v24H0V0z" fill="none"/>
     <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14 6 17h12l-3.86-5.14z"/>
@@ -2061,16 +2061,14 @@
 
 	const icons$4 = {
 		move,
-		image,
+		image: image$1,
 		scale,
 		rotate,
 	};
 
 	/**
-	 * @typedef {{
-	*  onUpdate?: (position: [number, number][]) => void
-	* }} ImageControlOptions
-	*/
+	 * @typedef {{}} ImageControlOptions
+	 */
 
 	class ImageControl {
 		/**
@@ -2114,30 +2112,32 @@
 
 		/**
 	   * @param {File} file
+		 * @param {[number, number][]=} coordinates
 	   */
-		async addFile(file) {
+		async addFile(file, coordinates) {
 			const image = await readFile(file);
-			this.addImage(image);
+			this.addImage(image, coordinates);
 		}
 
 		/**
 		 * @param {string} url
+		 * @param {[number, number][]=} coordinates
 		 */
-		async addUrl(url) {
+		async addUrl(url, coordinates) {
 			const image = await readUrl(url);
-			this.addImage(image);
+			this.addImage(image, coordinates);
 		}
 
 		/**
 		 * @param {HTMLImageElement} image
+		 * @param {[number, number][]=} coordinates
 		 */
-		async addImage(image) {
+		async addImage(image, coordinates) {
 			if (!this.map) throw Error('map is undefined');
-			const coordinates = centerPosition(image, this.map);
-			const raster = new Raster(image, coordinates);
+			const position = coordinates ?? centerPosition(image, this.map);
+			const raster = new Raster(image, position);
 			this.rasters[raster.id] = raster;
 			this.addRaster(raster);
-			this.selectRaster(raster.id);
 		}
 
 		/**
@@ -2163,12 +2163,14 @@
 			this.buttonMove.disabled = false;
 			this.buttonScale.disabled = false;
 			this.buttonRotate.disabled = false;
+			this.map.fire('image.select', { id: this.currentRaster.id });
 		}
 
 		deselectRaster() {
 			if (!this.map) throw Error('map is undefined');
 			if (!this.currentRaster) return;
 			this.map.removeLayer(this.currentRaster.contourLayer.id);
+			this.map.fire('image.deselect', { id: this.currentRaster.id });
 			this.setMode(null);
 			this.currentRaster = null;
 			this.buttonMove.disabled = true;
@@ -2189,6 +2191,7 @@
 				this.buttonRotate.classList.remove('-active');
 				this.currentMode.destroy();
 				this.currentMode = null;
+				this.map.fire('image.mode', { mode: this.currentMode });
 				// click on active button just deactivates current mode
 				if (currentId === mode) return;
 			}
@@ -2210,6 +2213,9 @@
 					this.updateCoordinates(coordinates);
 				});
 			}
+			if (this.currentMode) {
+				this.map.fire('image.mode', { mode: this.currentMode.id });
+			}
 		}
 
 		/**
@@ -2228,7 +2234,7 @@
 			rasterSource.setCoordinates(raster.coordinates);
 			polygonSource.setData(raster.polygonSource.source.data);
 			pointsSource.setData(raster.pointsSource.source.data);
-			this.options.onUpdate?.(coordinates);
+			this.map.fire('image.update', { coordinates });
 		}
 
 		/**
@@ -3271,8 +3277,33 @@
 	map.addControl(new InspectControl({ console: true }), 'bottom-right');
 
 	map.addControl(new RulerControl(), 'bottom-right');
+	map.on('ruler.on', () => console.log('Ruler activated'));
+	map.on('ruler.off', () => console.log('Ruler deactivated'));
 
-	map.addControl(new ImageControl(), 'bottom-right');
+	const image = new ImageControl();
+	map.addControl(image, 'bottom-right');
+	image.addUrl('https://korywka.github.io/mapbox-controls/preview/plan.jpg', [
+		[
+			30.622053488641882,
+			50.43926060648866,
+		],
+		[
+			30.627144888757584,
+			50.43197654403531,
+		],
+		[
+			30.617797873099676,
+			50.429326551923964,
+		],
+		[
+			30.612705668630156,
+			50.436610940291615,
+		],
+	]);
+	map.on('image.select', ({ id }) => console.log(`Selected image ${id}`));
+	map.on('image.deselect', ({ id }) => console.log(`Deselected image ${id}`));
+	map.on('image.update', ({ coordinates }) => console.log('Updated position:', coordinates));
+	map.on('image.mode', ({ mode }) => console.log(`Changed mode: ${mode}`));
 
 	map.addControl(new TooltipControl({
 		layer: 'polygon-fill',

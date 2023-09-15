@@ -1,9 +1,10 @@
-export class Move {
+export class Rotate {
     constructor(map: import('mapbox-gl').Map, raster: import('../raster').Raster, onUpdate: (coordinates: [number, number][]) => void);
     map: import("mapbox-gl").Map;
     raster: import("../raster").Raster;
     onUpdate: (coordinates: [number, number][]) => void;
-    prevPosition: [number, number] | null;
+    centroid: [number, number] | null;
+    startPoint: [number, number] | null;
     get id(): string;
     onPointerEnter: () => void;
     onPointerLeave: () => void;

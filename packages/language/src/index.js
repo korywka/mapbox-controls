@@ -12,8 +12,7 @@
  */
 
 const defaults = {
-	// Supported languages: https://docs.mapbox.com/help/troubleshooting/change-language/
-	supportedLanguages: ['en', 'es', 'fr', 'de', 'ru', 'zh', 'pt', 'ar', 'ja', 'ko', 'mul'],
+	supportedLanguages: ['ar', 'de', 'en', 'es', 'fr', 'it', 'ja', 'ko', 'mul', 'pt', 'ru', 'vi', 'zh-Hans', 'zh-Hant'],
 	getLanguageKey: (/** @type {string} */ language) => (language === 'mul' ? 'name' : `name_${language}`),
 	excludedLayerIds: [],
 };

@@ -13,15 +13,16 @@ import StylesControl from '@mapbox-controls/styles';
 import '@mapbox-controls/styles/src/index.css';
 
 map.addControl(new StylesControl(styles: {
-    label: 'Streets',
-    styleName: 'Mapbox Streets',
-    styleUrl: 'mapbox://styles/mapbox/streets-v12',
+  label: 'Streets',
+  styleName: 'Mapbox Streets',
+  styleUrl: 'mapbox://styles/mapbox/streets-v12',
 }, {
-    label: 'Satellite',
-    styleName: 'Mapbox Satellite Streets',
-    styleUrl: 'mapbox://sprites/mapbox/satellite-streets-v12',
+  label: 'Satellite',
+  styleName: 'Mapbox Satellite Streets',
+  styleUrl: 'mapbox://sprites/mapbox/satellite-streets-v12',
 }), 'top-left');
-// or with compact view and default styles (streets and satellite):
+
+// or with compact view and default styles (streets and satellite)
 map.addControl(new StylesControl({ compact: true }), 'top-left');
 ```
 
@@ -33,14 +34,14 @@ Use mapbox [`style.load`](https://docs.mapbox.com/mapbox-gl-js/api/map/#map.even
 
 ```ts
 export type Style = {
-    label: string;
-    styleName: string;
-    styleUrl: string;
+  label: string;
+  styleName: string;
+  styleUrl: string;
 };
 
 export type StylesControlOptions = {
-    styles?: Style[] | undefined;
-    onChange?: ((style: Style) => void) | undefined;
-    compact?: boolean | undefined;
+  styles?: Style[] | undefined;
+  onChange?: ((style: Style) => void) | undefined;
+  compact?: boolean | undefined;
 };
 ```

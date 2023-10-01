@@ -13,8 +13,8 @@ import TooltipControl from '@mapbox-controls/tooltip';
 import '@mapbox-controls/tooltip/src/index.css';
 
 map.addControl(new TooltipControl({
-    getContent: (event) => `${event.lngLat.lng.toFixed(6)}, ${event.lngLat.lat.toFixed(6)}`,
-    layer: 'some-layer-id',
+  getContent: (event) => `${event.lngLat.lng.toFixed(6)}, ${event.lngLat.lat.toFixed(6)}`,
+  layer: 'some-layer-id',
 }));
 ```
 
@@ -22,7 +22,7 @@ map.addControl(new TooltipControl({
 
 ```ts
 export type TooltipControlOptions = {
-    getContent: (event: MapLayerMouseEvent) => string;
-    layer?: string | undefined;
+  getContent: (event: MapLayerMouseEvent) => string;
+  layer?: string | undefined;
 };
 ```

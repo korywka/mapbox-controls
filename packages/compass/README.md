@@ -19,6 +19,6 @@ map.addControl(new CompassControl(), 'bottom-right');
 
 ```ts
 export type CompassControlOptions = {
-    instant?: boolean;
+  instant?: boolean;
 };
 ```

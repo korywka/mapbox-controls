@@ -1,4 +1,4 @@
-# @mapbox-controls/zoom
+# 🔍 @mapbox-controls/zoom
 
 [<< all controls](/README.md)
 

@@ -17,6 +17,8 @@ map.addControl(new StylesControl(), 'top-left');
 map.addControl(new StylesControl({ compact: true }), 'top-left');
 ```
 
+Use mapbox [`style.load`](https://docs.mapbox.com/mapbox-gl-js/api/map/#map.event:style.load) event to redraw layers.
+
 ## Options
 
 `styleName` - is the root value of style's `name` property according to [the specification](https://docs.mapbox.com/style-spec/reference/root/#name).

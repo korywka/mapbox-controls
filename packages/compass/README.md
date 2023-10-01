@@ -1,5 +1,7 @@
 # @mapbox-controls/compass
 
+[<< all controls](/README.md)
+
 Control to indicate map direction. Optionally, can be hidden if map bearing iz 0.
 
 ```

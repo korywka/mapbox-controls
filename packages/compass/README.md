@@ -17,4 +17,8 @@ map.addControl(new CompassControl(), 'bottom-right');
 
 ## Options
 
-https://github.com/korywka/mapbox-controls/blob/3da516e26bfbd19efcc52dd52e14abfa81ff2b4e/packages/compass/types/index.d.ts#L2-L4
+```js
+export type CompassControlOptions = {
+    instant?: boolean;
+};
+```

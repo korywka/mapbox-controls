@@ -1,8 +1,8 @@
 /**
- * @typedef {import('mapbox-gl').MapMouseEvent} MapMouseEvent
+ * @typedef {import('mapbox-gl').MapLayerMouseEvent} MapLayerMouseEvent
  * @typedef {import('mapbox-gl').MapLayerEventType} MapLayerEventType
  * @typedef {{
- *  getContent: (event: MapMouseEvent) => string
+ *  getContent: (event: MapLayerMouseEvent) => string
  *  layer?: string
  * }} TooltipControlOptions
  */
@@ -41,7 +41,7 @@ class TooltipControl {
 		this.map.off('move', this.updatePosition);
 	};
 
-	/** @param {MapMouseEvent} event */
+	/** @param {MapLayerMouseEvent} event */
 	move = (event) => {
 		this.node.innerHTML = this.options.getContent(event);
 		this.lngLat = event.lngLat;

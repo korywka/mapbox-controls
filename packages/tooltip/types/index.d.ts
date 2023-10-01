@@ -1,14 +1,14 @@
 export default TooltipControl;
-export type MapMouseEvent = import('mapbox-gl').MapMouseEvent;
+export type MapLayerMouseEvent = import('mapbox-gl').MapLayerMouseEvent;
 export type MapLayerEventType = import('mapbox-gl').MapLayerEventType;
 export type TooltipControlOptions = {
-    getContent: (event: MapMouseEvent) => string;
+    getContent: (event: MapLayerMouseEvent) => string;
     layer?: string | undefined;
 };
 declare class TooltipControl {
     constructor(options: TooltipControlOptions);
     options: {
-        getContent: (event: MapMouseEvent) => string;
+        getContent: (event: MapLayerMouseEvent) => string;
         layer?: string | undefined;
     };
     container: HTMLDivElement;
@@ -19,7 +19,7 @@ declare class TooltipControl {
     cursorStyle: string;
     show: () => void;
     hide: () => void;
-    move: (event: MapMouseEvent) => void;
+    move: (event: MapLayerMouseEvent) => void;
     updatePosition: () => void;
     onAdd(map: import('mapbox-gl').Map): HTMLElement;
     map: import("mapbox-gl").Map | undefined;

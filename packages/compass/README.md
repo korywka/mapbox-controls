@@ -1,4 +1,4 @@
-# @mapbox-controls/compass
+# 🧭 @mapbox-controls/compass
 
 [<< all controls](/README.md)
 

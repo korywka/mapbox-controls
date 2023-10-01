@@ -19,6 +19,6 @@ map.addControl(new InspectControl(), 'bottom-right');
 
 ```ts
 export type InspectControlOptions = {
-	console?: boolean;
+  console?: boolean;
 };
 ```

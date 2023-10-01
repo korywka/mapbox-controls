@@ -1,4 +1,4 @@
-# @mapbox-controls/tooltip
+# 🏷️ @mapbox-controls/tooltip
 
 [<< all controls](/README.md)
 

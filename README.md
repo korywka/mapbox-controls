@@ -2,6 +2,8 @@
 
 Some handy controls for `mapbox-gl-js` structured as monorepo.
 
+[Preview all controls in action](https://korywka.github.io/mapbox-controls/preview/)
+
 ## Controls list
 
 - [🧭 @mapbox-controls/compass](packages/compass) - indicate map direction

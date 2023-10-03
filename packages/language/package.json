@@ -1,6 +1,6 @@
 {
 	"name": "@mapbox-controls/language",
-	"version": "0.0.1",
+	"version": "1.0.0",
 	"description": "Change map language",
 	"type": "module",
 	"main": "./src/index.js",

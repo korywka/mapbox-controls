@@ -1,6 +1,6 @@
 {
 	"name": "@mapbox-controls/tooltip",
-	"version": "0.0.1",
+	"version": "1.0.0",
 	"description": "Display tooltip on hover",
 	"type": "module",
 	"main": "./src/index.js",

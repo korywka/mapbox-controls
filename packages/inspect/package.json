@@ -1,6 +1,6 @@
 {
   "name": "@mapbox-controls/inspect",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Debug map style layers and sources",
   "type": "module",
   "main": "./src/index.js",

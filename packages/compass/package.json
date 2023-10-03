@@ -1,6 +1,6 @@
 {
   "name": "@mapbox-controls/compass",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Indicate map direction",
   "type": "module",
   "main": "./src/index.js",

@@ -10,6 +10,7 @@ export class Raster {
 		this.width = image.width;
 		this.height = image.height;
 		this.coordinates = coordinates;
+		this.locked = false;
 	}
 
 	get id() {
@@ -83,7 +84,7 @@ export class Raster {
 			source: this.rasterSource.id,
 			paint: {
 				'raster-fade-duration': 0,
-				'raster-opacity': 0.7,
+				'raster-opacity': 0.5,
 			},
 		};
 	}

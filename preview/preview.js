@@ -77,28 +77,53 @@ map.on('ruler.off', () => console.log('Ruler deactivated'));
 
 const image = new ImageControl();
 map.addControl(image, 'bottom-right');
-image.addUrl('https://korywka.github.io/mapbox-controls/preview/plan.jpg', [
-	[
-		30.622053488641882,
-		50.43926060648866,
-	],
-	[
-		30.627144888757584,
-		50.43197654403531,
-	],
-	[
-		30.617797873099676,
-		50.429326551923964,
-	],
-	[
-		30.612705668630156,
-		50.436610940291615,
-	],
-]);
 map.on('image.select', ({ id }) => console.log(`Selected image ${id}`));
 map.on('image.deselect', ({ id }) => console.log(`Deselected image ${id}`));
 map.on('image.update', ({ coordinates }) => console.log('Updated position:', coordinates));
 map.on('image.mode', ({ mode }) => console.log(`Changed mode: ${mode}`));
+
+(async function () {
+	await map.once('style.load');
+	await image.addUrl('https://korywka.github.io/mapbox-controls/preview/plan.jpg', [
+		[
+			30.622053488641882,
+			50.43926060648866,
+		],
+		[
+			30.627144888757584,
+			50.43197654403531,
+		],
+		[
+			30.617797873099676,
+			50.429326551923964,
+		],
+		[
+			30.612705668630156,
+			50.436610940291615,
+		],
+	]);
+
+	map.on('image.select', ({ id }) => {
+		const rasterLayerId = image.rasters[id].rasterLayer.id;
+		const range = document.createElement('input');
+		range.style.position = 'absolute';
+		range.style.left = '50%';
+		range.style.transform = 'translateX(-50%)';
+		range.style.bottom = '16px';
+		range.type = 'range';
+		range.min = 0;
+		range.step = 0.05;
+		range.max = 1;
+		range.value = map.getPaintProperty(rasterLayerId, 'raster-opacity');
+		range.addEventListener('input', () => {
+			map.setPaintProperty(rasterLayerId, 'raster-opacity', Number(range.value));
+		});
+		document.body.appendChild(range);
+		map.once('image.deselect', () => {
+			document.body.removeChild(range);
+		});
+	});
+})();
 
 map.addControl(new TooltipControl({
 	layer: 'polygon-fill',

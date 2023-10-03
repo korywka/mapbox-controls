@@ -1903,6 +1903,7 @@
 			this.width = image.width;
 			this.height = image.height;
 			this.coordinates = coordinates;
+			this.locked = false;
 		}
 
 		get id() {
@@ -1976,7 +1977,7 @@
 				source: this.rasterSource.id,
 				paint: {
 					'raster-fade-duration': 0,
-					'raster-opacity': 0.7,
+					'raster-opacity': 0.5,
 				},
 			};
 		}
@@ -2032,28 +2033,28 @@
 	}
 
 	const image$1 = parseSVG(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
     <path d="M0 0h24v24H0V0z" fill="none"/>
     <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14 6 17h12l-3.86-5.14z"/>
 </svg>
 `);
 
 	const move = parseSVG(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
   <path d="M0 0h24v24H0V0z" fill="none"/>
   <path d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"/>
 </svg>
 `);
 
 	const scale = parseSVG(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
     <rect fill="none" height="24" width="24"/>
     <polygon points="21,11 21,3 13,3 16.29,6.29 6.29,16.29 3,13 3,21 11,21 7.71,17.71 17.71,7.71"/>
 </svg>
 `);
 
 	const rotate = parseSVG(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="22" width="22" fill="currentColor">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="20" width="20" fill="currentColor">
   <path d="M0 0h24v24H0V0z" fill="none"/>
   <path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/>
 </svg>
@@ -2108,7 +2109,8 @@
 	   */
 		async addFile(file, coordinates) {
 			const image = await readFile(file);
-			this.addImage(image, coordinates);
+			const id = this.addImage(image, coordinates);
+			return id;
 		}
 
 		/**
@@ -2117,7 +2119,8 @@
 		 */
 		async addUrl(url, coordinates) {
 			const image = await readUrl(url);
-			this.addImage(image, coordinates);
+			const id = this.addImage(image, coordinates);
+			return id;
 		}
 
 		/**
@@ -2130,6 +2133,8 @@
 			const raster = new Raster(image, position);
 			this.rasters[raster.id] = raster;
 			this.addRaster(raster);
+			this.map.fire('image.new', { id: raster.id });
+			return raster.id;
 		}
 
 		/**
@@ -2150,7 +2155,9 @@
 		selectRaster(id) {
 			if (!this.map) throw Error('map is undefined');
 			this.deselectRaster();
-			this.currentRaster = this.rasters[id];
+			const raster = this.rasters[id];
+			if (raster.locked) return;
+			this.currentRaster = raster;
 			this.map.addLayer(this.currentRaster.contourLayer);
 			this.buttonMove.disabled = false;
 			this.buttonScale.disabled = false;
@@ -2260,6 +2267,17 @@
 		};
 
 		/**
+		 * @param {string} id
+		 * @param {boolean} isLocked
+		 */
+		setLock = (id, isLocked) => {
+			this.rasters[id].locked = isLocked;
+			if (this.currentRaster?.id === id && isLocked) {
+				this.deselectRaster();
+			}
+		};
+
+		/**
 	   * @param {import('mapbox-gl').Map} map
 	   * @returns {HTMLElement}
 	   */
@@ -2286,7 +2304,7 @@
 	}
 
 	const inspect = parseSVG(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
     <path d="M0 0h24v24H0z" fill="none"/>
     <path d="M20 19.59V8l-6-6H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c.45 0 .85-.15 1.19-.4l-4.43-4.43c-.8.52-1.74.83-2.76.83-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5c0 1.02-.31 1.96-.83 2.75L20 19.59zM9 13c0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3-3 1.34-3 3z"/>
 </svg>
@@ -2616,7 +2634,7 @@
 	}
 
 	const ruler = parseSVG(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
     <rect fill="none" height="24" width="24"/>
     <path d="M20,6H4C2.9,6,2,6.9,2,8v8c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2V8C22,6.9,21.1,6,20,6z M20,16H4V8h3v3c0,0.55,0.45,1,1,1h0 c0.55,0,1-0.45,1-1V8h2v3c0,0.55,0.45,1,1,1h0c0.55,0,1-0.45,1-1V8h2v3c0,0.55,0.45,1,1,1h0c0.55,0,1-0.45,1-1V8h3V16z"/>
 </svg>
@@ -2944,7 +2962,7 @@
 	}
 
 	const layers = parseSVG(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" height="22" width="22">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20" height="20">
   <path d="m24 41.5-18-14 2.5-1.85L24 37.7l15.5-12.05L42 27.5Zm0-7.6-18-14 18-14 18 14Zm0-15.05Zm0 11.25 13.1-10.2L24 9.7 10.9 19.9Z"/>
 </svg>
 `);
@@ -3171,14 +3189,14 @@
 	}
 
 	const plus = parseSVG(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
     <rect fill="none" height="24" width="24"/>
     <path d="M18,13h-5v5c0,0.55-0.45,1-1,1l0,0c-0.55,0-1-0.45-1-1v-5H6c-0.55,0-1-0.45-1-1l0,0c0-0.55,0.45-1,1-1h5V6 c0-0.55,0.45-1,1-1l0,0c0.55,0,1,0.45,1,1v5h5c0.55,0,1,0.45,1,1l0,0C19,12.55,18.55,13,18,13z"/>
 </svg>
 `);
 
 	const minus = parseSVG(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
     <rect fill="none" height="24" width="24"/>
     <path d="M18,13H6c-0.55,0-1-0.45-1-1l0,0c0-0.55,0.45-1,1-1h12c0.55,0,1,0.45,1,1l0,0C19,12.55,18.55,13,18,13z"/>
 </svg>
@@ -3273,28 +3291,53 @@
 
 	const image = new ImageControl();
 	map.addControl(image, 'bottom-right');
-	image.addUrl('https://korywka.github.io/mapbox-controls/preview/plan.jpg', [
-		[
-			30.622053488641882,
-			50.43926060648866,
-		],
-		[
-			30.627144888757584,
-			50.43197654403531,
-		],
-		[
-			30.617797873099676,
-			50.429326551923964,
-		],
-		[
-			30.612705668630156,
-			50.436610940291615,
-		],
-	]);
 	map.on('image.select', ({ id }) => console.log(`Selected image ${id}`));
 	map.on('image.deselect', ({ id }) => console.log(`Deselected image ${id}`));
 	map.on('image.update', ({ coordinates }) => console.log('Updated position:', coordinates));
 	map.on('image.mode', ({ mode }) => console.log(`Changed mode: ${mode}`));
+
+	(async function () {
+		await map.once('style.load');
+		await image.addUrl('https://korywka.github.io/mapbox-controls/preview/plan.jpg', [
+			[
+				30.622053488641882,
+				50.43926060648866,
+			],
+			[
+				30.627144888757584,
+				50.43197654403531,
+			],
+			[
+				30.617797873099676,
+				50.429326551923964,
+			],
+			[
+				30.612705668630156,
+				50.436610940291615,
+			],
+		]);
+
+		map.on('image.select', ({ id }) => {
+			const rasterLayerId = image.rasters[id].rasterLayer.id;
+			const range = document.createElement('input');
+			range.style.position = 'absolute';
+			range.style.left = '50%';
+			range.style.transform = 'translateX(-50%)';
+			range.style.bottom = '16px';
+			range.type = 'range';
+			range.min = 0;
+			range.step = 0.05;
+			range.max = 1;
+			range.value = map.getPaintProperty(rasterLayerId, 'raster-opacity');
+			range.addEventListener('input', () => {
+				map.setPaintProperty(rasterLayerId, 'raster-opacity', Number(range.value));
+			});
+			document.body.appendChild(range);
+			map.once('image.deselect', () => {
+				document.body.removeChild(range);
+			});
+		});
+	})();
 
 	map.addControl(new TooltipControl({
 		layer: 'polygon-fill',

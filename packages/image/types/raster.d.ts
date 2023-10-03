@@ -4,6 +4,7 @@ export class Raster {
     width: number;
     height: number;
     coordinates: [number, number][];
+    locked: boolean;
     get id(): string;
     get rasterSource(): {
         id: string;

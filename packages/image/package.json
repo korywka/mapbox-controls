@@ -1,7 +1,7 @@
 {
   "name": "@mapbox-controls/image",
   "version": "0.0.1",
-  "description": "Drag, scale and rotate image on the map",
+  "description": "Move, scale and rotate image on a map",
   "type": "module",
   "main": "./src/index.js",
   "scripts": {

@@ -8,7 +8,7 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: #505050;
+	color: #333;
 	cursor: pointer;
 }
 
@@ -37,7 +37,7 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: #505050;
+	color: #333;
 }
 
 .mapbox-ctrl-inspect button.-active {
@@ -124,7 +124,7 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: #505050;
+	color: #333;
 }
 
 .mapbox-ctrl-ruler button.-active {
@@ -164,7 +164,7 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: #505050;
+	color: #333;
 }
 
 .mapbox-ctrl-styles-compact select {
@@ -196,5 +196,5 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: #505050;
+	color: #333;
 }

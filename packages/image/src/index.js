@@ -49,7 +49,8 @@ class ImageControl {
    */
 	async addFile(file, coordinates) {
 		const image = await readFile(file);
-		this.addImage(image, coordinates);
+		const id = this.addImage(image, coordinates);
+		return id;
 	}
 
 	/**
@@ -58,7 +59,8 @@ class ImageControl {
 	 */
 	async addUrl(url, coordinates) {
 		const image = await readUrl(url);
-		this.addImage(image, coordinates);
+		const id = this.addImage(image, coordinates);
+		return id;
 	}
 
 	/**
@@ -71,6 +73,8 @@ class ImageControl {
 		const raster = new Raster(image, position);
 		this.rasters[raster.id] = raster;
 		this.addRaster(raster);
+		this.map.fire('image.new', { id: raster.id });
+		return raster.id;
 	}
 
 	/**
@@ -91,7 +95,9 @@ class ImageControl {
 	selectRaster(id) {
 		if (!this.map) throw Error('map is undefined');
 		this.deselectRaster();
-		this.currentRaster = this.rasters[id];
+		const raster = this.rasters[id];
+		if (raster.locked) return;
+		this.currentRaster = raster;
 		this.map.addLayer(this.currentRaster.contourLayer);
 		this.buttonMove.disabled = false;
 		this.buttonScale.disabled = false;
@@ -197,6 +203,17 @@ class ImageControl {
 			if (!features.length) {
 				this.deselectRaster();
 			}
+		}
+	};
+
+	/**
+	 * @param {string} id
+	 * @param {boolean} isLocked
+	 */
+	setLock = (id, isLocked) => {
+		this.rasters[id].locked = isLocked;
+		if (this.currentRaster?.id === id && isLocked) {
+			this.deselectRaster();
 		}
 	};
 

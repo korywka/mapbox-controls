@@ -9,14 +9,14 @@
   },
   "dependencies": {
     "@mapbox-controls/helpers": "0.0.1",
-    "@turf/bearing": "7.0.0-alpha.0",
-    "@turf/centroid": "7.0.0-alpha.0",
-    "@turf/helpers": "7.0.0-alpha.0",
-    "@turf/rhumb-bearing": "7.0.0-alpha.0",
-    "@turf/rhumb-distance": "7.0.0-alpha.0",
-    "@turf/transform-rotate": "7.0.0-alpha.0",
-    "@turf/transform-scale": "7.0.0-alpha.0",
-    "@turf/transform-translate": "7.0.0-alpha.0"
+    "@turf/bearing": "7.0.0-alpha.2",
+    "@turf/centroid": "7.0.0-alpha.2",
+    "@turf/helpers": "7.0.0-alpha.2",
+    "@turf/rhumb-bearing": "7.0.0-alpha.2",
+    "@turf/rhumb-distance": "7.0.0-alpha.2",
+    "@turf/transform-rotate": "7.0.0-alpha.2",
+    "@turf/transform-scale": "7.0.0-alpha.2",
+    "@turf/transform-translate": "7.0.0-alpha.2"
   },
   "devDependencies": {
     "@types/geojson": "7946.0.10",

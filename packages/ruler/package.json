@@ -9,8 +9,8 @@
 	},
 	"dependencies": {
 		"@mapbox-controls/helpers": "0.0.1",
-		"@turf/distance": "7.0.0-alpha.0",
-		"@turf/helpers": "7.0.0-alpha.0"
+		"@turf/distance": "7.0.0-alpha.2",
+		"@turf/helpers": "7.0.0-alpha.2"
 	},
 	"devDependencies": {
 		"@types/geojson": "7946.0.10",

@@ -3341,7 +3341,10 @@
 
 	map.addControl(new TooltipControl({
 		layer: 'polygon-fill',
-		getContent: (event) => `TooltipControl example ${event.lngLat.lng.toFixed(6)}, ${event.lngLat.lat.toFixed(6)}`,
+		getContent: (event) => {
+			console.log('Tooltip for feature id:', event.features?.at(0).id);
+			return `TooltipControl example ${event.lngLat.lng.toFixed(6)}, ${event.lngLat.lat.toFixed(6)}`;
+		},
 	}));
 
 	const languageControl = new LanguageControl();

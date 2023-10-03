@@ -1,4 +1,4 @@
-# 🧭 @mapbox-controls/image
+# 🏙️ @mapbox-controls/image
 
 [<< all controls](/README.md)
 

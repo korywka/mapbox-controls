@@ -2,7 +2,7 @@
 
 # 💅 @mapbox-controls/styles
 
-![styles](https://github.com/korywka/mapbox-controls/assets/988471/3cc39282-68cb-4e2a-8665-49b24cea4a8e)
+![styles](https://github.com/korywka/mapbox-controls/assets/988471/18ac929f-06ff-4043-8b4b-258b876b9585)
 
 Control to change map style among provided.
 

@@ -1,6 +1,8 @@
+[<< all controls](/README.md)
+
 # 💅 @mapbox-controls/styles
 
-[<< all controls](/README.md)
+![styles](https://github.com/korywka/mapbox-controls/assets/988471/3cc39282-68cb-4e2a-8665-49b24cea4a8e)
 
 Control to change map style among provided.
 

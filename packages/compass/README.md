@@ -1,6 +1,8 @@
+[<< all controls](/README.md)
+
 # 🧭 @mapbox-controls/compass
 
-[<< all controls](/README.md)
+![compass](https://github.com/korywka/mapbox-controls/assets/988471/03647bed-7a93-430b-bd49-b4d0b878734d)
 
 Control to indicate map direction. Optionally, can be hidden if map bearing iz 0.
 

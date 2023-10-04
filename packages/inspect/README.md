@@ -1,6 +1,8 @@
+[<< all controls](/README.md)
+
 # 🐞 @mapbox-controls/inspect
 
-[<< all controls](/README.md)
+![inspect](https://github.com/korywka/mapbox-controls/assets/988471/51eaee3e-1f4d-4e9a-b177-fd36f8c5ece1)
 
 Control to debug map style layers and sources.
 

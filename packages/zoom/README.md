@@ -1,6 +1,8 @@
+[<< all controls](/README.md)
+
 # 🔍 @mapbox-controls/zoom
 
-[<< all controls](/README.md)
+![zoom](https://github.com/korywka/mapbox-controls/assets/988471/6f02cf18-765c-47c0-821c-5cb741d34972)
 
 Control to zoom in and zoom out map. The difference between the standard ones is that they are not combined with a compass control.
 

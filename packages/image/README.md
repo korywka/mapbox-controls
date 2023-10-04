@@ -48,23 +48,23 @@ Below is an example how to control image opacity by slider (full implementation 
 
 ```js
 map.on('image.select', ({ id }) => {
-	const rasterLayerId = image.rasters[id].rasterLayer.id;
-	const range = document.createElement('input');
-	range.style.position = 'absolute';
-	range.style.left = '50%';
-	range.style.transform = 'translateX(-50%)';
-	range.style.bottom = '16px';
-	range.type = 'range';
-	range.min = 0;
-	range.step = 0.05;
-	range.max = 1;
-	range.value = map.getPaintProperty(rasterLayerId, 'raster-opacity');
-	range.addEventListener('input', () => {
-		map.setPaintProperty(rasterLayerId, 'raster-opacity', Number(range.value));
-	});
-	document.body.appendChild(range);
-	map.once('image.deselect', () => {
-		document.body.removeChild(range);
-	});
+  const rasterLayerId = image.rasters[id].rasterLayer.id;
+  const range = document.createElement('input');
+  range.style.position = 'absolute';
+  range.style.left = '50%';
+  range.style.transform = 'translateX(-50%)';
+  range.style.bottom = '16px';
+  range.type = 'range';
+  range.min = 0;
+  range.step = 0.05;
+  range.max = 1;
+  range.value = map.getPaintProperty(rasterLayerId, 'raster-opacity');
+  range.addEventListener('input', () => {
+    map.setPaintProperty(rasterLayerId, 'raster-opacity', Number(range.value));
+  });
+  document.body.appendChild(range);
+  map.once('image.deselect', () => {
+    document.body.removeChild(range);
+  });
 });
 ```

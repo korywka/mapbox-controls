@@ -40,7 +40,7 @@ Measure distance between points on a map
 
 Change map style
 
-<img width="973" alt="image" src="https://github.com/korywka/mapbox-controls/assets/988471/8a13ece0-46c8-40f9-a854-8d47bd7d4156">
+<img width="1063" alt="image" src="https://github.com/korywka/mapbox-controls/assets/988471/9b5ec825-d40b-4eb0-b14a-fa176480a721">
 
 ## [🏷️ @mapbox-controls/tooltip](packages/tooltip)
 
@@ -52,6 +52,5 @@ Display tooltip on hover
 
 Zoom in and zoom out map
 
-<img width="935" alt="image" src="https://github.com/korywka/mapbox-controls/assets/988471/f20045d3-ea05-4694-bb76-85f8d850b5a9">
-
+<img width="1073" alt="image" src="https://github.com/korywka/mapbox-controls/assets/988471/4df4f8a2-fe66-41cc-bc1e-6fa7d2c6c999">
 

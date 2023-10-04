@@ -2,7 +2,7 @@
 
 # 📖 @mapbox-controls/language
 
-![language](https://github.com/korywka/mapbox-controls/assets/988471/b2984a79-73f0-43e2-96b3-782b4b9970dc)
+![](https://github.com/korywka/mapbox-controls/assets/988471/b2984a79-73f0-43e2-96b3-782b4b9970dc)
 
 Localize map or change dynamically language.
 

@@ -2,7 +2,7 @@
 
 # 📏 @mapbox-controls/ruler
 
-![ruler](https://github.com/korywka/mapbox-controls/assets/988471/1c90555c-2e22-4785-8365-14c1bacabb18)
+![](https://github.com/korywka/mapbox-controls/assets/988471/1c90555c-2e22-4785-8365-14c1bacabb18)
 
 Control to measure distance between points on a map.
 

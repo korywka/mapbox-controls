@@ -2,7 +2,7 @@
 
 # 🏙️ @mapbox-controls/image
 
-![image](https://github.com/korywka/mapbox-controls/assets/988471/9db0c22d-662a-43fb-90e6-1fbe4405dcc5)
+![](https://github.com/korywka/mapbox-controls/assets/988471/9db0c22d-662a-43fb-90e6-1fbe4405dcc5)
 
 Control to move, scale, rotate image (raster layer) on top of a map.
 Very handy to represent information from the raster to geojson, for example, the contours of buildings.

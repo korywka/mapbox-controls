@@ -1,6 +1,6 @@
 {
 	"name": "@mapbox-controls/language",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Change map language",
 	"type": "module",
 	"main": "./src/index.js",
@@ -9,7 +9,7 @@
 	},
 	"devDependencies": {
 		"@types/mapbox-gl": "2.7.13",
-		"mapbox-gl": "3.0.0-beta.1"
+		"mapbox-gl": "3.0.0-beta.3"
 	},
 	"peerDependencies": {
 		"mapbox-gl": ">=1.0.0 <4.0.0"

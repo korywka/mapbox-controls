@@ -2,7 +2,7 @@
 
 # 🏷️ @mapbox-controls/tooltip
 
-![tooltip](https://github.com/korywka/mapbox-controls/assets/988471/ac7b2ba3-352e-48e2-b1fa-79fc73c1b63c)
+![](https://github.com/korywka/mapbox-controls/assets/988471/ac7b2ba3-352e-48e2-b1fa-79fc73c1b63c)
 
 Control to display tooltip on hover. The content of the tooltip may depend on the data stored in the layer.
 

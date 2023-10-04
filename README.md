@@ -2,7 +2,7 @@
 
 Some handy controls for `mapbox-gl-js` structured as monorepo. [Example of all controls](https://korywka.github.io/mapbox-controls/preview/).
 
-<img width="1724" alt="image" src="https://github.com/korywka/mapbox-controls/assets/988471/84d96210-1b3c-4004-a456-4933ce34e118">
+<img width="1724" alt="" src="https://github.com/korywka/mapbox-controls/assets/988471/84d96210-1b3c-4004-a456-4933ce34e118">
 
 ## Controls list
 

@@ -24,15 +24,15 @@ importers:
   packages/compass:
     dependencies:
       '@mapbox-controls/helpers':
-        specifier: 1.0.1
-        version: 1.0.1(mapbox-gl@3.0.0-beta.3)
+        specifier: 1.1.0
+        version: link:../helpers
     devDependencies:
       '@types/mapbox-gl':
-        specifier: 2.7.13
-        version: 2.7.13
+        specifier: 2.7.19
+        version: 2.7.19
       mapbox-gl:
-        specifier: 3.0.0-beta.3
-        version: 3.0.0-beta.3
+        specifier: 3.0.1
+        version: 3.0.1
 
   packages/helpers:
     devDependencies:
@@ -226,6 +226,7 @@ packages:
     engines: {node: '>=6.9.0'}
     dependencies:
       regenerator-runtime: 0.14.0
+    dev: true
 
   /@eslint-community/eslint-utils@4.4.0(eslint@8.56.0):
     resolution: {integrity: sha512-1/sA4dwrzBAyeUoQ6oxahHKmrZvsnLCg4RfxW3ZFGGmQkSNQPFNLV9CUEFQP1x9EYXHTo5p6xdhZM1Ne9p/AfA==}
@@ -288,107 +289,6 @@ packages:
     resolution: {integrity: sha512-eF2rxCRulEKXHTRiDrDy6erMYWqNw4LPdQ8UQA4huuxaQsVeRPFl2oM8oDGxMFhJUWZf9McpLtJasDDZb/Bpeg==}
     dev: true
 
-  /@loaders.gl/3d-tiles@3.3.0(@loaders.gl/core@3.3.0):
-    resolution: {integrity: sha512-PNOMfXJ4VBcUF/477bGHqCp2oWH1ZQADTXR4x7g5GGHS/5SPAQibNr61H8uLGM0u3SCiePbrbNo1BQYhvomqLg==}
-    peerDependencies:
-      '@loaders.gl/core': ^3.2.0
-    dependencies:
-      '@loaders.gl/core': 3.3.0
-      '@loaders.gl/draco': 3.3.0
-      '@loaders.gl/gltf': 3.3.0
-      '@loaders.gl/loader-utils': 3.3.0
-      '@loaders.gl/math': 3.3.0
-      '@loaders.gl/tiles': 3.3.0(@loaders.gl/core@3.3.0)
-      '@math.gl/core': 3.6.3
-      '@math.gl/geospatial': 3.6.3
-
-  /@loaders.gl/core@3.3.0:
-    resolution: {integrity: sha512-tamOfDPZHcitV4YvZUV1GJQWzrxaeRyh1leSQU3EAgW56t+jqzwzZ5D9l28nllxCms1hYPcupCN97MXK0uel8A==}
-    dependencies:
-      '@babel/runtime': 7.22.11
-      '@loaders.gl/loader-utils': 3.3.0
-      '@loaders.gl/worker-utils': 3.3.0
-      '@probe.gl/log': 3.6.0
-
-  /@loaders.gl/draco@3.3.0:
-    resolution: {integrity: sha512-D2iKRTmZ+qnN0RMG5LDnDqgkMYI6HKIzUGGn5GK8B5xEdX3GaMTsohzD8QCuDbcZQsDoXQru/w9wLRTEWfeEJw==}
-    dependencies:
-      '@babel/runtime': 7.22.11
-      '@loaders.gl/loader-utils': 3.3.0
-      '@loaders.gl/schema': 3.3.0
-      '@loaders.gl/worker-utils': 3.3.0
-      draco3d: 1.5.5
-
-  /@loaders.gl/gltf@3.3.0:
-    resolution: {integrity: sha512-vJq/NBwQUAOOci+ZZP0dmVLYHapv9JRACEEh6sFaPOVrPalfqlRJeyX3+WEBZ97gBoYPzHKMhFbVGHf/jIo5tA==}
-    dependencies:
-      '@loaders.gl/draco': 3.3.0
-      '@loaders.gl/images': 3.3.0
-      '@loaders.gl/loader-utils': 3.3.0
-      '@loaders.gl/textures': 3.3.0
-      '@math.gl/core': 3.6.3
-
-  /@loaders.gl/images@3.3.0:
-    resolution: {integrity: sha512-XV3FbUn9o52To0AEPbk9LMM0r5gsMh7b4Sz36xx8EtTHQhd70XeUL0MygUsjGMsiEqYFuI7LtK/7DN4Be7r8Ng==}
-    dependencies:
-      '@loaders.gl/loader-utils': 3.3.0
-
-  /@loaders.gl/loader-utils@3.3.0:
-    resolution: {integrity: sha512-zTZA7HcmI3AN1U9sAmlvVQSjhKrPIBYfGY6jJWc+sT8dvlkLbZHfEhUi2miAGnwl1CN3VI9DsfCwtli1mdhSrw==}
-    dependencies:
-      '@babel/runtime': 7.22.11
-      '@loaders.gl/worker-utils': 3.3.0
-      '@probe.gl/stats': 3.6.0
-
-  /@loaders.gl/math@3.3.0:
-    resolution: {integrity: sha512-asutxFDWDnqtY8XjJuaSImlrVmCA65jRd7V7vkoywskSuN2OWz3rwIJZ9qlJSEUsbr8vphMFwBGsbA5x7KN1vQ==}
-    dependencies:
-      '@loaders.gl/images': 3.3.0
-      '@loaders.gl/loader-utils': 3.3.0
-      '@math.gl/core': 3.6.3
-
-  /@loaders.gl/schema@3.3.0:
-    resolution: {integrity: sha512-jO1FPF6jOqAyKY9hUBF9lz2dI/jULpPXmkFoiVddrmkqOPczxUIXbKvQEr3I6eOWQqaoxuh4e9ogK26eBuvvag==}
-    dependencies:
-      '@types/geojson': 7946.0.13
-
-  /@loaders.gl/textures@3.3.0:
-    resolution: {integrity: sha512-4odc+4Jc0JZD4CcjYR5qKp08yTm59h1BASfEiVhTcVFRc0ScdSHJC8VqVClQ5ajmSjsqf3zZqlpBx01+YQ+zBQ==}
-    dependencies:
-      '@loaders.gl/images': 3.3.0
-      '@loaders.gl/loader-utils': 3.3.0
-      '@loaders.gl/schema': 3.3.0
-      '@loaders.gl/worker-utils': 3.3.0
-      ktx-parse: 0.0.4
-      texture-compressor: 1.0.2
-
-  /@loaders.gl/tiles@3.3.0(@loaders.gl/core@3.3.0):
-    resolution: {integrity: sha512-G2mIZtp0Q+ucZ4PNNMxFBtDP5O5H24iMURvIwlhOk/CSFZ1rRRr2xxnLySRKFgvv5+H1Qka0XNgov2AFgX0Fvw==}
-    peerDependencies:
-      '@loaders.gl/core': ^3.2.0
-    dependencies:
-      '@loaders.gl/core': 3.3.0
-      '@loaders.gl/loader-utils': 3.3.0
-      '@loaders.gl/math': 3.3.0
-      '@math.gl/core': 3.6.3
-      '@math.gl/culling': 3.6.3
-      '@math.gl/geospatial': 3.6.3
-      '@math.gl/web-mercator': 3.6.3
-      '@probe.gl/stats': 3.6.0
-
-  /@loaders.gl/worker-utils@3.3.0:
-    resolution: {integrity: sha512-S9/9Gk6czazo4Jv1WixURCWfA7qTnZsDo2ECnmF4nAFid5NSAmg28X3CT3gWE900iFLXSNo/SfuVl6GXuA6NxQ==}
-    dependencies:
-      '@babel/runtime': 7.22.11
-
-  /@mapbox-controls/helpers@1.0.1(mapbox-gl@3.0.0-beta.3):
-    resolution: {integrity: sha512-xMTl7vaUYuaMiaVu6z8D4wTEjWD6OLZ3l7MFDN2Yp2MM8MUw1v33TmfQckZXwFR8m9g2Rm9ME+zvXlvDEF88QA==}
-    peerDependencies:
-      mapbox-gl: '>=1.0.0 <4.0.0'
-    dependencies:
-      mapbox-gl: 3.0.0-beta.3
-    dev: false
-
   /@mapbox/geojson-rewind@0.5.2:
     resolution: {integrity: sha512-tJaT+RbYGJYStt7wI3cq4Nl4SXxG8W7JDG5DMJu97V25RnbNg3QtQtf+KD+VLjNpWKYsRvXDNmNrBgEETr1ifA==}
     hasBin: true
@@ -421,36 +321,6 @@ packages:
     resolution: {integrity: sha512-Es6WcD0nO5l+2BOQS4uLfNPYQaNDfbot3X1XUoloz+x0mPDS3eeORZJl06HXjwBG1fOGwCRnzK88LMdxKRrd6Q==}
     engines: {node: '>=6.0.0'}
 
-  /@math.gl/core@3.6.3:
-    resolution: {integrity: sha512-jBABmDkj5uuuE0dTDmwwss7Cup5ZwQ6Qb7h1pgvtkEutTrhkcv8SuItQNXmF45494yIHeoGue08NlyeY6wxq2A==}
-    dependencies:
-      '@babel/runtime': 7.22.11
-      '@math.gl/types': 3.6.3
-      gl-matrix: 3.4.3
-
-  /@math.gl/culling@3.6.3:
-    resolution: {integrity: sha512-3UERXHbaPlM6pnTk2MI7LeQ5CoelDZzDzghTTcv+HdQCZsT/EOEuEdYimETHtSxiyiOmsX2Un65UBLYT/rbKZg==}
-    dependencies:
-      '@babel/runtime': 7.22.11
-      '@math.gl/core': 3.6.3
-      gl-matrix: 3.4.3
-
-  /@math.gl/geospatial@3.6.3:
-    resolution: {integrity: sha512-6xf657lJnaecSarSzn02t0cnsCSkWb+39m4+im96v20dZTrLCWZ2glDQVzfuL91meDnDXjH4oyvynp12Mj5MFg==}
-    dependencies:
-      '@babel/runtime': 7.22.11
-      '@math.gl/core': 3.6.3
-      gl-matrix: 3.4.3
-
-  /@math.gl/types@3.6.3:
-    resolution: {integrity: sha512-3uWLVXHY3jQxsXCr/UCNPSc2BG0hNUljhmOBt9l+lNFDp7zHgm0cK2Tw4kj2XfkJy4TgwZTBGwRDQgWEbLbdTA==}
-
-  /@math.gl/web-mercator@3.6.3:
-    resolution: {integrity: sha512-UVrkSOs02YLehKaehrxhAejYMurehIHPfFQvPFZmdJHglHOU4V2cCUApTVEwOksvCp161ypEqVp+9H6mGhTTcw==}
-    dependencies:
-      '@babel/runtime': 7.22.11
-      gl-matrix: 3.4.3
-
   /@nodelib/fs.scandir@2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
     engines: {node: '>= 8'}
@@ -471,22 +341,6 @@ packages:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.15.0
     dev: true
-
-  /@probe.gl/env@3.6.0:
-    resolution: {integrity: sha512-4tTZYUg/8BICC3Yyb9rOeoKeijKbZHRXBEKObrfPmX4sQmYB15ZOUpoVBhAyJkOYVAM8EkPci6Uw5dLCwx2BEQ==}
-    dependencies:
-      '@babel/runtime': 7.22.11
-
-  /@probe.gl/log@3.6.0:
-    resolution: {integrity: sha512-hjpyenpEvOdowgZ1qMeCJxfRD4JkKdlXz0RC14m42Un62NtOT+GpWyKA4LssT0+xyLULCByRAtG2fzZorpIAcA==}
-    dependencies:
-      '@babel/runtime': 7.22.11
-      '@probe.gl/env': 3.6.0
-
-  /@probe.gl/stats@3.6.0:
-    resolution: {integrity: sha512-JdALQXB44OP4kUBN/UrQgzbJe4qokbVF4Y8lkIA8iVCFnjVowWIgkD/z/0QO65yELT54tTrtepw1jScjKB+rhQ==}
-    dependencies:
-      '@babel/runtime': 7.22.11
 
   /@rollup/plugin-commonjs@25.0.7(rollup@4.9.1):
     resolution: {integrity: sha512-nEvcR+LRjEjsaSsc4x3XZfCCvZIaSMenZu/OiwOKGN2UhQpAYI7ru7czFvyWbErlpoGjnSX3D5Ch5FcMA3kRWQ==}
@@ -775,23 +629,14 @@ packages:
     resolution: {integrity: sha512-LG4opVs2ANWZ1TJoKc937iMmNstM/d0ae1vNbnBvBhqCSezgVUOzcLCqbI5elV8Vy6WKwKjaqR+zO9VKirBBCA==}
     dev: true
 
-  /@types/geojson@7946.0.10:
-    resolution: {integrity: sha512-Nmh0K3iWQJzniTuPRcJn5hxXkfB1T1pgB89SBig5PlJQU5yocazeu4jATJlaA0GYFKWMqDdvYemoSnF2pXgLVA==}
-    dev: true
-
   /@types/geojson@7946.0.13:
     resolution: {integrity: sha512-bmrNrgKMOhM3WsafmbGmC+6dsF2Z308vLFsQ3a/bT8X8Sv5clVYpPars/UPq+sAaJP+5OoLAYgwbkS5QEJdLUQ==}
+    dev: true
 
   /@types/mapbox-gl@2.7.10:
     resolution: {integrity: sha512-nMVEcu9bAcenvx6oPWubQSPevsekByjOfKjlkr+8P91vawtkxTnopDoXXq1Qn/f4cg3zt0Z2W9DVsVsKRNXJTw==}
     dependencies:
       '@types/geojson': 7946.0.13
-    dev: true
-
-  /@types/mapbox-gl@2.7.13:
-    resolution: {integrity: sha512-qNffhTdYkeFl8QG9Q1zPPJmcs8PvHgmLa1PcwP1rxvcfMsIgcFr/FnrCttG0ZnH7Kzdd7xfECSRNTWSr4jC3PQ==}
-    dependencies:
-      '@types/geojson': 7946.0.10
     dev: true
 
   /@types/mapbox-gl@2.7.19:
@@ -887,11 +732,6 @@ packages:
   /arg@5.0.2:
     resolution: {integrity: sha512-PYjyFOLKQ9y57JvQ6QLo8dAgNqswh8M1RMJYdQduT6xbWSgK36P/Z/v+p888pM69jMMfS8Xd8F6I1kQ/I9HUGg==}
     dev: true
-
-  /argparse@1.0.10:
-    resolution: {integrity: sha512-o5Roy6tNG4SL/FOkCAN6RzjiakZS25RLYFrcMttJqbdd8BWrnA+fGz57iN5Pb06pvBGvl5gQ0B48dJlslXvoTg==}
-    dependencies:
-      sprintf-js: 1.0.3
 
   /argparse@2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
@@ -1118,9 +958,6 @@ packages:
     dependencies:
       esutils: 2.0.3
     dev: true
-
-  /draco3d@1.5.5:
-    resolution: {integrity: sha512-JVuNV0EJzD3LBYhGyIXJLeBID/EVtmFO1ZNhAYflTgiMiAJlbhXQmRRda/azjc8MRVMHh0gqGhiqHUo5dIXM8Q==}
 
   /earcut@2.2.4:
     resolution: {integrity: sha512-/pjZsA1b4RPHbeWZQn66SWS8nZZWLQQ23oE3Eam7aroEFGEvwKAsJfZ9ytiEMycfzXWpca4FA9QIOehf7PocBQ==}
@@ -1418,11 +1255,6 @@ packages:
     engines: {node: '>= 4'}
     dev: true
 
-  /image-size@0.7.5:
-    resolution: {integrity: sha512-Hiyv+mXHfFEP7LzUL/llg9RwFxxY+o9N3JVLIeG5E7iFIFAalxvRU9UZthBdYDEVnzHMgjnKJPPpay5BWf1g9g==}
-    engines: {node: '>=6.9.0'}
-    hasBin: true
-
   /import-fresh@3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
     engines: {node: '>=6'}
@@ -1555,9 +1387,6 @@ packages:
       json-buffer: 3.0.1
     dev: true
 
-  /ktx-parse@0.0.4:
-    resolution: {integrity: sha512-LY3nrmfXl+wZZdPxgJ3ZmLvG+wkOZZP3/dr4RbQj1Pk3Qwz44esOOSFFVQJcNWpXAtiNIC66WgXufX/SYgYz6A==}
-
   /levn@0.4.1:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
@@ -1587,36 +1416,6 @@ packages:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
-
-  /mapbox-gl@3.0.0-beta.3:
-    resolution: {integrity: sha512-Cnw1jAK8qNrW7ZLuSBMaS7hyy0cIvHXZHgdrfHGXR72bwrVEHmolc/2g+jMj5evCoojGyNb/YLVtyVulZ0TOXQ==}
-    dependencies:
-      '@loaders.gl/3d-tiles': 3.3.0(@loaders.gl/core@3.3.0)
-      '@loaders.gl/core': 3.3.0
-      '@loaders.gl/gltf': 3.3.0
-      '@mapbox/geojson-rewind': 0.5.2
-      '@mapbox/jsonlint-lines-primitives': 2.0.2
-      '@mapbox/mapbox-gl-supported': 2.0.1
-      '@mapbox/point-geometry': 0.1.0
-      '@mapbox/tiny-sdf': 2.0.6
-      '@mapbox/unitbezier': 0.0.1
-      '@mapbox/vector-tile': 1.3.1
-      '@mapbox/whoots-js': 3.1.0
-      cheap-ruler: 3.0.2
-      csscolorparser: 1.0.3
-      earcut: 2.2.4
-      geojson-vt: 3.2.1
-      gl-matrix: 3.4.3
-      grid-index: 1.1.0
-      kdbush: 4.0.2
-      murmurhash-js: 1.0.0
-      pbf: 3.2.1
-      potpack: 2.0.0
-      quickselect: 2.0.0
-      rw: 1.3.3
-      supercluster: 8.0.1
-      tinyqueue: 2.0.3
-      vt-pbf: 3.1.3
 
   /mapbox-gl@3.0.1:
     resolution: {integrity: sha512-o7C6sAlj6Hkdd4xQVEgQflgJYNYyZOAtYahhIOb9m8chI8umtWcCp8Ie0iGLYJvce1WHRMa3WGzs69ggwuWlDA==}
@@ -1861,6 +1660,7 @@ packages:
 
   /regenerator-runtime@0.14.0:
     resolution: {integrity: sha512-srw17NI0TUWHuGa5CFGGmhfNIeja30WMBfbslPNhf6JrqQlLN5gcrvig1oqPxiVaXb0oW0XRKtH6Nngs5lKCIA==}
+    dev: true
 
   /registry-auth-token@3.3.2:
     resolution: {integrity: sha512-JL39c60XlzCVgNrO+qq68FoNb56w/m7JYvGR2jT5iR1xBrUA3Mfx5Twk5rqTThPmQKMWydGmq8oFtDlxfrmxnQ==}
@@ -2028,9 +1828,6 @@ packages:
     resolution: {integrity: sha512-zC8zGoGkmc8J9ndvml8Xksr1Amk9qBujgbF0JAIWO7kXr43w0h/0GJNM/Vustixu+YE8N/MTrQ7N31FvHUACxQ==}
     dev: true
 
-  /sprintf-js@1.0.3:
-    resolution: {integrity: sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g==}
-
   /string-width@4.2.3:
     resolution: {integrity: sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==}
     engines: {node: '>=8'}
@@ -2105,13 +1902,6 @@ packages:
   /text-table@0.2.0:
     resolution: {integrity: sha512-N+8UisAXDGk8PFXP4HAzVR9nbfmVJ3zYLAWiTIoqC5v5isinhr+r5uaO8+7r3BMfuNIufIsA7RdpVgacC2cSpw==}
     dev: true
-
-  /texture-compressor@1.0.2:
-    resolution: {integrity: sha512-dStVgoaQ11mA5htJ+RzZ51ZxIZqNOgWKAIvtjLrW1AliQQLCmrDqNzQZ8Jh91YealQ95DXt4MEduLzJmbs6lig==}
-    hasBin: true
-    dependencies:
-      argparse: 1.0.10
-      image-size: 0.7.5
 
   /tinyqueue@2.0.3:
     resolution: {integrity: sha512-ppJZNDuKGgxzkHihX8v9v9G5f+18gzaTfrukGrq6ueg0lmH4nqVnA2IPG0AEH3jKEk2GRJCUhDoqpoiw3PHLBA==}

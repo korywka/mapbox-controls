@@ -1,40 +1,40 @@
 {
-  "name": "@mapbox-controls/image",
-  "version": "1.0.1",
-  "description": "Move, scale and rotate image on a map",
-  "type": "module",
-  "main": "./src/index.js",
-  "scripts": {
-    "build": "tsc"
-  },
-  "dependencies": {
-    "@mapbox-controls/helpers": "1.0.1",
-    "@turf/bearing": "7.0.0-alpha.2",
-    "@turf/centroid": "7.0.0-alpha.2",
-    "@turf/helpers": "7.0.0-alpha.2",
-    "@turf/rhumb-bearing": "7.0.0-alpha.2",
-    "@turf/rhumb-distance": "7.0.0-alpha.2",
-    "@turf/transform-rotate": "7.0.0-alpha.2",
-    "@turf/transform-scale": "7.0.0-alpha.2",
-    "@turf/transform-translate": "7.0.0-alpha.2"
-  },
-  "devDependencies": {
-    "@types/geojson": "7946.0.10",
-    "@types/mapbox-gl": "2.7.13",
-    "mapbox-gl": "3.0.0-beta.3"
-  },
-  "peerDependencies": {
-    "mapbox-gl": ">=1.0.0 <4.0.0"
-  },
-  "types": "./types/index.d.ts",
-  "files": [
-    "src",
-    "types"
-  ],
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
-  "repository": "korywka/mapbox-controls",
-  "license": "MIT"
+	"name": "@mapbox-controls/image",
+	"version": "1.1.0",
+	"description": "Move, scale and rotate image on a map",
+	"type": "module",
+	"main": "./src/index.js",
+	"scripts": {
+		"build": "tsc"
+	},
+	"dependencies": {
+		"@mapbox-controls/helpers": "1.1.0",
+		"@turf/bearing": "7.0.0-alpha.2",
+		"@turf/centroid": "7.0.0-alpha.2",
+		"@turf/helpers": "7.0.0-alpha.2",
+		"@turf/rhumb-bearing": "7.0.0-alpha.2",
+		"@turf/rhumb-distance": "7.0.0-alpha.2",
+		"@turf/transform-rotate": "7.0.0-alpha.2",
+		"@turf/transform-scale": "7.0.0-alpha.2",
+		"@turf/transform-translate": "7.0.0-alpha.2"
+	},
+	"devDependencies": {
+		"@types/geojson": "7946.0.13",
+		"@types/mapbox-gl": "2.7.19",
+		"mapbox-gl": "3.0.1"
+	},
+	"peerDependencies": {
+		"mapbox-gl": ">=1.0.0 <4.0.0"
+	},
+	"types": "./types/index.d.ts",
+	"files": [
+		"src",
+		"types"
+	],
+	"publishConfig": {
+		"access": "public",
+		"registry": "https://registry.npmjs.org/"
+	},
+	"repository": "korywka/mapbox-controls",
+	"license": "MIT"
 }

@@ -8,14 +8,14 @@
 		"build": "tsc"
 	},
 	"dependencies": {
-		"@mapbox-controls/helpers": "1.0.1",
+		"@mapbox-controls/helpers": "1.1.0",
 		"@turf/distance": "7.0.0-alpha.2",
 		"@turf/helpers": "7.0.0-alpha.2"
 	},
 	"devDependencies": {
-		"@types/geojson": "7946.0.10",
-		"@types/mapbox-gl": "2.7.13",
-		"mapbox-gl": "3.0.0-beta.3"
+		"@types/geojson": "7946.0.13",
+		"@types/mapbox-gl": "2.7.19",
+		"mapbox-gl": "3.0.1"
 	},
 	"peerDependencies": {
 		"mapbox-gl": ">=1.0.0 <4.0.0"

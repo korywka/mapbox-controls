@@ -75,8 +75,10 @@ map.addControl(new RulerControl(), 'bottom-right');
 map.on('ruler.on', () => console.log('Ruler activated'));
 map.on('ruler.off', () => console.log('Ruler deactivated'));
 
-const image = new ImageControl();
+const image = new ImageControl({ removeButton: true });
 map.addControl(image, 'bottom-right');
+map.on('image.add', ({ id }) => console.log(`Added image ${id}`));
+map.on('image.remove', ({ id }) => console.log(`Removed image ${id}`));
 map.on('image.select', ({ id }) => console.log(`Selected image ${id}`));
 map.on('image.deselect', ({ id }) => console.log(`Deselected image ${id}`));
 map.on('image.update', ({ coordinates }) => console.log('Updated position:', coordinates));

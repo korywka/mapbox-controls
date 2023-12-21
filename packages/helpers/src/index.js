@@ -15,6 +15,7 @@ export function controlContainer(className) {
  * @param {Node=} options.icon
  * @param {string=} options.textContent
  * @param {boolean=} options.disabled
+ * @param {boolean=} options.hidden
  * @param {string=} options.className
  * @param {() => void=} options.onClick
  */
@@ -32,6 +33,9 @@ export function controlButton(options = {}) {
 	}
 	if (options.disabled) {
 		button.disabled = true;
+	}
+	if (options.hidden) {
+		button.hidden = true;
 	}
 	if (options.className) {
 		button.classList.add(options.className);

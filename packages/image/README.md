@@ -19,6 +19,14 @@ const imageControl = new ImageControl();
 map.addControl(imageControl, 'bottom-right');
 ```
 
+## Options
+
+```ts
+export type ImageControlOptions = {
+  removeButton?: boolean;
+};
+```
+
 ## Events
 
 | event          | description                |
@@ -27,7 +35,8 @@ map.addControl(imageControl, 'bottom-right');
 | image.deselect | image was deselected       |
 | image.mode     | transform mode was changed |
 | image.update   | position was updated       |
-| image.new      | new image added            |
+| image.add      | new image added            |
+| image.remove   | image removed              |
 
 ## Methods
 
@@ -36,6 +45,7 @@ Methods are useful for programmatic control (when option `invisible` is `true`):
 - `addFile(file: File, coordinates?: [number, number][] | undefined): Promise<string>;` - add new image by file. raster id is returned
 - `addUrl(url: string, coordinates?: [number, number][] | undefined): Promise<string>;` - add new image by url. raster id is returned
 - `setLock: (id: string, isLocked: boolean) => void;` - lock or unlock image. locked image can't be selected
+- `removeRaster: () => void;` - removes selected raster from the map
 
 If image was added without `coordinates` parameter, the image is scaled down to be fully visible and placed at the center of the viewport.
 

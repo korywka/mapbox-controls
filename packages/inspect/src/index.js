@@ -4,9 +4,9 @@ import { popup } from './popup.js';
 
 /**
  * @typedef {{
-* 	console?: boolean
-* }} InspectControlOptions
-*/
+ * 	console?: boolean
+ * }} InspectControlOptions
+ */
 
 export default class InspectControl {
 	/** @param {InspectControlOptions} options */

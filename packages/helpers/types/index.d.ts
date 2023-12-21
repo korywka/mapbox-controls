@@ -4,6 +4,7 @@ export function controlButton(options?: {
     icon?: Node | undefined;
     textContent?: string | undefined;
     disabled?: boolean | undefined;
+    hidden?: boolean | undefined;
     className?: string | undefined;
     onClick?: (() => void) | undefined;
 }): HTMLButtonElement;

@@ -1,11 +1,16 @@
 export default ImageControl;
+export type ImageControlOptions = {
+    removeButton?: boolean;
+};
 declare class ImageControl {
+    constructor(options?: ImageControlOptions);
     container: HTMLDivElement;
     fileInput: HTMLInputElement;
     buttonAdd: HTMLButtonElement;
     buttonMove: HTMLButtonElement;
     buttonScale: HTMLButtonElement;
     buttonRotate: HTMLButtonElement;
+    buttonRemove: HTMLButtonElement | undefined;
     rasters: Record<string, Raster>;
     currentRaster: Raster | null;
     currentMode: Move | Scale | Rotate | null;
@@ -13,6 +18,7 @@ declare class ImageControl {
     addUrl(url: string, coordinates?: [number, number][] | undefined): Promise<string>;
     addImage(image: HTMLImageElement, coordinates?: [number, number][] | undefined): Promise<string>;
     addRaster(raster: Raster): void;
+    removeRaster(): void;
     selectRaster(id: string): void;
     deselectRaster(): void;
     setMode(mode: 'move' | 'scale' | 'rotate' | null): void;

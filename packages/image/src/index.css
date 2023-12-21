@@ -6,6 +6,10 @@
 	cursor: pointer;
 }
 
+.mapbox-ctrl-image button[hidden] {
+	display: none;
+}
+
 .mapbox-ctrl-image button.-active {
 	color: #4264fb;
 }

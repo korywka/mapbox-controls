@@ -54,7 +54,7 @@ Other methods may help to use this control without buttons, these methods are de
 ## Change paint properties
 
 Paint properties can be changed dynamically.
-Below is an example how to control image opacity by slider (full implementation is available in [preview](../../preview/preview.js)).
+Below is an example how to control image opacity by slider (full implementation is available in [preview](/preview/preview.js)).
 
 ```js
 map.on('image.select', ({ id }) => {

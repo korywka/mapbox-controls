@@ -8,7 +8,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@mapbox-controls/helpers": "1.1.0",
+    "@mapbox-controls/helpers": "1.2.0",
     "@turf/distance": "7.0.0-alpha.2",
     "@turf/helpers": "7.0.0-alpha.2"
   },

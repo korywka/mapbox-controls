@@ -8,7 +8,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@mapbox-controls/helpers": "1.1.0"
+    "@mapbox-controls/helpers": "1.2.0"
   },
   "devDependencies": {
     "@types/mapbox-gl": "3.1.0",

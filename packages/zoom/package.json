@@ -1,6 +1,6 @@
 {
   "name": "@mapbox-controls/zoom",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Zoom in and zoom out map",
   "type": "module",
   "main": "./src/index.js",

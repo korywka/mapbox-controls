@@ -1,6 +1,6 @@
 {
   "name": "@mapbox-controls/ruler",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Measure distance between points on a map",
   "type": "module",
   "main": "./src/index.js",
@@ -21,10 +21,7 @@
     "mapbox-gl": ">=1.0.0 <4.0.0"
   },
   "types": "./types/index.d.ts",
-  "files": [
-    "src",
-    "types"
-  ],
+  "files": ["src", "types"],
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"

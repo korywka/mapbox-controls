@@ -24,7 +24,7 @@ importers:
   packages/compass:
     dependencies:
       '@mapbox-controls/helpers':
-        specifier: 1.1.0
+        specifier: 1.2.0
         version: link:../helpers
     devDependencies:
       '@types/mapbox-gl':
@@ -49,7 +49,7 @@ importers:
   packages/image:
     dependencies:
       '@mapbox-controls/helpers':
-        specifier: 1.1.0
+        specifier: 1.2.0
         version: link:../helpers
       '@turf/bearing':
         specifier: 7.0.0-alpha.2
@@ -89,7 +89,7 @@ importers:
   packages/inspect:
     dependencies:
       '@mapbox-controls/helpers':
-        specifier: 1.1.0
+        specifier: 1.2.0
         version: link:../helpers
     devDependencies:
       '@types/mapbox-gl':
@@ -111,7 +111,7 @@ importers:
   packages/ruler:
     dependencies:
       '@mapbox-controls/helpers':
-        specifier: 1.1.0
+        specifier: 1.2.0
         version: link:../helpers
       '@turf/distance':
         specifier: 7.0.0-alpha.2
@@ -133,7 +133,7 @@ importers:
   packages/styles:
     dependencies:
       '@mapbox-controls/helpers':
-        specifier: 1.1.0
+        specifier: 1.2.0
         version: link:../helpers
     devDependencies:
       '@types/mapbox-gl':
@@ -155,7 +155,7 @@ importers:
   packages/zoom:
     dependencies:
       '@mapbox-controls/helpers':
-        specifier: 1.1.0
+        specifier: 1.2.0
         version: link:../helpers
     devDependencies:
       '@types/mapbox-gl':

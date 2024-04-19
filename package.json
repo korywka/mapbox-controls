@@ -1,13 +1,14 @@
 {
-	"name": "mapbox-gl-controls",
-	"private": true,
-	"scripts": {
-		"lint": "eslint packages/**/src/*.js"
-	},
-	"devDependencies": {
-		"eslint": "8.56.0",
-		"eslint-config-ecmascript": "2.6.0",
-		"pnpm": "8.12.1",
-		"typescript": "5.3.3"
-	}
+  "name": "mapbox-gl-controls",
+  "private": true,
+  "scripts": {
+    "lint": "eslint packages/**/src/*.js",
+    "publish": "pnpm -r publish"
+  },
+  "devDependencies": {
+    "eslint": "8.56.0",
+    "eslint-config-ecmascript": "2.6.0",
+    "pnpm": "8.12.1",
+    "typescript": "5.3.3"
+  }
 }

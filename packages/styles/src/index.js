@@ -101,7 +101,6 @@ export default class StylesControl {
 		this.map.on('styledata', () => {
 			if (!this.map) throw Error('map is undefined');
 			const styleName = this.map.getStyle().name;
-			if (!styleName) throw Error('style must have name');
 			select.value = styleName;
 		});
 	}

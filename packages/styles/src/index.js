@@ -17,13 +17,13 @@ import { icons } from './icons.js';
 
 const defaults = [
 	{
-		label: 'Streets',
-		styleName: 'Mapbox Streets',
-		styleUrl: 'mapbox://styles/mapbox/streets-v12',
+		label: 'Standard',
+		styleName: 'Mapbox Standard',
+		styleUrl: 'mapbox://styles/mapbox/standard',
 	}, {
 		label: 'Satellite',
 		styleName: 'Mapbox Satellite Streets',
-		styleUrl: 'mapbox://sprites/mapbox/satellite-streets-v12',
+		styleUrl: 'mapbox://styles/mapbox/satellite-streets-v12',
 	},
 ];
 
@@ -36,10 +36,27 @@ export default class StylesControl {
 	}
 
 	/** @param {string} name */
-	findStyleByName(name) {
+	findStyle(name) {
 		const style = this.options.styles.find((s) => s.styleName === name);
 		if (!style) throw Error(`can't find style with name ${name}`);
 		return style;
+	}
+
+	getCurrentStyleName() {
+		if (!this.map) throw Error('map is undefined');
+		/** @type {string} */
+		let name;
+		/** @type {any} mapbox standard style doesn't return JSON Style object */
+		const style = this.map.getStyle();
+		if (Array.isArray(style.imports) && style.imports.length) {
+			// mapbox standard style
+			name = style.imports[0].data.name;
+		} else {
+			// classic style
+			name = style.name;
+		}
+		if (!name) throw Error('style must have name');
+		return name;
 	}
 
 	expanded() {
@@ -67,9 +84,8 @@ export default class StylesControl {
 				button.classList.remove('-active');
 			});
 			const styleNames = this.options.styles.map((style) => style.styleName);
-			const styleName = this.map.getStyle().name;
-			if (!styleName) throw Error('style must have name');
-			const currentStyleIndex = styleNames.indexOf(styleName);
+			const currentStyleName = this.getCurrentStyleName();
+			const currentStyleIndex = styleNames.indexOf(currentStyleName);
 			if (currentStyleIndex !== -1) {
 				const currentButton = buttons[currentStyleIndex];
 				currentButton.classList.add('-active');
@@ -93,16 +109,13 @@ export default class StylesControl {
 
 		select.addEventListener('change', () => {
 			if (!this.map) throw Error('map is undefined');
-			const style = this.findStyleByName(select.value);
+			const style = this.findStyle(select.value);
 			this.map.setStyle(style.styleUrl);
 			if (this.options.onChange) this.options.onChange(style);
 		});
 
 		this.map.on('styledata', () => {
-			if (!this.map) throw Error('map is undefined');
-			const styleName = this.map.getStyle().name;
-			if (!styleName) throw Error('style must have name');
-			select.value = styleName;
+			select.value = this.getCurrentStyleName();
 		});
 	}
 

@@ -1,31 +1,28 @@
 {
-	"name": "@mapbox-controls/compass",
-	"version": "1.1.0",
-	"description": "Indicate map direction",
-	"type": "module",
-	"main": "./src/index.js",
-	"scripts": {
-		"build": "tsc"
-	},
-	"dependencies": {
-		"@mapbox-controls/helpers": "1.1.0"
-	},
-	"devDependencies": {
-		"@types/mapbox-gl": "2.7.19",
-		"mapbox-gl": "3.0.1"
-	},
-	"peerDependencies": {
-		"mapbox-gl": ">=1.0.0 <4.0.0"
-	},
-	"types": "./types/index.d.ts",
-	"files": [
-		"src",
-		"types"
-	],
-	"publishConfig": {
-		"access": "public",
-		"registry": "https://registry.npmjs.org/"
-	},
-	"repository": "korywka/mapbox-controls",
-	"license": "MIT"
+  "name": "@mapbox-controls/compass",
+  "version": "1.1.0",
+  "description": "Indicate map direction",
+  "type": "module",
+  "main": "./src/index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@mapbox-controls/helpers": "1.1.0"
+  },
+  "devDependencies": {
+    "@types/mapbox-gl": "3.1.0",
+    "mapbox-gl": "3.3.0"
+  },
+  "peerDependencies": {
+    "mapbox-gl": ">=1.0.0 <4.0.0"
+  },
+  "types": "./types/index.d.ts",
+  "files": ["src", "types"],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": "korywka/mapbox-controls",
+  "license": "MIT"
 }

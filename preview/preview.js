@@ -45,7 +45,7 @@ const polygon = {
 const map = new mapboxgl.Map({
 	accessToken: 'pk.eyJ1Ijoia29yeXdrYSIsImEiOiJja2p1ajdlOWozMnF2MzBtajRvOTVzZDRpIn0.nnlX7TDuZ3zuGkZGr_oA3A',
 	container: 'map',
-	style: 'mapbox://styles/mapbox/streets-v12',
+	style: 'mapbox://styles/mapbox/standard',
 	zoom: 14,
 	center: [30.5234, 50.4501],
 });

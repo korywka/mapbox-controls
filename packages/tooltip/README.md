@@ -25,6 +25,6 @@ map.addControl(new TooltipControl({
 ```ts
 export type TooltipControlOptions = {
   getContent: (event: MapLayerMouseEvent) => string;
-  layer?: string | undefined;
+  layer?: string;
 };
 ```

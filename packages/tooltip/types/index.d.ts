@@ -3,7 +3,7 @@ export type MapLayerMouseEvent = import('mapbox-gl').MapLayerMouseEvent;
 export type MapLayerEventType = import('mapbox-gl').MapLayerEventType;
 export type TooltipControlOptions = {
     getContent: (event: MapLayerMouseEvent) => string;
-    layer?: string | undefined;
+    layer?: string;
 };
 declare class TooltipControl {
     constructor(options: TooltipControlOptions);

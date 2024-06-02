@@ -30,10 +30,10 @@ languageControl.setLanguage(event.target.value);
 
 ```ts
 export type LanguageControlOptions = {
-  supportedLanguages?: string[] | undefined;
-  language?: string | undefined;
-  getLanguageKey?: ((language: string) => string) | undefined;
-  excludedLayerIds?: string[] | undefined;
+  supportedLanguages?: string[];
+  language?: string;
+  getLanguageKey?: (language: string) => string;
+  excludedLayerIds?: string[];
 };
 ```
 

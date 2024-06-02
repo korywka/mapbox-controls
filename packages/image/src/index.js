@@ -13,7 +13,6 @@ import { icons } from './icons.js';
  * }} ImageControlOptions
  */
 
-
 class ImageControl {
 	/** @param {ImageControlOptions} options */
 	constructor(options = {}) {
@@ -221,6 +220,13 @@ class ImageControl {
 	onMapClick = (event) => {
 		if (!this.map) throw Error('map is undefined');
 		const layersId = Object.values(this.rasters).map((i) => i.fillLayer.id);
+		// sometimes layers are removed from the map without destroing the control, e.g. style was changed
+		const errorLayerId = layersId.find((id) => {
+			return !this.map?.getLayer(id);
+		});
+		if (errorLayerId) {
+			console.error(`layer with id ${errorLayerId} was removed from the map`);
+		}
 		const features = this.map.queryRenderedFeatures(event.point, { layers: layersId });
 		if (features[0]) {
 			/** @type {string} */

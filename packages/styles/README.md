@@ -42,8 +42,8 @@ export type Style = {
 };
 
 export type StylesControlOptions = {
-  styles?: Style[] | undefined;
-  onChange?: ((style: Style) => void) | undefined;
-  compact?: boolean | undefined;
+  styles?: Style[];
+  onChange?: (style: Style) => void;
+  compact?: boolean;
 };
 ```

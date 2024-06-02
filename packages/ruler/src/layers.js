@@ -1,30 +1,51 @@
-/** @type {import('mapbox-gl').LineLayer & { source: string }} */
-export const lineLayer = {
-	id: 'mapbox-control-ruler-line',
-	type: 'line',
-	source: 'mapbox-control-ruler-lines',
-	layout: {},
-	paint: {
-		'line-color': '#263238',
-		'line-width': 2,
-	},
-};
+import { sources } from './sources.js';
 
-/** @type {import('mapbox-gl').SymbolLayer & { source: string }} */
-export const symbolLayer = {
-	id: 'mapbox-control-ruler-symbol',
-	type: 'symbol',
-	source: 'mapbox-control-ruler-points',
-	layout: {
-		'text-field': '{text}',
-		'text-font': ['Roboto Medium'],
-		'text-anchor': 'top',
-		'text-size': 12,
-		'text-offset': [0, 0.8],
+/**
+ * @typedef {{
+ *  line: import('mapbox-gl').LineLayer
+ *  markers: import('mapbox-gl').CircleLayer
+ *  labels: import('mapbox-gl').SymbolLayer
+ * }} Layers
+ */
+
+/** @type {Layers} */
+export const layers = {
+	line: {
+		id: 'mapbox-control-ruler-line',
+		type: 'line',
+		source: sources.line,
+		layout: {},
+		paint: {
+			'line-color': '#263238',
+			'line-width': 2,
+		},
 	},
-	paint: {
-		'text-color': '#263238',
-		'text-halo-color': '#fff',
-		'text-halo-width': 1,
+	markers: {
+		id: 'mapbox-control-ruler-markers',
+		type: 'circle',
+		source: sources.points,
+		paint: {
+			'circle-radius': 5,
+			'circle-color': '#fff',
+			'circle-stroke-width': 2,
+			'circle-stroke-color': '#000',
+		},
+	},
+	labels: {
+		id: 'mapbox-control-ruler-labels',
+		type: 'symbol',
+		source: sources.points,
+		layout: {
+			'text-field': '{distance}',
+			'text-font': ['Roboto Medium'],
+			'text-anchor': 'top',
+			'text-size': 12,
+			'text-offset': [0, 0.8],
+		},
+		paint: {
+			'text-color': '#263238',
+			'text-halo-color': '#fff',
+			'text-halo-width': 1,
+		},
 	},
 };

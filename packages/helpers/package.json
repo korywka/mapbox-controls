@@ -1,26 +1,26 @@
 {
-  "name": "@mapbox-controls/helpers",
-  "version": "1.2.0",
-  "description": "Helpers for mapbox controls",
-  "type": "module",
-  "main": "./src/index.js",
-  "scripts": {
-    "build": "tsc"
-  },
-  "devDependencies": {
-    "@types/geojson": "7946.0.13",
-    "@types/mapbox-gl": "3.1.0",
-    "mapbox-gl": "3.3.0"
-  },
-  "peerDependencies": {
-    "mapbox-gl": ">=1.0.0 <4.0.0"
-  },
-  "types": "./types/index.d.ts",
-  "files": ["src", "types"],
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
-  "repository": "korywka/mapbox-gl-controls",
-  "license": "MIT"
+	"name": "@mapbox-controls/helpers",
+	"version": "2.0.0",
+	"description": "Helpers for mapbox controls",
+	"type": "module",
+	"main": "./src/index.js",
+	"scripts": {
+		"build": "tsc"
+	},
+	"devDependencies": {
+		"@types/geojson": "7946.0.14",
+		"@types/mapbox-gl": "3.1.0",
+		"mapbox-gl": "3.4.0"
+	},
+	"peerDependencies": {
+		"mapbox-gl": ">=1.0.0 <4.0.0"
+	},
+	"types": "./types/index.d.ts",
+	"files": ["src", "types"],
+	"publishConfig": {
+		"access": "public",
+		"registry": "https://registry.npmjs.org/"
+	},
+	"repository": "korywka/mapbox-gl-controls",
+	"license": "MIT"
 }

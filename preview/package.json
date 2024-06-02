@@ -1,30 +1,31 @@
 {
-  "name": "preview",
-  "private": "true",
-  "type": "module",
-  "scripts": {
-    "start": "concurrently \"npm:serve\" \"npm:watch\"",
-    "serve": "serve .",
-    "build": "rollup -c",
-    "watch": "rollup -c -w"
-  },
-  "dependencies": {
-    "@mapbox-controls/compass": "workspace:*",
-    "@mapbox-controls/image": "workspace:*",
-    "@mapbox-controls/inspect": "workspace:*",
-    "@mapbox-controls/language": "workspace:*",
-    "@mapbox-controls/ruler": "workspace:*",
-    "@mapbox-controls/styles": "workspace:*",
-    "@mapbox-controls/tooltip": "workspace:*",
-    "@mapbox-controls/zoom": "workspace:*",
-    "mapbox-gl": "3.3.0"
-  },
-  "devDependencies": {
-    "@rollup/plugin-commonjs": "25.0.7",
-    "@rollup/plugin-node-resolve": "15.2.3",
-    "concurrently": "8.2.2",
-    "rollup": "4.14.3",
-    "rollup-plugin-import-css": "3.5.0",
-    "serve": "14.2.1"
-  }
+	"name": "preview",
+	"private": "true",
+	"type": "module",
+	"scripts": {
+		"start": "concurrently \"npm:serve\" \"npm:watch\"",
+		"serve": "serve .",
+		"build": "rollup -c",
+		"watch": "rollup -c -w"
+	},
+	"dependencies": {
+		"@mapbox-controls/compass": "workspace:*",
+		"@mapbox-controls/image": "workspace:*",
+		"@mapbox-controls/inspect": "workspace:*",
+		"@mapbox-controls/language": "workspace:*",
+		"@mapbox-controls/ruler": "workspace:*",
+		"@mapbox-controls/styles": "workspace:*",
+		"@mapbox-controls/tooltip": "workspace:*",
+		"@mapbox-controls/zoom": "workspace:*",
+		"mapbox-gl": "3.4.0"
+	},
+	"devDependencies": {
+		"@rollup/plugin-commonjs": "25.0.8",
+		"@rollup/plugin-node-resolve": "15.2.3",
+		"concurrently": "8.2.2",
+		"rollup": "4.18.0",
+		"rollup-plugin-import-css": "3.5.0",
+		"rollup-plugin-polyfill-node": "0.13.0",
+		"serve": "14.2.3"
+	}
 }

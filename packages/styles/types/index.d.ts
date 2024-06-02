@@ -6,7 +6,8 @@ export default class StylesControl {
         compact?: boolean | undefined;
     };
     container: HTMLDivElement;
-    findStyleByName(name: string): Style;
+    findStyle(name: string): Style;
+    getCurrentStyleName(): string;
     expanded(): void;
     compact(): void;
     onAdd(map: import('mapbox-gl').Map): HTMLElement;
@@ -19,7 +20,7 @@ export type Style = {
     styleUrl: string;
 };
 export type StylesControlOptions = {
-    styles?: Style[] | undefined;
-    onChange?: ((style: Style) => void) | undefined;
-    compact?: boolean | undefined;
+    styles?: Style[];
+    onChange?: (style: Style) => void;
+    compact?: boolean;
 };

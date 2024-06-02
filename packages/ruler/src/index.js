@@ -1,49 +1,36 @@
-import mapboxgl from 'mapbox-gl';
 import { controlContainer, controlButton } from '@mapbox-controls/helpers';
 import { icons } from './icons.js';
-import distance from '@turf/distance';
-import { labelFormat } from './label-format.js';
-import { lineLayer, symbolLayer } from './layers.js';
+import { layers } from './layers.js';
+import { sources, toGeoJSONLine, toGeoJSONPoints } from './sources.js';
 
 /**
- * @typedef {import('@turf/helpers').Units} Units
  * @typedef {{
- *  units?: Units
+ *  units?: import('@turf/helpers').Units
  *  labelFormat?: (n: number) => string
- *  symbolLayout?: import('mapbox-gl').SymbolLayout
- *  symbolPaint?: import('mapbox-gl').SymbolPaint
  *  lineLayout?: import('mapbox-gl').LineLayout
  *  linePaint?: import('mapbox-gl').LinePaint
- *  markerCSS?: Partial<CSSStyleDeclaration>
+ *  markerLayout?: import('mapbox-gl').CircleLayout
+ *  markerPaint?: import('mapbox-gl').CirclePaint
+ *  labelLayout?: import('mapbox-gl').SymbolLayout
+ *  labelPaint?: import('mapbox-gl').SymbolPaint
  * 	invisible?: boolean
  * }} RulerControlOptions
  */
-
-/**
- * @type {{
- * 	units: Units
- *  labelFormat: (n: number) => string
- * }}
- */
-const defaults = {
-	units: 'kilometers',
-	labelFormat,
-};
 
 export default class RulerControl {
 	/**
    * @param {RulerControlOptions} options
    */
 	constructor(options = {}) {
-		this.options = { ...defaults, ...options };
+		this.options = options;
 		this.container = controlContainer('mapbox-ctrl-ruler');
 		this.isActive = false;
 		/** @type {[number, number][]} */
 		this.coordinates = [];
-		/** @type {import('mapbox-gl').Marker[]} */
-		this.markers = [];
 		/** @type {HTMLButtonElement | null} */
 		this.button = null;
+		/** @type {(() => void) | null} */
+		this.removeDragEvents = null;
 		if (!this.options.invisible) {
 			this.button = controlButton({
 				title: 'Ruler',
@@ -64,51 +51,66 @@ export default class RulerControl {
 	draw = () => {
 		if (!this.map) throw Error('map is undefined');
 
-		this.map.addSource(lineLayer.source, {
+		this.map.addSource(sources.line, {
 			type: 'geojson',
-			data: this.asLine(),
+			data: toGeoJSONLine(this.coordinates),
 		});
 
-		this.map.addSource(symbolLayer.source, {
+		this.map.addSource(sources.points, {
 			type: 'geojson',
-			data: this.asPoints(),
+			data: toGeoJSONPoints(this.coordinates, {
+				units: this.options.units,
+				labelFormat: this.options.labelFormat,
+			}),
 		});
 
 		this.map.addLayer({
-			...lineLayer,
+			...layers.line,
 			layout: {
-				...lineLayer.layout,
+				...layers.line.layout,
 				...this.options.lineLayout,
 			},
 			paint: {
-				...lineLayer.paint,
+				...layers.line.paint,
 				...this.options.linePaint,
 			},
 		});
 
 		this.map.addLayer({
-			...symbolLayer,
+			...layers.markers,
 			layout: {
-				...symbolLayer.layout,
-				...this.options.symbolLayout,
+				...layers.markers.layout,
+				...this.options.markerLayout,
 			},
 			paint: {
-				...symbolLayer.paint,
-				...this.options.symbolPaint,
+				...layers.markers.paint,
+				...this.options.markerPaint,
+			},
+		});
+
+		this.map.addLayer({
+			...layers.labels,
+			layout: {
+				...layers.labels.layout,
+				...this.options.labelLayout,
+			},
+			paint: {
+				...layers.labels.paint,
+				...this.options.labelPaint,
 			},
 		});
 	};
 
 	activate() {
 		if (!this.map) throw Error('map is undefined');
+		const map = this.map;
 		this.isActive = true;
-		this.markers = [];
 		this.coordinates = [];
-		this.map.getCanvas().style.cursor = 'crosshair';
+		map.getCanvas().style.cursor = 'crosshair';
 		this.draw();
-		this.map.on('click', this.mapClickListener);
-		this.map.on('style.load', this.draw);
-		this.map.fire('ruler.on');
+		map.on('click', this.mapClickListener);
+		map.on('style.load', this.draw);
+		map.fire('ruler.on');
 		if (this.button) {
 			this.button.classList.add('-active');
 		}
@@ -119,11 +121,11 @@ export default class RulerControl {
 		this.isActive = false;
 		this.map.getCanvas().style.cursor = '';
 		// remove layers, sources and event listeners
-		this.map.removeLayer(lineLayer.id);
-		this.map.removeLayer(symbolLayer.id);
-		this.map.removeSource(lineLayer.source);
-		this.map.removeSource(symbolLayer.source);
-		this.markers.forEach((m) => m.remove());
+		this.map.removeLayer(layers.line.id);
+		this.map.removeLayer(layers.markers.id);
+		this.map.removeLayer(layers.labels.id);
+		this.map.removeSource(sources.line);
+		this.map.removeSource(sources.points);
 		this.map.off('click', this.mapClickListener);
 		this.map.off('style.load', this.draw);
 		this.map.fire('ruler.off');
@@ -147,83 +149,97 @@ export default class RulerControl {
 		if (!this.map) throw Error('map is undefined');
 		if (!this.isActive) throw Error('ruler is not active');
 		this.coordinates.push(coordinate);
-		const markerElement = this.newMarkerElement();
-		const marker = new mapboxgl.Marker({ element: markerElement, draggable: true })
-			.setLngLat(coordinate)
-			.addTo(this.map);
-		this.markers.push(marker);
 		this.updateSource();
-		const markerIndex = this.markers.length - 1;
-		marker.on('drag', () => {
-			const lngLat = marker.getLngLat();
-			this.coordinates[markerIndex] = [lngLat.lng, lngLat.lat];
-			this.updateSource();
-		});
 	}
 
 	updateSource() {
 		if (!this.map) throw Error('map is undefined');
 		this.map.fire('ruler.change', { coordinates: this.coordinates });
-		const lineSource = /** @type {import('mapbox-gl').GeoJSONSource} */(this.map.getSource(lineLayer.source));
-		const symbolSource = /** @type {import('mapbox-gl').GeoJSONSource} */(this.map.getSource(symbolLayer.source));
-		lineSource.setData(this.asLine());
-		symbolSource.setData(this.asPoints());
+		const lineSource = /** @type {import('mapbox-gl').GeoJSONSource} */(this.map.getSource(sources.line));
+		const pointsSource = /** @type {import('mapbox-gl').GeoJSONSource} */(this.map.getSource(sources.points));
+		const geoJSONLine = toGeoJSONLine(this.coordinates);
+		const geoJSONPoints = toGeoJSONPoints(this.coordinates, {
+			units: this.options.units,
+			labelFormat: this.options.labelFormat,
+		});
+		lineSource.setData(geoJSONLine);
+		pointsSource.setData(geoJSONPoints);
 	}
 
-	newMarkerElement() {
-		const node = document.createElement('div');
-		node.style.width = '12px';
-		node.style.height = '12px';
-		node.style.borderRadius = '50%';
-		node.style.background = '#fff';
-		node.style.boxSizing = 'border-box';
-		node.style.border = '2px solid #263238';
+	addDragEvents() {
+		/** @typedef {import('mapbox-gl').MapMouseEvent} MapMouseEvent */
+		/** @typedef {import('mapbox-gl').MapTouchEvent} MapTouchEvent */
+		/** @typedef {import('mapbox-gl').MapLayerMouseEvent} MapLayerMouseEvent */
+		/** @typedef {import('mapbox-gl').MapLayerTouchEvent} MapLayerTouchEvent */
+		if (!this.map) throw Error('map is undefined');
+		const self = this;
+		const map = this.map;
+		const canvas = map.getCanvas();
+		/** @type {number} */
+		let markerIndex;
 
-		if (this.options.markerCSS) {
-			Object.entries(this.options.markerCSS).forEach(([key, value]) => {
-				node.style.setProperty(key, String(value));
-			});
+		function onMouseEnter() {
+			canvas.style.cursor = 'move';
 		}
 
-		return node;
-	}
+		function onMouseLeave() {
+			canvas.style.cursor = '';
+		}
 
-	/**
-   * @returns {import('geojson').Feature<import('geojson').LineString>}
-   */
-	asLine() {
-		return {
-			type: 'Feature',
-			properties: {},
-			geometry: {
-				type: 'LineString',
-				coordinates: this.coordinates,
-			},
-		};
-	}
+		/** @param {MapLayerMouseEvent | MapLayerTouchEvent} event */
+		function onStart(event) {
+			// do not block multitouch actions
+			if (event.type === 'touchstart' && event.points.length !== 1) {
+				return;
+			}
+			event.preventDefault();
+			const features = event.features;
+			if (!features) return;
+			markerIndex = Number(features[0].id);
+			canvas.style.cursor = 'grabbing';
+			// mouse events
+			map.on('mousemove', onMove);
+			map.on('mouseup', onEnd);
+			// touch events
+			map.on('touchmove', onMove);
+			map.on('touchend', onEnd);
+		}
 
-	/**
-   * @returns {import('geojson').FeatureCollection<import('geojson').Point>}
-   */
-	asPoints() {
-		let sum = 0;
-		return {
-			type: 'FeatureCollection',
-			features: this.coordinates.map((coordinate, index) => {
-				if (index > 0) {
-					sum += distance(this.coordinates[index - 1], coordinate, { units: this.options.units });
-				}
-				return {
-					type: 'Feature',
-					properties: {
-						text: this.options.labelFormat(sum),
-					},
-					geometry: {
-						type: 'Point',
-						coordinates: coordinate,
-					},
-				};
-			}),
+		/** @param {MapMouseEvent | MapTouchEvent} event */
+		function onMove(event) {
+			const coords = event.lngLat;
+			canvas.style.cursor = 'grabbing';
+			self.coordinates[markerIndex] = [coords.lng, coords.lat];
+			self.updateSource();
+		}
+
+		function onEnd() {
+			// mouse events
+			map.off('mousemove', onMove);
+			map.off('mouseup', onEnd);
+			// touch events
+			map.off('touchmove', onMove);
+			map.off('touchend', onEnd);
+		}
+
+		// mouse events
+		map.on('mouseenter', layers.markers.id, onMouseEnter);
+		map.on('mouseleave', layers.markers.id, onMouseLeave);
+		map.on('mousedown', layers.markers.id, onStart);
+		// touch events
+		map.on('touchstart', layers.markers.id, onStart);
+
+		this.removeDragEvents = () => {
+			// mouse events
+			map.off('mousedown', layers.markers.id, onStart);
+			map.off('mousemove', onMove);
+			map.off('mouseup', onEnd);
+			map.off('mouseenter', layers.markers.id, onMouseEnter);
+			map.off('mouseleave', layers.markers.id, onMouseLeave);
+			// touch events
+			map.off('touchstart', layers.markers.id, onStart);
+			map.off('touchmove', onMove);
+			map.off('touchend', onEnd);
 		};
 	}
 
@@ -236,12 +252,17 @@ export default class RulerControl {
 		if (this.button) {
 			this.container.appendChild(this.button);
 		}
+		this.addDragEvents();
 		return this.container;
 	}
 
 	onRemove() {
-		if (this.isActive) this.deactivate();
-		this.map?.off('click', this.mapClickListener);
+		if (this.isActive) {
+			this.deactivate();
+		}
+		if (this.removeDragEvents) {
+			this.removeDragEvents();
+		}
 		this.container.parentNode?.removeChild(this.container);
 	}
 }

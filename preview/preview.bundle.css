@@ -141,6 +141,7 @@
 .mapbox-ctrl-styles-expanded button {
 	width: auto;
 	padding: 0 8px;
+	color: #333;
 }
 
 .mapboxgl-ctrl-group.mapbox-ctrl-styles-expanded button {
@@ -155,7 +156,7 @@
 	border-radius: 0 4px 4px 0;
 }
 
-.mapbox-ctrl-styles-expanded button+button {
+.mapbox-ctrl-styles-expanded button + button {
 	border: none;
 }
 
@@ -180,6 +181,7 @@
 	opacity: 0;
 	cursor: pointer;
 }
+
 .mapbox-ctrl-tooltip {
 	padding: 5px 7px;
 	background: #fff;

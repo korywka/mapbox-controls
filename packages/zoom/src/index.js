@@ -6,12 +6,12 @@ class ZoomControl {
 		this.container = controlContainer('mapbox-ctrl-zoom');
 		this.buttonIn = controlButton({
 			title: 'Zoom In',
-			icon: icons.plus,
+			icon: icons.plus(),
 			onClick: () => this.map?.zoomIn(),
 		});
 		this.buttonOut = controlButton({
 			title: 'Zoom Out',
-			icon: icons.minus,
+			icon: icons.minus(),
 			onClick: () => this.map?.zoomOut(),
 		});
 	}

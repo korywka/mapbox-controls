@@ -20,33 +20,33 @@ class ImageControl {
 		this.fileInput = createFileInput();
 		this.buttonAdd = controlButton({
 			title: 'Add image',
-			icon: icons.image,
+			icon: icons.image(),
 			className: 'mapbox-ctrl-image-add',
 			onClick: () => this.fileInput.click(),
 		});
 		this.buttonMove = controlButton({
 			disabled: true,
 			title: 'Move image',
-			icon: icons.move,
+			icon: icons.move(),
 			onClick: () => this.setMode('move'),
 		});
 		this.buttonScale = controlButton({
 			disabled: true,
 			title: 'Scale image',
-			icon: icons.scale,
+			icon: icons.scale(),
 			onClick: () => this.setMode('scale'),
 		});
 		this.buttonRotate = controlButton({
 			disabled: true,
 			title: 'Rotate image',
-			icon: icons.rotate,
+			icon: icons.rotate(),
 			onClick: () => this.setMode('rotate'),
 		});
 		if (options.removeButton) {
 			this.buttonRemove = controlButton({
 				hidden: true,
 				title: 'Remove image',
-				icon: icons.remove,
+				icon: icons.remove(),
 				onClick: () => this.removeRaster(),
 			});
 		}
@@ -220,7 +220,7 @@ class ImageControl {
 	onMapClick = (event) => {
 		if (!this.map) throw Error('map is undefined');
 		const layersId = Object.values(this.rasters).map((i) => i.fillLayer.id);
-		// sometimes layers are removed from the map without destroing the control, e.g. style was changed
+		// sometimes layers are removed from the map without destroying the control, e.g. style was changed
 		const errorLayerId = layersId.find((id) => {
 			return !this.map?.getLayer(id);
 		});

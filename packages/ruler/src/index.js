@@ -34,7 +34,7 @@ export default class RulerControl {
 		if (!this.options.invisible) {
 			this.button = controlButton({
 				title: 'Ruler',
-				icon: icons.ruler,
+				icon: icons.ruler(),
 				onClick: () => this.onControlButtonClick(),
 			});
 		}
@@ -188,7 +188,7 @@ export default class RulerControl {
 
 		/** @param {MapLayerMouseEvent | MapLayerTouchEvent} event */
 		function onStart(event) {
-			// do not block multitouch actions
+			// do not block multi-touch actions
 			if (event.type === 'touchstart' && event.points.length !== 1) {
 				return;
 			}

@@ -15,7 +15,7 @@ export default class InspectControl {
 		this.container = controlContainer('mapbox-ctrl-inspect');
 		this.button = controlButton({
 			title: 'Inspect',
-			icon: icons.inspect,
+			icon: icons.inspect(),
 			onClick: () => this.onControlButtonClick(),
 		});
 		this.isActive = false;

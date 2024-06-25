@@ -12,3 +12,9 @@
 - **StyleControl**: update types
 - **ImageControl**: add error hint for missing layers
 - Update dependencies
+
+## 2.1.0
+
+- Update `@turf` package from alpha version to release version
+- Fix Vite SSR for icons
+- Update dependencies

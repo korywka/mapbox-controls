@@ -95,7 +95,7 @@ export default class StylesControl {
 
 	compact() {
 		if (!this.map) throw Error('map is undefined');
-		const button = controlButton({ title: 'Styles', icon: icons.layers });
+		const button = controlButton({ title: 'Styles', icon: icons.layers() });
 		const select = document.createElement('select');
 		this.container.appendChild(button);
 		button.appendChild(select);

@@ -155,15 +155,17 @@
 		return /** @type SVGElement */ ((new DOMParser().parseFromString(string, 'image/svg+xml')).firstChild);
 	}
 
-	const compass = parseSVG(`
-<svg viewBox="0 0 24 24" width="22" height="22" xmlns="http://www.w3.org/2000/svg">
-    <g fill="none" fill-rule="evenodd">
-        <path d="M0 0h24v24H0z"/>
-        <path fill="#f44336" d="M12 3l4 8H8z"/>
-        <path fill="#9E9E9E" d="M12 21l-4-8h8z"/>
-    </g>
-</svg>
-`);
+	function compass() {
+		return parseSVG(`
+		<svg viewBox="0 0 24 24" width="22" height="22" xmlns="http://www.w3.org/2000/svg">
+				<g fill="none" fill-rule="evenodd">
+						<path d="M0 0h24v24H0z"/>
+						<path fill="#f44336" d="M12 3l4 8H8z"/>
+						<path fill="#9E9E9E" d="M12 21l-4-8h8z"/>
+				</g>
+		</svg>
+	`);
+	}
 
 	const icons$5 = {
 		compass,
@@ -182,10 +184,10 @@
 		constructor(options = {}) {
 			this.options = { ...options };
 			this.container = controlContainer('mapbox-ctrl-compass');
-			this.icon = icons$5.compass;
+			this.icon = icons$5.compass();
 			this.button = controlButton({
 				title: 'Compass',
-				icon: icons$5.compass,
+				icon: this.icon,
 				onClick: () => this.onControlButtonClick(),
 			});
 		}
@@ -296,291 +298,6 @@
 			map.unproject(position[2]).toArray(),
 			map.unproject(position[3]).toArray(),
 		]);
-	}
-
-	/**
-	 * @module helpers
-	 */
-	/**
-	 * Earth Radius used with the Harvesine formula and approximates using a spherical (non-ellipsoid) Earth.
-	 *
-	 * @memberof helpers
-	 * @type {number}
-	 */
-	const earthRadius$1 = 6371008.8;
-	/**
-	 * Unit of measurement factors using a spherical (non-ellipsoid) earth radius.
-	 *
-	 * Keys are the name of the unit, values are the number of that unit in a single radian
-	 *
-	 * @memberof helpers
-	 * @type {Object}
-	 */
-	const factors$1 = {
-	    centimeters: earthRadius$1 * 100,
-	    centimetres: earthRadius$1 * 100,
-	    degrees: 360 / (2 * Math.PI),
-	    feet: earthRadius$1 * 3.28084,
-	    inches: earthRadius$1 * 39.37,
-	    kilometers: earthRadius$1 / 1000,
-	    kilometres: earthRadius$1 / 1000,
-	    meters: earthRadius$1,
-	    metres: earthRadius$1,
-	    miles: earthRadius$1 / 1609.344,
-	    millimeters: earthRadius$1 * 1000,
-	    millimetres: earthRadius$1 * 1000,
-	    nauticalmiles: earthRadius$1 / 1852,
-	    radians: 1,
-	    yards: earthRadius$1 * 1.0936,
-	};
-	/**
-	 * Wraps a GeoJSON {@link Geometry} in a GeoJSON {@link Feature}.
-	 *
-	 * @name feature
-	 * @param {Geometry} geometry input geometry
-	 * @param {Object} [properties={}] an Object of key-value pairs to add as properties
-	 * @param {Object} [options={}] Optional Parameters
-	 * @param {Array<number>} [options.bbox] Bounding Box Array [west, south, east, north] associated with the Feature
-	 * @param {string|number} [options.id] Identifier associated with the Feature
-	 * @returns {Feature} a GeoJSON Feature
-	 * @example
-	 * var geometry = {
-	 *   "type": "Point",
-	 *   "coordinates": [110, 50]
-	 * };
-	 *
-	 * var feature = turf.feature(geometry);
-	 *
-	 * //=feature
-	 */
-	function feature$1(geom, properties, options = {}) {
-	    const feat = { type: "Feature" };
-	    if (options.id === 0 || options.id) {
-	        feat.id = options.id;
-	    }
-	    if (options.bbox) {
-	        feat.bbox = options.bbox;
-	    }
-	    feat.properties = properties || {};
-	    feat.geometry = geom;
-	    return feat;
-	}
-	/**
-	 * Creates a {@link Point} {@link Feature} from a Position.
-	 *
-	 * @name point
-	 * @param {Array<number>} coordinates longitude, latitude position (each in decimal degrees)
-	 * @param {Object} [properties={}] an Object of key-value pairs to add as properties
-	 * @param {Object} [options={}] Optional Parameters
-	 * @param {Array<number>} [options.bbox] Bounding Box Array [west, south, east, north] associated with the Feature
-	 * @param {string|number} [options.id] Identifier associated with the Feature
-	 * @returns {Feature<Point>} a Point feature
-	 * @example
-	 * var point = turf.point([-75.343, 39.984]);
-	 *
-	 * //=point
-	 */
-	function point$1(coordinates, properties, options = {}) {
-	    if (!coordinates) {
-	        throw new Error("coordinates is required");
-	    }
-	    if (!Array.isArray(coordinates)) {
-	        throw new Error("coordinates must be an Array");
-	    }
-	    if (coordinates.length < 2) {
-	        throw new Error("coordinates must be at least 2 numbers long");
-	    }
-	    if (!isNumber$4(coordinates[0]) || !isNumber$4(coordinates[1])) {
-	        throw new Error("coordinates must contain numbers");
-	    }
-	    const geom = {
-	        type: "Point",
-	        coordinates,
-	    };
-	    return feature$1(geom, properties, options);
-	}
-	/**
-	 * Creates a {@link Polygon} {@link Feature} from an Array of LinearRings.
-	 *
-	 * @name polygon
-	 * @param {Array<Array<Array<number>>>} coordinates an array of LinearRings
-	 * @param {Object} [properties={}] an Object of key-value pairs to add as properties
-	 * @param {Object} [options={}] Optional Parameters
-	 * @param {Array<number>} [options.bbox] Bounding Box Array [west, south, east, north] associated with the Feature
-	 * @param {string|number} [options.id] Identifier associated with the Feature
-	 * @returns {Feature<Polygon>} Polygon Feature
-	 * @example
-	 * var polygon = turf.polygon([[[-5, 52], [-4, 56], [-2, 51], [-7, 54], [-5, 52]]], { name: 'poly1' });
-	 *
-	 * //=polygon
-	 */
-	function polygon$2(coordinates, properties, options = {}) {
-	    for (const ring of coordinates) {
-	        if (ring.length < 4) {
-	            throw new Error("Each LinearRing of a Polygon must have 4 or more Positions.");
-	        }
-	        if (ring[ring.length - 1].length !== ring[0].length) {
-	            throw new Error("First and last Position are not equivalent.");
-	        }
-	        for (let j = 0; j < ring[ring.length - 1].length; j++) {
-	            // Check if first point of Polygon contains two numbers
-	            if (ring[ring.length - 1][j] !== ring[0][j]) {
-	                throw new Error("First and last Position are not equivalent.");
-	            }
-	        }
-	    }
-	    const geom = {
-	        type: "Polygon",
-	        coordinates,
-	    };
-	    return feature$1(geom, properties, options);
-	}
-	/**
-	 * Takes one or more {@link Feature|Features} and creates a {@link FeatureCollection}.
-	 *
-	 * @name featureCollection
-	 * @param {Feature[]} features input features
-	 * @param {Object} [options={}] Optional Parameters
-	 * @param {Array<number>} [options.bbox] Bounding Box Array [west, south, east, north] associated with the Feature
-	 * @param {string|number} [options.id] Identifier associated with the Feature
-	 * @returns {FeatureCollection} FeatureCollection of Features
-	 * @example
-	 * var locationA = turf.point([-75.343, 39.984], {name: 'Location A'});
-	 * var locationB = turf.point([-75.833, 39.284], {name: 'Location B'});
-	 * var locationC = turf.point([-75.534, 39.123], {name: 'Location C'});
-	 *
-	 * var collection = turf.featureCollection([
-	 *   locationA,
-	 *   locationB,
-	 *   locationC
-	 * ]);
-	 *
-	 * //=collection
-	 */
-	function featureCollection$1(features, options = {}) {
-	    const fc = { type: "FeatureCollection" };
-	    if (options.id) {
-	        fc.id = options.id;
-	    }
-	    if (options.bbox) {
-	        fc.bbox = options.bbox;
-	    }
-	    fc.features = features;
-	    return fc;
-	}
-	/**
-	 * Convert a distance measurement (assuming a spherical Earth) from radians to a more friendly unit.
-	 * Valid units: miles, nauticalmiles, inches, yards, meters, metres, kilometers, centimeters, feet
-	 *
-	 * @name radiansToLength
-	 * @param {number} radians in radians across the sphere
-	 * @param {string} [units="kilometers"] can be degrees, radians, miles, inches, yards, metres,
-	 * meters, kilometres, kilometers.
-	 * @returns {number} distance
-	 */
-	function radiansToLength$1(radians, units = "kilometers") {
-	    const factor = factors$1[units];
-	    if (!factor) {
-	        throw new Error(units + " units is invalid");
-	    }
-	    return radians * factor;
-	}
-	/**
-	 * Convert a distance measurement (assuming a spherical Earth) from a real-world unit into radians
-	 * Valid units: miles, nauticalmiles, inches, yards, meters, metres, kilometers, centimeters, feet
-	 *
-	 * @name lengthToRadians
-	 * @param {number} distance in real units
-	 * @param {string} [units="kilometers"] can be degrees, radians, miles, inches, yards, metres,
-	 * meters, kilometres, kilometers.
-	 * @returns {number} radians
-	 */
-	function lengthToRadians$1(distance, units = "kilometers") {
-	    const factor = factors$1[units];
-	    if (!factor) {
-	        throw new Error(units + " units is invalid");
-	    }
-	    return distance / factor;
-	}
-	/**
-	 * Converts any bearing angle from the north line direction (positive clockwise)
-	 * and returns an angle between 0-360 degrees (positive clockwise), 0 being the north line
-	 *
-	 * @name bearingToAzimuth
-	 * @param {number} bearing angle, between -180 and +180 degrees
-	 * @returns {number} angle between 0 and 360 degrees
-	 */
-	function bearingToAzimuth$1(bearing) {
-	    let angle = bearing % 360;
-	    if (angle < 0) {
-	        angle += 360;
-	    }
-	    return angle;
-	}
-	/**
-	 * Converts an angle in radians to degrees
-	 *
-	 * @name radiansToDegrees
-	 * @param {number} radians angle in radians
-	 * @returns {number} degrees between 0 and 360 degrees
-	 */
-	function radiansToDegrees$1(radians) {
-	    const degrees = radians % (2 * Math.PI);
-	    return (degrees * 180) / Math.PI;
-	}
-	/**
-	 * Converts an angle in degrees to radians
-	 *
-	 * @name degreesToRadians
-	 * @param {number} degrees angle between 0 and 360 degrees
-	 * @returns {number} angle in radians
-	 */
-	function degreesToRadians$1(degrees) {
-	    const radians = degrees % 360;
-	    return (radians * Math.PI) / 180;
-	}
-	/**
-	 * Converts a length to the requested unit.
-	 * Valid units: miles, nauticalmiles, inches, yards, meters, metres, kilometers, centimeters, feet
-	 *
-	 * @param {number} length to be converted
-	 * @param {Units} [originalUnit="kilometers"] of the length
-	 * @param {Units} [finalUnit="kilometers"] returned unit
-	 * @returns {number} the converted length
-	 */
-	function convertLength$1(length, originalUnit = "kilometers", finalUnit = "kilometers") {
-	    if (!(length >= 0)) {
-	        throw new Error("length must be a positive number");
-	    }
-	    return radiansToLength$1(lengthToRadians$1(length, originalUnit), finalUnit);
-	}
-	/**
-	 * isNumber
-	 *
-	 * @param {*} num Number to validate
-	 * @returns {boolean} true/false
-	 * @example
-	 * turf.isNumber(123)
-	 * //=true
-	 * turf.isNumber('foo')
-	 * //=false
-	 */
-	function isNumber$4(num) {
-	    return !isNaN(num) && num !== null && !Array.isArray(num);
-	}
-	/**
-	 * isObject
-	 *
-	 * @param {*} input variable to validate
-	 * @returns {boolean} true/false, including false for Arrays and Functions
-	 * @example
-	 * turf.isObject({elevation: 10})
-	 * //=true
-	 * turf.isObject('foo')
-	 * //=false
-	 */
-	function isObject$2(input) {
-	    return input !== null && typeof input === "object" && !Array.isArray(input);
 	}
 
 	var toStr$9 = Object.prototype.toString;
@@ -6794,8 +6511,8 @@
 
 	var equal = /*@__PURE__*/getDefaultExportFromCjs(deepEqual);
 
-	var __defProp$6 = Object.defineProperty;
-	var __name$6 = (target, value) => __defProp$6(target, "name", { value, configurable: true });
+	var __defProp$e = Object.defineProperty;
+	var __name$e = (target, value) => __defProp$e(target, "name", { value, configurable: true });
 	var _GeojsonEquality = class _GeojsonEquality {
 	  constructor(opts) {
 	    this.direction = false;
@@ -6907,18 +6624,18 @@
 	    return Boolean(!g1.bbox && !g2.bbox) || (g1.bbox && g2.bbox ? this.compareCoord(g1.bbox, g2.bbox) : false);
 	  }
 	};
-	__name$6(_GeojsonEquality, "GeojsonEquality");
+	__name$e(_GeojsonEquality, "GeojsonEquality");
 	function sameLength(g1, g2) {
 	  return g1.coordinates ? g1.coordinates.length === g2.coordinates.length : g1.length === g2.length;
 	}
-	__name$6(sameLength, "sameLength");
+	__name$e(sameLength, "sameLength");
 	function explode(g) {
 	  return g.coordinates.map((part) => ({
 	    type: g.type.replace("Multi", ""),
 	    coordinates: part
 	  }));
 	}
-	__name$6(explode, "explode");
+	__name$e(explode, "explode");
 
 	// index.ts
 	var earthRadius = 63710088e-1;
@@ -6968,7 +6685,7 @@
 	  feat.geometry = geom;
 	  return feat;
 	}
-	__name$6(feature, "feature");
+	__name$e(feature, "feature");
 	function geometry(type, coordinates, _options = {}) {
 	  switch (type) {
 	    case "Point":
@@ -6987,7 +6704,7 @@
 	      throw new Error(type + " is invalid");
 	  }
 	}
-	__name$6(geometry, "geometry");
+	__name$e(geometry, "geometry");
 	function point(coordinates, properties, options = {}) {
 	  if (!coordinates) {
 	    throw new Error("coordinates is required");
@@ -7007,7 +6724,7 @@
 	  };
 	  return feature(geom, properties, options);
 	}
-	__name$6(point, "point");
+	__name$e(point, "point");
 	function points(coordinates, properties, options = {}) {
 	  return featureCollection(
 	    coordinates.map((coords) => {
@@ -7016,7 +6733,7 @@
 	    options
 	  );
 	}
-	__name$6(points, "points");
+	__name$e(points, "points");
 	function polygon$1(coordinates, properties, options = {}) {
 	  for (const ring of coordinates) {
 	    if (ring.length < 4) {
@@ -7039,7 +6756,7 @@
 	  };
 	  return feature(geom, properties, options);
 	}
-	__name$6(polygon$1, "polygon");
+	__name$e(polygon$1, "polygon");
 	function polygons(coordinates, properties, options = {}) {
 	  return featureCollection(
 	    coordinates.map((coords) => {
@@ -7048,7 +6765,7 @@
 	    options
 	  );
 	}
-	__name$6(polygons, "polygons");
+	__name$e(polygons, "polygons");
 	function lineString(coordinates, properties, options = {}) {
 	  if (coordinates.length < 2) {
 	    throw new Error("coordinates must be an array of two or more positions");
@@ -7059,7 +6776,7 @@
 	  };
 	  return feature(geom, properties, options);
 	}
-	__name$6(lineString, "lineString");
+	__name$e(lineString, "lineString");
 	function lineStrings(coordinates, properties, options = {}) {
 	  return featureCollection(
 	    coordinates.map((coords) => {
@@ -7068,7 +6785,7 @@
 	    options
 	  );
 	}
-	__name$6(lineStrings, "lineStrings");
+	__name$e(lineStrings, "lineStrings");
 	function featureCollection(features, options = {}) {
 	  const fc = { type: "FeatureCollection" };
 	  if (options.id) {
@@ -7080,7 +6797,7 @@
 	  fc.features = features;
 	  return fc;
 	}
-	__name$6(featureCollection, "featureCollection");
+	__name$e(featureCollection, "featureCollection");
 	function multiLineString(coordinates, properties, options = {}) {
 	  const geom = {
 	    type: "MultiLineString",
@@ -7088,7 +6805,7 @@
 	  };
 	  return feature(geom, properties, options);
 	}
-	__name$6(multiLineString, "multiLineString");
+	__name$e(multiLineString, "multiLineString");
 	function multiPoint(coordinates, properties, options = {}) {
 	  const geom = {
 	    type: "MultiPoint",
@@ -7096,7 +6813,7 @@
 	  };
 	  return feature(geom, properties, options);
 	}
-	__name$6(multiPoint, "multiPoint");
+	__name$e(multiPoint, "multiPoint");
 	function multiPolygon(coordinates, properties, options = {}) {
 	  const geom = {
 	    type: "MultiPolygon",
@@ -7104,7 +6821,7 @@
 	  };
 	  return feature(geom, properties, options);
 	}
-	__name$6(multiPolygon, "multiPolygon");
+	__name$e(multiPolygon, "multiPolygon");
 	function geometryCollection(geometries, properties, options = {}) {
 	  const geom = {
 	    type: "GeometryCollection",
@@ -7112,7 +6829,7 @@
 	  };
 	  return feature(geom, properties, options);
 	}
-	__name$6(geometryCollection, "geometryCollection");
+	__name$e(geometryCollection, "geometryCollection");
 	function round(num, precision = 0) {
 	  if (precision && !(precision >= 0)) {
 	    throw new Error("precision must be a positive number");
@@ -7120,7 +6837,7 @@
 	  const multiplier = Math.pow(10, precision || 0);
 	  return Math.round(num * multiplier) / multiplier;
 	}
-	__name$6(round, "round");
+	__name$e(round, "round");
 	function radiansToLength(radians, units = "kilometers") {
 	  const factor = factors[units];
 	  if (!factor) {
@@ -7128,7 +6845,7 @@
 	  }
 	  return radians * factor;
 	}
-	__name$6(radiansToLength, "radiansToLength");
+	__name$e(radiansToLength, "radiansToLength");
 	function lengthToRadians(distance, units = "kilometers") {
 	  const factor = factors[units];
 	  if (!factor) {
@@ -7136,11 +6853,11 @@
 	  }
 	  return distance / factor;
 	}
-	__name$6(lengthToRadians, "lengthToRadians");
+	__name$e(lengthToRadians, "lengthToRadians");
 	function lengthToDegrees(distance, units) {
 	  return radiansToDegrees(lengthToRadians(distance, units));
 	}
-	__name$6(lengthToDegrees, "lengthToDegrees");
+	__name$e(lengthToDegrees, "lengthToDegrees");
 	function bearingToAzimuth(bearing) {
 	  let angle = bearing % 360;
 	  if (angle < 0) {
@@ -7148,24 +6865,24 @@
 	  }
 	  return angle;
 	}
-	__name$6(bearingToAzimuth, "bearingToAzimuth");
+	__name$e(bearingToAzimuth, "bearingToAzimuth");
 	function radiansToDegrees(radians) {
 	  const degrees = radians % (2 * Math.PI);
 	  return degrees * 180 / Math.PI;
 	}
-	__name$6(radiansToDegrees, "radiansToDegrees");
+	__name$e(radiansToDegrees, "radiansToDegrees");
 	function degreesToRadians(degrees) {
 	  const radians = degrees % 360;
 	  return radians * Math.PI / 180;
 	}
-	__name$6(degreesToRadians, "degreesToRadians");
+	__name$e(degreesToRadians, "degreesToRadians");
 	function convertLength(length, originalUnit = "kilometers", finalUnit = "kilometers") {
 	  if (!(length >= 0)) {
 	    throw new Error("length must be a positive number");
 	  }
 	  return radiansToLength(lengthToRadians(length, originalUnit), finalUnit);
 	}
-	__name$6(convertLength, "convertLength");
+	__name$e(convertLength, "convertLength");
 	function convertArea(area, originalUnit = "meters", finalUnit = "kilometers") {
 	  if (!(area >= 0)) {
 	    throw new Error("area must be a positive number");
@@ -7180,15 +6897,15 @@
 	  }
 	  return area / startFactor * finalFactor;
 	}
-	__name$6(convertArea, "convertArea");
+	__name$e(convertArea, "convertArea");
 	function isNumber(num) {
 	  return !isNaN(num) && num !== null && !Array.isArray(num);
 	}
-	__name$6(isNumber, "isNumber");
+	__name$e(isNumber, "isNumber");
 	function isObject(input) {
 	  return input !== null && typeof input === "object" && !Array.isArray(input);
 	}
-	__name$6(isObject, "isObject");
+	__name$e(isObject, "isObject");
 	function validateBBox(bbox) {
 	  if (!bbox) {
 	    throw new Error("bbox is required");
@@ -7205,7 +6922,7 @@
 	    }
 	  });
 	}
-	__name$6(validateBBox, "validateBBox");
+	__name$e(validateBBox, "validateBBox");
 	function validateId(id) {
 	  if (!id) {
 	    throw new Error("id is required");
@@ -7214,10 +6931,10 @@
 	    throw new Error("id must be a number or a string");
 	  }
 	}
-	__name$6(validateId, "validateId");
+	__name$e(validateId, "validateId");
 
-	var __defProp$5 = Object.defineProperty;
-	var __name$5 = (target, value) => __defProp$5(target, "name", { value, configurable: true });
+	var __defProp$d = Object.defineProperty;
+	var __name$d = (target, value) => __defProp$d(target, "name", { value, configurable: true });
 	function coordEach(geojson, callback, excludeWrapCoord) {
 	  if (geojson === null)
 	    return;
@@ -7321,7 +7038,7 @@
 	    }
 	  }
 	}
-	__name$5(coordEach, "coordEach");
+	__name$d(coordEach, "coordEach");
 	function coordReduce(geojson, callback, initialValue, excludeWrapCoord) {
 	  var previousValue = initialValue;
 	  coordEach(
@@ -7343,7 +7060,7 @@
 	  );
 	  return previousValue;
 	}
-	__name$5(coordReduce, "coordReduce");
+	__name$d(coordReduce, "coordReduce");
 	function propEach(geojson, callback) {
 	  var i;
 	  switch (geojson.type) {
@@ -7358,7 +7075,7 @@
 	      break;
 	  }
 	}
-	__name$5(propEach, "propEach");
+	__name$d(propEach, "propEach");
 	function propReduce(geojson, callback, initialValue) {
 	  var previousValue = initialValue;
 	  propEach(geojson, function(currentProperties, featureIndex) {
@@ -7369,7 +7086,7 @@
 	  });
 	  return previousValue;
 	}
-	__name$5(propReduce, "propReduce");
+	__name$d(propReduce, "propReduce");
 	function featureEach(geojson, callback) {
 	  if (geojson.type === "Feature") {
 	    callback(geojson, 0);
@@ -7380,7 +7097,7 @@
 	    }
 	  }
 	}
-	__name$5(featureEach, "featureEach");
+	__name$d(featureEach, "featureEach");
 	function featureReduce(geojson, callback, initialValue) {
 	  var previousValue = initialValue;
 	  featureEach(geojson, function(currentFeature, featureIndex) {
@@ -7391,7 +7108,7 @@
 	  });
 	  return previousValue;
 	}
-	__name$5(featureReduce, "featureReduce");
+	__name$d(featureReduce, "featureReduce");
 	function coordAll(geojson) {
 	  var coords = [];
 	  coordEach(geojson, function(coord) {
@@ -7399,7 +7116,7 @@
 	  });
 	  return coords;
 	}
-	__name$5(coordAll, "coordAll");
+	__name$d(coordAll, "coordAll");
 	function geomEach(geojson, callback) {
 	  var i, j, g, geometry, stopG, geometryMaybeCollection, isGeometryCollection, featureProperties, featureBBox, featureId, featureIndex = 0, isFeatureCollection = geojson.type === "FeatureCollection", isFeature = geojson.type === "Feature", stop = isFeatureCollection ? geojson.features.length : 1;
 	  for (i = 0; i < stop; i++) {
@@ -7459,7 +7176,7 @@
 	    featureIndex++;
 	  }
 	}
-	__name$5(geomEach, "geomEach");
+	__name$d(geomEach, "geomEach");
 	function geomReduce(geojson, callback, initialValue) {
 	  var previousValue = initialValue;
 	  geomEach(
@@ -7480,7 +7197,7 @@
 	  );
 	  return previousValue;
 	}
-	__name$5(geomReduce, "geomReduce");
+	__name$d(geomReduce, "geomReduce");
 	function flattenEach(geojson, callback) {
 	  geomEach(geojson, function(geometry, featureIndex, properties, bbox, id) {
 	    var type = geometry === null ? null : geometry.type;
@@ -7520,7 +7237,7 @@
 	    }
 	  });
 	}
-	__name$5(flattenEach, "flattenEach");
+	__name$d(flattenEach, "flattenEach");
 	function flattenReduce(geojson, callback, initialValue) {
 	  var previousValue = initialValue;
 	  flattenEach(
@@ -7539,7 +7256,7 @@
 	  );
 	  return previousValue;
 	}
-	__name$5(flattenReduce, "flattenReduce");
+	__name$d(flattenReduce, "flattenReduce");
 	function segmentEach(geojson, callback) {
 	  flattenEach(geojson, function(feature2, featureIndex, multiFeatureIndex) {
 	    var segmentIndex = 0;
@@ -7582,7 +7299,7 @@
 	      return false;
 	  });
 	}
-	__name$5(segmentEach, "segmentEach");
+	__name$d(segmentEach, "segmentEach");
 	function segmentReduce(geojson, callback, initialValue) {
 	  var previousValue = initialValue;
 	  var started = false;
@@ -7605,7 +7322,7 @@
 	  );
 	  return previousValue;
 	}
-	__name$5(segmentReduce, "segmentReduce");
+	__name$d(segmentReduce, "segmentReduce");
 	function lineEach(geojson, callback) {
 	  if (!geojson)
 	    throw new Error("geojson is required");
@@ -7633,7 +7350,7 @@
 	    }
 	  });
 	}
-	__name$5(lineEach, "lineEach");
+	__name$d(lineEach, "lineEach");
 	function lineReduce(geojson, callback, initialValue) {
 	  var previousValue = initialValue;
 	  lineEach(
@@ -7653,7 +7370,7 @@
 	  );
 	  return previousValue;
 	}
-	__name$5(lineReduce, "lineReduce");
+	__name$d(lineReduce, "lineReduce");
 	function findSegment(geojson, options) {
 	  options = options || {};
 	  if (!isObject(options))
@@ -7746,7 +7463,7 @@
 	  }
 	  throw new Error("geojson is invalid");
 	}
-	__name$5(findSegment, "findSegment");
+	__name$d(findSegment, "findSegment");
 	function findPoint(geojson, options) {
 	  options = options || {};
 	  if (!isObject(options))
@@ -7821,38 +7538,30 @@
 	  }
 	  throw new Error("geojson is invalid");
 	}
-	__name$5(findPoint, "findPoint");
+	__name$d(findPoint, "findPoint");
 
-	/**
-	 * Computes the centroid as the mean of all vertices within the object.
-	 *
-	 * @name centroid
-	 * @param {GeoJSON} geojson GeoJSON to be centered
-	 * @param {Object} [options={}] Optional Parameters
-	 * @param {Object} [options.properties={}] an Object that is used as the {@link Feature}'s properties
-	 * @returns {Feature<Point>} the centroid of the input object
-	 * @example
-	 * var polygon = turf.polygon([[[-81, 41], [-88, 36], [-84, 31], [-80, 33], [-77, 39], [-81, 41]]]);
-	 *
-	 * var centroid = turf.centroid(polygon);
-	 *
-	 * //addToMap
-	 * var addToMap = [polygon, centroid]
-	 */
+	var __defProp$c = Object.defineProperty;
+	var __name$c = (target, value) => __defProp$c(target, "name", { value, configurable: true });
 	function centroid(geojson, options = {}) {
-	    let xSum = 0;
-	    let ySum = 0;
-	    let len = 0;
-	    coordEach(geojson, function (coord) {
-	        xSum += coord[0];
-	        ySum += coord[1];
-	        len++;
-	    }, true);
-	    return point$1([xSum / len, ySum / len], options.properties);
+	  let xSum = 0;
+	  let ySum = 0;
+	  let len = 0;
+	  coordEach(
+	    geojson,
+	    function(coord) {
+	      xSum += coord[0];
+	      ySum += coord[1];
+	      len++;
+	    },
+	    true
+	  );
+	  return point([xSum / len, ySum / len], options.properties);
 	}
+	__name$c(centroid, "centroid");
+	var turf_centroid_default = centroid;
 
-	var __defProp$4 = Object.defineProperty;
-	var __name$4 = (target, value) => __defProp$4(target, "name", { value, configurable: true });
+	var __defProp$b = Object.defineProperty;
+	var __name$b = (target, value) => __defProp$b(target, "name", { value, configurable: true });
 	function getCoord(coord) {
 	  if (!coord) {
 	    throw new Error("coord is required");
@@ -7870,7 +7579,7 @@
 	  }
 	  throw new Error("coord must be GeoJSON Point or an Array of numbers");
 	}
-	__name$4(getCoord, "getCoord");
+	__name$b(getCoord, "getCoord");
 	function getCoords(coords) {
 	  if (Array.isArray(coords)) {
 	    return coords;
@@ -7888,7 +7597,7 @@
 	    "coords must be GeoJSON Feature, Geometry Object or an Array"
 	  );
 	}
-	__name$4(getCoords, "getCoords");
+	__name$b(getCoords, "getCoords");
 	function containsNumber(coordinates) {
 	  if (coordinates.length > 1 && isNumber(coordinates[0]) && isNumber(coordinates[1])) {
 	    return true;
@@ -7898,7 +7607,7 @@
 	  }
 	  throw new Error("coordinates must only contain numbers");
 	}
-	__name$4(containsNumber, "containsNumber");
+	__name$b(containsNumber, "containsNumber");
 	function geojsonType(value, type, name) {
 	  if (!type || !name) {
 	    throw new Error("type and name required");
@@ -7909,7 +7618,7 @@
 	    );
 	  }
 	}
-	__name$4(geojsonType, "geojsonType");
+	__name$b(geojsonType, "geojsonType");
 	function featureOf(feature, type, name) {
 	  if (!feature) {
 	    throw new Error("No feature passed");
@@ -7928,7 +7637,7 @@
 	    );
 	  }
 	}
-	__name$4(featureOf, "featureOf");
+	__name$b(featureOf, "featureOf");
 	function collectionOf(featureCollection, type, name) {
 	  if (!featureCollection) {
 	    throw new Error("No featureCollection passed");
@@ -7954,14 +7663,14 @@
 	    }
 	  }
 	}
-	__name$4(collectionOf, "collectionOf");
+	__name$b(collectionOf, "collectionOf");
 	function getGeom(geojson) {
 	  if (geojson.type === "Feature") {
 	    return geojson.geometry;
 	  }
 	  return geojson;
 	}
-	__name$4(getGeom, "getGeom");
+	__name$b(getGeom, "getGeom");
 	function getType(geojson, _name) {
 	  if (geojson.type === "FeatureCollection") {
 	    return "FeatureCollection";
@@ -7974,157 +7683,76 @@
 	  }
 	  return geojson.type;
 	}
-	__name$4(getType, "getType");
+	__name$b(getType, "getType");
 
-	// https://en.wikipedia.org/wiki/Rhumb_line
-	/**
-	 * Takes two {@link Point|points} and finds the bearing angle between them along a Rhumb line
-	 * i.e. the angle measured in degrees start the north line (0 degrees)
-	 *
-	 * @name rhumbBearing
-	 * @param {Coord} start starting Point
-	 * @param {Coord} end ending Point
-	 * @param {Object} [options] Optional parameters
-	 * @param {boolean} [options.final=false] calculates the final bearing if true
-	 * @returns {number} bearing from north in decimal degrees, between -180 and 180 degrees (positive clockwise)
-	 * @example
-	 * var point1 = turf.point([-75.343, 39.984], {"marker-color": "#F00"});
-	 * var point2 = turf.point([-75.534, 39.123], {"marker-color": "#00F"});
-	 *
-	 * var bearing = turf.rhumbBearing(point1, point2);
-	 *
-	 * //addToMap
-	 * var addToMap = [point1, point2];
-	 * point1.properties.bearing = bearing;
-	 * point2.properties.bearing = bearing;
-	 */
+	var __defProp$a = Object.defineProperty;
+	var __name$a = (target, value) => __defProp$a(target, "name", { value, configurable: true });
 	function rhumbBearing(start, end, options = {}) {
-	    let bear360;
-	    if (options.final) {
-	        bear360 = calculateRhumbBearing(getCoord(end), getCoord(start));
-	    }
-	    else {
-	        bear360 = calculateRhumbBearing(getCoord(start), getCoord(end));
-	    }
-	    const bear180 = bear360 > 180 ? -(360 - bear360) : bear360;
-	    return bear180;
+	  let bear360;
+	  if (options.final) {
+	    bear360 = calculateRhumbBearing(getCoord(end), getCoord(start));
+	  } else {
+	    bear360 = calculateRhumbBearing(getCoord(start), getCoord(end));
+	  }
+	  const bear180 = bear360 > 180 ? -(360 - bear360) : bear360;
+	  return bear180;
 	}
-	/**
-	 * Returns the bearing from ‘this’ point to destination point along a rhumb line.
-	 * Adapted from Geodesy: https://github.com/chrisveness/geodesy/blob/master/latlon-spherical.js
-	 *
-	 * @private
-	 * @param   {Array<number>} from - origin point.
-	 * @param   {Array<number>} to - destination point.
-	 * @returns {number} Bearing in degrees from north.
-	 * @example
-	 * var p1 = new LatLon(51.127, 1.338);
-	 * var p2 = new LatLon(50.964, 1.853);
-	 * var d = p1.rhumbBearingTo(p2); // 116.7 m
-	 */
+	__name$a(rhumbBearing, "rhumbBearing");
 	function calculateRhumbBearing(from, to) {
-	    // φ => phi
-	    // Δλ => deltaLambda
-	    // Δψ => deltaPsi
-	    // θ => theta
-	    const phi1 = degreesToRadians$1(from[1]);
-	    const phi2 = degreesToRadians$1(to[1]);
-	    let deltaLambda = degreesToRadians$1(to[0] - from[0]);
-	    // if deltaLambdaon over 180° take shorter rhumb line across the anti-meridian:
-	    if (deltaLambda > Math.PI) {
-	        deltaLambda -= 2 * Math.PI;
-	    }
-	    if (deltaLambda < -Math.PI) {
-	        deltaLambda += 2 * Math.PI;
-	    }
-	    const deltaPsi = Math.log(Math.tan(phi2 / 2 + Math.PI / 4) / Math.tan(phi1 / 2 + Math.PI / 4));
-	    const theta = Math.atan2(deltaLambda, deltaPsi);
-	    return (radiansToDegrees$1(theta) + 360) % 360;
+	  const phi1 = degreesToRadians(from[1]);
+	  const phi2 = degreesToRadians(to[1]);
+	  let deltaLambda = degreesToRadians(to[0] - from[0]);
+	  if (deltaLambda > Math.PI) {
+	    deltaLambda -= 2 * Math.PI;
+	  }
+	  if (deltaLambda < -Math.PI) {
+	    deltaLambda += 2 * Math.PI;
+	  }
+	  const deltaPsi = Math.log(
+	    Math.tan(phi2 / 2 + Math.PI / 4) / Math.tan(phi1 / 2 + Math.PI / 4)
+	  );
+	  const theta = Math.atan2(deltaLambda, deltaPsi);
+	  return (radiansToDegrees(theta) + 360) % 360;
 	}
+	__name$a(calculateRhumbBearing, "calculateRhumbBearing");
+	var turf_rhumb_bearing_default = rhumbBearing;
 
-	// https://en.wikipedia.org/wiki/Rhumb_line
-	/**
-	 * Calculates the distance along a rhumb line between two {@link Point|points} in degrees, radians,
-	 * miles, or kilometers.
-	 *
-	 * @name rhumbDistance
-	 * @param {Coord} from origin point
-	 * @param {Coord} to destination point
-	 * @param {Object} [options] Optional parameters
-	 * @param {string} [options.units="kilometers"] can be degrees, radians, miles, or kilometers
-	 * @returns {number} distance between the two points
-	 * @example
-	 * var from = turf.point([-75.343, 39.984]);
-	 * var to = turf.point([-75.534, 39.123]);
-	 * var options = {units: 'miles'};
-	 *
-	 * var distance = turf.rhumbDistance(from, to, options);
-	 *
-	 * //addToMap
-	 * var addToMap = [from, to];
-	 * from.properties.distance = distance;
-	 * to.properties.distance = distance;
-	 */
+	var __defProp$9 = Object.defineProperty;
+	var __name$9 = (target, value) => __defProp$9(target, "name", { value, configurable: true });
 	function rhumbDistance(from, to, options = {}) {
-	    const origin = getCoord(from);
-	    const destination = getCoord(to);
-	    // compensate the crossing of the 180th meridian (https://macwright.org/2016/09/26/the-180th-meridian.html)
-	    // solution from https://github.com/mapbox/mapbox-gl-js/issues/3250#issuecomment-294887678
-	    destination[0] +=
-	        destination[0] - origin[0] > 180
-	            ? -360
-	            : origin[0] - destination[0] > 180
-	                ? 360
-	                : 0;
-	    const distanceInMeters = calculateRhumbDistance(origin, destination);
-	    const distance = convertLength$1(distanceInMeters, "meters", options.units);
-	    return distance;
+	  const origin = getCoord(from);
+	  const destination = getCoord(to);
+	  destination[0] += destination[0] - origin[0] > 180 ? -360 : origin[0] - destination[0] > 180 ? 360 : 0;
+	  const distanceInMeters = calculateRhumbDistance(origin, destination);
+	  const distance = convertLength(distanceInMeters, "meters", options.units);
+	  return distance;
 	}
-	/**
-	 * Returns the distance travelling from ‘this’ point to destination point along a rhumb line.
-	 * Adapted from Geodesy: https://github.com/chrisveness/geodesy/blob/master/latlon-spherical.js
-	 *
-	 * @private
-	 * @param   {Array<number>} origin point.
-	 * @param   {Array<number>} destination point.
-	 * @param   {number} [radius=6371e3] - (Mean) radius of earth (defaults to radius in metres).
-	 * @returns {number} Distance in km between this point and destination point (same units as radius).
-	 *
-	 * @example
-	 *     var p1 = new LatLon(51.127, 1.338);
-	 *     var p2 = new LatLon(50.964, 1.853);
-	 *     var d = p1.distanceTo(p2); // 40.31 km
-	 */
+	__name$9(rhumbDistance, "rhumbDistance");
 	function calculateRhumbDistance(origin, destination, radius) {
-	    // φ => phi
-	    // λ => lambda
-	    // ψ => psi
-	    // Δ => Delta
-	    // δ => delta
-	    // θ => theta
-	    radius = radius === undefined ? earthRadius$1 : Number(radius);
-	    // see www.edwilliams.org/avform.htm#Rhumb
-	    const R = radius;
-	    const phi1 = (origin[1] * Math.PI) / 180;
-	    const phi2 = (destination[1] * Math.PI) / 180;
-	    const DeltaPhi = phi2 - phi1;
-	    let DeltaLambda = (Math.abs(destination[0] - origin[0]) * Math.PI) / 180;
-	    // if dLon over 180° take shorter rhumb line across the anti-meridian:
-	    if (DeltaLambda > Math.PI) {
-	        DeltaLambda -= 2 * Math.PI;
-	    }
-	    // on Mercator projection, longitude distances shrink by latitude; q is the 'stretch factor'
-	    // q becomes ill-conditioned along E-W line (0/0); use empirical tolerance to avoid it
-	    const DeltaPsi = Math.log(Math.tan(phi2 / 2 + Math.PI / 4) / Math.tan(phi1 / 2 + Math.PI / 4));
-	    const q = Math.abs(DeltaPsi) > 10e-12 ? DeltaPhi / DeltaPsi : Math.cos(phi1);
-	    // distance is pythagoras on 'stretched' Mercator projection
-	    const delta = Math.sqrt(DeltaPhi * DeltaPhi + q * q * DeltaLambda * DeltaLambda); // angular distance in radians
-	    const dist = delta * R;
-	    return dist;
+	  radius = radius === void 0 ? earthRadius : Number(radius);
+	  const R = radius;
+	  const phi1 = origin[1] * Math.PI / 180;
+	  const phi2 = destination[1] * Math.PI / 180;
+	  const DeltaPhi = phi2 - phi1;
+	  let DeltaLambda = Math.abs(destination[0] - origin[0]) * Math.PI / 180;
+	  if (DeltaLambda > Math.PI) {
+	    DeltaLambda -= 2 * Math.PI;
+	  }
+	  const DeltaPsi = Math.log(
+	    Math.tan(phi2 / 2 + Math.PI / 4) / Math.tan(phi1 / 2 + Math.PI / 4)
+	  );
+	  const q = Math.abs(DeltaPsi) > 1e-11 ? DeltaPhi / DeltaPsi : Math.cos(phi1);
+	  const delta = Math.sqrt(
+	    DeltaPhi * DeltaPhi + q * q * DeltaLambda * DeltaLambda
+	  );
+	  const dist = delta * R;
+	  return dist;
 	}
+	__name$9(calculateRhumbDistance, "calculateRhumbDistance");
+	var turf_rhumb_distance_default = rhumbDistance;
 
-	var __defProp$3 = Object.defineProperty;
-	var __name$3 = (target, value) => __defProp$3(target, "name", { value, configurable: true });
+	var __defProp$8 = Object.defineProperty;
+	var __name$8 = (target, value) => __defProp$8(target, "name", { value, configurable: true });
 	function rhumbDestination(origin, distance, bearing, options = {}) {
 	  const wasNegativeDistance = distance < 0;
 	  let distanceInMeters = convertLength(
@@ -8143,7 +7771,7 @@
 	  destination[0] += destination[0] - coords[0] > 180 ? -360 : coords[0] - destination[0] > 180 ? 360 : 0;
 	  return point(destination, options.properties);
 	}
-	__name$3(rhumbDestination, "rhumbDestination");
+	__name$8(rhumbDestination, "rhumbDestination");
 	function calculateRhumbDestination(origin, distance, bearing, radius) {
 	  radius = radius === void 0 ? earthRadius : Number(radius);
 	  const delta = distance / radius;
@@ -8166,11 +7794,10 @@
 	    phi2 * 180 / Math.PI
 	  ];
 	}
-	__name$3(calculateRhumbDestination, "calculateRhumbDestination");
-	var turf_rhumb_destination_default = rhumbDestination;
+	__name$8(calculateRhumbDestination, "calculateRhumbDestination");
 
-	var __defProp$2 = Object.defineProperty;
-	var __name$2 = (target, value) => __defProp$2(target, "name", { value, configurable: true });
+	var __defProp$7 = Object.defineProperty;
+	var __name$7 = (target, value) => __defProp$7(target, "name", { value, configurable: true });
 
 	// index.ts
 	function clone(geojson) {
@@ -8194,7 +7821,7 @@
 	      throw new Error("unknown GeoJSON type");
 	  }
 	}
-	__name$2(clone, "clone");
+	__name$7(clone, "clone");
 	function cloneFeature(geojson) {
 	  const cloned = { type: "Feature" };
 	  Object.keys(geojson).forEach((key) => {
@@ -8215,7 +7842,7 @@
 	  }
 	  return cloned;
 	}
-	__name$2(cloneFeature, "cloneFeature");
+	__name$7(cloneFeature, "cloneFeature");
 	function cloneProperties(properties) {
 	  const cloned = {};
 	  if (!properties) {
@@ -8239,7 +7866,7 @@
 	  });
 	  return cloned;
 	}
-	__name$2(cloneProperties, "cloneProperties");
+	__name$7(cloneProperties, "cloneProperties");
 	function cloneFeatureCollection(geojson) {
 	  const cloned = { type: "FeatureCollection" };
 	  Object.keys(geojson).forEach((key) => {
@@ -8256,7 +7883,7 @@
 	  });
 	  return cloned;
 	}
-	__name$2(cloneFeatureCollection, "cloneFeatureCollection");
+	__name$7(cloneFeatureCollection, "cloneFeatureCollection");
 	function cloneGeometry(geometry) {
 	  const geom = { type: geometry.type };
 	  if (geometry.bbox) {
@@ -8271,7 +7898,7 @@
 	  geom.coordinates = deepSlice(geometry.coordinates);
 	  return geom;
 	}
-	__name$2(cloneGeometry, "cloneGeometry");
+	__name$7(cloneGeometry, "cloneGeometry");
 	function deepSlice(coords) {
 	  const cloned = coords;
 	  if (typeof cloned[0] !== "object") {
@@ -8281,115 +7908,63 @@
 	    return deepSlice(coord);
 	  });
 	}
-	__name$2(deepSlice, "deepSlice");
-	var turf_clone_default = clone;
+	__name$7(deepSlice, "deepSlice");
 
-	/**
-	 * Rotates any geojson Feature or Geometry of a specified angle, around its `centroid` or a given `pivot` point.
-	 *
-	 * @name transformRotate
-	 * @param {GeoJSON} geojson object to be rotated
-	 * @param {number} angle of rotation in decimal degrees, positive clockwise
-	 * @param {Object} [options={}] Optional parameters
-	 * @param {Coord} [options.pivot='centroid'] point around which the rotation will be performed
-	 * @param {boolean} [options.mutate=false] allows GeoJSON input to be mutated (significant performance increase if true)
-	 * @returns {GeoJSON} the rotated GeoJSON feature
-	 * @example
-	 * var poly = turf.polygon([[[0,29],[3.5,29],[2.5,32],[0,29]]]);
-	 * var options = {pivot: [0, 25]};
-	 * var rotatedPoly = turf.transformRotate(poly, 10, options);
-	 *
-	 * //addToMap
-	 * var addToMap = [poly, rotatedPoly];
-	 * rotatedPoly.properties = {stroke: '#F00', 'stroke-width': 4};
-	 */
+	var __defProp$6 = Object.defineProperty;
+	var __name$6 = (target, value) => __defProp$6(target, "name", { value, configurable: true });
 	function transformRotate(geojson, angle, options) {
-	  // Optional parameters
 	  options = options || {};
-	  if (!isObject$2(options)) throw new Error("options is invalid");
+	  if (!isObject(options))
+	    throw new Error("options is invalid");
 	  var pivot = options.pivot;
 	  var mutate = options.mutate;
-
-	  // Input validation
-	  if (!geojson) throw new Error("geojson is required");
-	  if (angle === undefined || angle === null || isNaN(angle))
+	  if (!geojson)
+	    throw new Error("geojson is required");
+	  if (angle === void 0 || angle === null || isNaN(angle))
 	    throw new Error("angle is required");
-
-	  // Shortcut no-rotation
-	  if (angle === 0) return geojson;
-
-	  // Use centroid of GeoJSON if pivot is not provided
-	  if (!pivot) pivot = centroid(geojson);
-
-	  // Clone geojson to avoid side effects
-	  if (mutate === false || mutate === undefined) geojson = turf_clone_default(geojson);
-
-	  // Rotate each coordinate
-	  coordEach(geojson, function (pointCoords) {
+	  if (angle === 0)
+	    return geojson;
+	  if (!pivot)
+	    pivot = centroid(geojson);
+	  if (mutate === false || mutate === void 0)
+	    geojson = clone(geojson);
+	  coordEach(geojson, function(pointCoords) {
 	    var initialAngle = rhumbBearing(pivot, pointCoords);
 	    var finalAngle = initialAngle + angle;
 	    var distance = rhumbDistance(pivot, pointCoords);
-	    var newCoords = getCoords(turf_rhumb_destination_default(pivot, distance, finalAngle));
+	    var newCoords = getCoords(rhumbDestination(pivot, distance, finalAngle));
 	    pointCoords[0] = newCoords[0];
 	    pointCoords[1] = newCoords[1];
 	  });
 	  return geojson;
 	}
+	__name$6(transformRotate, "transformRotate");
+	var turf_transform_rotate_default = transformRotate;
 
-	// http://en.wikipedia.org/wiki/Haversine_formula
-	// http://www.movable-type.co.uk/scripts/latlong.html
-	/**
-	 * Takes two {@link Point|points} and finds the geographic bearing between them,
-	 * i.e. the angle measured in degrees from the north line (0 degrees)
-	 *
-	 * @name bearing
-	 * @param {Coord} start starting Point
-	 * @param {Coord} end ending Point
-	 * @param {Object} [options={}] Optional parameters
-	 * @param {boolean} [options.final=false] calculates the final bearing if true
-	 * @returns {number} bearing in decimal degrees, between -180 and 180 degrees (positive clockwise)
-	 * @example
-	 * var point1 = turf.point([-75.343, 39.984]);
-	 * var point2 = turf.point([-75.534, 39.123]);
-	 *
-	 * var bearing = turf.bearing(point1, point2);
-	 *
-	 * //addToMap
-	 * var addToMap = [point1, point2]
-	 * point1.properties['marker-color'] = '#f00'
-	 * point2.properties['marker-color'] = '#0f0'
-	 * point1.properties.bearing = bearing
-	 */
+	var __defProp$5 = Object.defineProperty;
+	var __name$5 = (target, value) => __defProp$5(target, "name", { value, configurable: true });
 	function bearing(start, end, options = {}) {
-	    // Reverse calculation
-	    if (options.final === true) {
-	        return calculateFinalBearing(start, end);
-	    }
-	    const coordinates1 = getCoord(start);
-	    const coordinates2 = getCoord(end);
-	    const lon1 = degreesToRadians$1(coordinates1[0]);
-	    const lon2 = degreesToRadians$1(coordinates2[0]);
-	    const lat1 = degreesToRadians$1(coordinates1[1]);
-	    const lat2 = degreesToRadians$1(coordinates2[1]);
-	    const a = Math.sin(lon2 - lon1) * Math.cos(lat2);
-	    const b = Math.cos(lat1) * Math.sin(lat2) -
-	        Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1);
-	    return radiansToDegrees$1(Math.atan2(a, b));
+	  if (options.final === true) {
+	    return calculateFinalBearing(start, end);
+	  }
+	  const coordinates1 = getCoord(start);
+	  const coordinates2 = getCoord(end);
+	  const lon1 = degreesToRadians(coordinates1[0]);
+	  const lon2 = degreesToRadians(coordinates2[0]);
+	  const lat1 = degreesToRadians(coordinates1[1]);
+	  const lat2 = degreesToRadians(coordinates2[1]);
+	  const a = Math.sin(lon2 - lon1) * Math.cos(lat2);
+	  const b = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1);
+	  return radiansToDegrees(Math.atan2(a, b));
 	}
-	/**
-	 * Calculates Final Bearing
-	 *
-	 * @private
-	 * @param {Coord} start starting Point
-	 * @param {Coord} end ending Point
-	 * @returns {number} bearing
-	 */
+	__name$5(bearing, "bearing");
 	function calculateFinalBearing(start, end) {
-	    // Swap start & end
-	    let bear = bearing(end, start);
-	    bear = (bear + 180) % 360;
-	    return bear;
+	  let bear = bearing(end, start);
+	  bear = (bear + 180) % 360;
+	  return bear;
 	}
+	__name$5(calculateFinalBearing, "calculateFinalBearing");
+	var turf_bearing_default = bearing;
 
 	class Rotate {
 		/**
@@ -8429,7 +8004,7 @@
 		onPointerDown = (event) => {
 			event.preventDefault();
 			const geojson = this.raster.polygonSource.source.data;
-			this.centroid = /** @type {[number, number]} */ (centroid(geojson).geometry.coordinates);
+			this.centroid = /** @type {[number, number]} */ (turf_centroid_default(geojson).geometry.coordinates);
 			this.startPoint = [event.lngLat.lng, event.lngLat.lat];
 			this.map.on('mousemove', this.onPointerMove);
 			document.addEventListener('pointerup', this.onPointerUp, { once: true });
@@ -8443,11 +8018,11 @@
 			if (!this.startPoint) throw Error('previous position is undefined');
 			/** @type {[number, number]} */
 			const currentPosition = [event.lngLat.lng, event.lngLat.lat];
-			const azimuthA = bearingToAzimuth$1(bearing(this.startPoint, this.centroid));
-			const azimuthB = bearingToAzimuth$1(bearing(currentPosition, this.centroid));
+			const azimuthA = bearingToAzimuth(turf_bearing_default(this.startPoint, this.centroid));
+			const azimuthB = bearingToAzimuth(turf_bearing_default(currentPosition, this.centroid));
 			const delta = azimuthB - azimuthA;
 			const geojson = this.raster.polygonSource.source.data;
-			const transformed = transformRotate(geojson, delta);
+			const transformed = turf_transform_rotate_default(geojson, delta);
 			const position = /** @type {[number, number][]} */ (transformed.geometry.coordinates[0]);
 			this.onUpdate(position.slice(0, 4));
 			this.startPoint = currentPosition;
@@ -8470,8 +8045,8 @@
 		}
 	}
 
-	var __defProp$1 = Object.defineProperty;
-	var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+	var __defProp$4 = Object.defineProperty;
+	var __name$4 = (target, value) => __defProp$4(target, "name", { value, configurable: true });
 	function bbox(geojson, options = {}) {
 	  if (geojson.bbox != null && true !== options.recompute) {
 	    return geojson.bbox;
@@ -8493,148 +8068,95 @@
 	  });
 	  return result;
 	}
-	__name$1(bbox, "bbox");
-	var turf_bbox_default = bbox;
+	__name$4(bbox, "bbox");
 
-	var __defProp = Object.defineProperty;
-	var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+	var __defProp$3 = Object.defineProperty;
+	var __name$3 = (target, value) => __defProp$3(target, "name", { value, configurable: true });
 	function center(geojson, options = {}) {
 	  const ext = bbox(geojson);
 	  const x = (ext[0] + ext[2]) / 2;
 	  const y = (ext[1] + ext[3]) / 2;
 	  return point([x, y], options.properties, options);
 	}
-	__name(center, "center");
-	var turf_center_default = center;
+	__name$3(center, "center");
 
-	/**
-	 * Scale a GeoJSON from a given point by a factor of scaling (ex: factor=2 would make the GeoJSON 200% larger).
-	 * If a FeatureCollection is provided, the origin point will be calculated based on each individual Feature.
-	 *
-	 * @name transformScale
-	 * @param {GeoJSON} geojson GeoJSON to be scaled
-	 * @param {number} factor of scaling, positive values greater than 0. Numbers between 0 and 1 will shrink the geojson, numbers greater than 1 will expand it, a factor of 1 will not change the geojson.
-	 * @param {Object} [options={}] Optional parameters
-	 * @param {string|Coord} [options.origin='centroid'] Point from which the scaling will occur (string options: sw/se/nw/ne/center/centroid)
-	 * @param {boolean} [options.mutate=false] allows GeoJSON input to be mutated (significant performance increase if true)
-	 * @returns {GeoJSON} scaled GeoJSON
-	 * @example
-	 * var poly = turf.polygon([[[0,29],[3.5,29],[2.5,32],[0,29]]]);
-	 * var scaledPoly = turf.transformScale(poly, 3);
-	 *
-	 * //addToMap
-	 * var addToMap = [poly, scaledPoly];
-	 * scaledPoly.properties = {stroke: '#F00', 'stroke-width': 4};
-	 */
+	var __defProp$2 = Object.defineProperty;
+	var __name$2 = (target, value) => __defProp$2(target, "name", { value, configurable: true });
 	function transformScale(geojson, factor, options) {
-	  // Optional parameters
 	  options = options || {};
-	  if (!isObject$2(options)) throw new Error("options is invalid");
+	  if (!isObject(options))
+	    throw new Error("options is invalid");
 	  var origin = options.origin;
 	  var mutate = options.mutate;
-
-	  // Input validation
-	  if (!geojson) throw new Error("geojson required");
+	  if (!geojson)
+	    throw new Error("geojson required");
 	  if (typeof factor !== "number" || factor <= 0)
 	    throw new Error("invalid factor");
 	  var originIsPoint = Array.isArray(origin) || typeof origin === "object";
-
-	  // Clone geojson to avoid side effects
-	  if (mutate !== true) geojson = turf_clone_default(geojson);
-
-	  // Scale each Feature separately
+	  if (mutate !== true)
+	    geojson = clone(geojson);
 	  if (geojson.type === "FeatureCollection" && !originIsPoint) {
-	    featureEach(geojson, function (feature, index) {
+	    featureEach(geojson, function(feature, index) {
 	      geojson.features[index] = scale$1(feature, factor, origin);
 	    });
 	    return geojson;
 	  }
-	  // Scale Feature/Geometry
 	  return scale$1(geojson, factor, origin);
 	}
-
-	/**
-	 * Scale Feature/Geometry
-	 *
-	 * @private
-	 * @param {Feature|Geometry} feature GeoJSON Feature/Geometry
-	 * @param {number} factor of scaling, positive or negative values greater than 0
-	 * @param {string|Coord} [origin="centroid"] Point from which the scaling will occur (string options: sw/se/nw/ne/center/centroid)
-	 * @returns {Feature|Geometry} scaled GeoJSON Feature/Geometry
-	 */
+	__name$2(transformScale, "transformScale");
 	function scale$1(feature, factor, origin) {
-	  // Default params
 	  var isPoint = getType(feature) === "Point";
 	  origin = defineOrigin(feature, origin);
-
-	  // Shortcut no-scaling
-	  if (factor === 1 || isPoint) return feature;
-
-	  // Scale each coordinate
-	  coordEach(feature, function (coord) {
+	  if (factor === 1 || isPoint)
+	    return feature;
+	  coordEach(feature, function(coord) {
 	    var originalDistance = rhumbDistance(origin, coord);
 	    var bearing = rhumbBearing(origin, coord);
 	    var newDistance = originalDistance * factor;
-	    var newCoord = getCoords(turf_rhumb_destination_default(origin, newDistance, bearing));
+	    var newCoord = getCoords(rhumbDestination(origin, newDistance, bearing));
 	    coord[0] = newCoord[0];
 	    coord[1] = newCoord[1];
-	    if (coord.length === 3) coord[2] *= factor;
+	    if (coord.length === 3)
+	      coord[2] *= factor;
 	  });
-
 	  delete feature.bbox;
-
 	  return feature;
 	}
-
-	/**
-	 * Define Origin
-	 *
-	 * @private
-	 * @param {GeoJSON} geojson GeoJSON
-	 * @param {string|Coord} origin sw/se/nw/ne/center/centroid
-	 * @returns {Feature<Point>} Point origin
-	 */
+	__name$2(scale$1, "scale");
 	function defineOrigin(geojson, origin) {
-	  // Default params
-	  if (origin === undefined || origin === null) origin = "centroid";
-
-	  // Input Coord
+	  if (origin === void 0 || origin === null)
+	    origin = "centroid";
 	  if (Array.isArray(origin) || typeof origin === "object")
 	    return getCoord(origin);
-
-	  // Define BBox
-	  var bbox = geojson.bbox
-	    ? geojson.bbox
-	    : turf_bbox_default(geojson, { recalculate: true });
-	  var west = bbox[0];
-	  var south = bbox[1];
-	  var east = bbox[2];
-	  var north = bbox[3];
-
+	  var bbox$1 = geojson.bbox ? geojson.bbox : bbox(geojson, { recalculate: true });
+	  var west = bbox$1[0];
+	  var south = bbox$1[1];
+	  var east = bbox$1[2];
+	  var north = bbox$1[3];
 	  switch (origin) {
 	    case "sw":
 	    case "southwest":
 	    case "westsouth":
 	    case "bottomleft":
-	      return point$1([west, south]);
+	      return point([west, south]);
 	    case "se":
 	    case "southeast":
 	    case "eastsouth":
 	    case "bottomright":
-	      return point$1([east, south]);
+	      return point([east, south]);
 	    case "nw":
 	    case "northwest":
 	    case "westnorth":
 	    case "topleft":
-	      return point$1([west, north]);
+	      return point([west, north]);
 	    case "ne":
 	    case "northeast":
 	    case "eastnorth":
 	    case "topright":
-	      return point$1([east, north]);
+	      return point([east, north]);
 	    case "center":
-	      return turf_center_default(geojson);
-	    case undefined:
+	      return center(geojson);
+	    case void 0:
 	    case null:
 	    case "centroid":
 	      return centroid(geojson);
@@ -8642,6 +8164,8 @@
 	      throw new Error("invalid origin");
 	  }
 	}
+	__name$2(defineOrigin, "defineOrigin");
+	var turf_transform_scale_default = transformScale;
 
 	class Scale {
 		/**
@@ -8698,11 +8222,11 @@
 			const point0 = this.raster.coordinates[index0];
 			const pointA = this.raster.coordinates[this.knobIndex];
 			const pointB = [event.lngLat.lng, event.lngLat.lat];
-			const distA0 = rhumbDistance(pointA, point0);
-			const distB0 = rhumbDistance(pointB, point0);
+			const distA0 = turf_rhumb_distance_default(pointA, point0);
+			const distB0 = turf_rhumb_distance_default(pointB, point0);
 			const scale = distB0 / distA0;
 			const geojson = this.raster.polygonSource.source.data;
-			const transformed = transformScale(geojson, scale, { origin: point0 });
+			const transformed = turf_transform_scale_default(geojson, scale, { origin: point0 });
 			const position = /** @type {[number, number][]} */ (transformed.geometry.coordinates[0]);
 			this.onUpdate(position.slice(0, 4));
 		};
@@ -8722,62 +8246,35 @@
 		}
 	}
 
-	/**
-	 * Moves any geojson Feature or Geometry of a specified distance along a Rhumb Line
-	 * on the provided direction angle.
-	 *
-	 * @name transformTranslate
-	 * @param {GeoJSON} geojson object to be translated
-	 * @param {number} distance length of the motion; negative values determine motion in opposite direction
-	 * @param {number} direction of the motion; angle from North in decimal degrees, positive clockwise
-	 * @param {Object} [options={}] Optional parameters
-	 * @param {string} [options.units='kilometers'] in which `distance` will be express; miles, kilometers, degrees, or radians
-	 * @param {number} [options.zTranslation=0] length of the vertical motion, same unit of distance
-	 * @param {boolean} [options.mutate=false] allows GeoJSON input to be mutated (significant performance increase if true)
-	 * @returns {GeoJSON} the translated GeoJSON object
-	 * @example
-	 * var poly = turf.polygon([[[0,29],[3.5,29],[2.5,32],[0,29]]]);
-	 * var translatedPoly = turf.transformTranslate(poly, 100, 35);
-	 *
-	 * //addToMap
-	 * var addToMap = [poly, translatedPoly];
-	 * translatedPoly.properties = {stroke: '#F00', 'stroke-width': 4};
-	 */
+	var __defProp$1 = Object.defineProperty;
+	var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
 	function transformTranslate(geojson, distance, direction, options) {
-	  // Optional parameters
 	  options = options || {};
-	  if (!isObject$2(options)) throw new Error("options is invalid");
+	  if (!isObject(options))
+	    throw new Error("options is invalid");
 	  var units = options.units;
 	  var zTranslation = options.zTranslation;
 	  var mutate = options.mutate;
-
-	  // Input validation
-	  if (!geojson) throw new Error("geojson is required");
-	  if (distance === undefined || distance === null || isNaN(distance))
+	  if (!geojson)
+	    throw new Error("geojson is required");
+	  if (distance === void 0 || distance === null || isNaN(distance))
 	    throw new Error("distance is required");
 	  if (zTranslation && typeof zTranslation !== "number" && isNaN(zTranslation))
 	    throw new Error("zTranslation is not a number");
-
-	  // Shortcut no-motion
-	  zTranslation = zTranslation !== undefined ? zTranslation : 0;
-	  if (distance === 0 && zTranslation === 0) return geojson;
-
-	  if (direction === undefined || direction === null || isNaN(direction))
+	  zTranslation = zTranslation !== void 0 ? zTranslation : 0;
+	  if (distance === 0 && zTranslation === 0)
+	    return geojson;
+	  if (direction === void 0 || direction === null || isNaN(direction))
 	    throw new Error("direction is required");
-
-	  // Invert with negative distances
 	  if (distance < 0) {
 	    distance = -distance;
 	    direction = direction + 180;
 	  }
-
-	  // Clone geojson to avoid side effects
-	  if (mutate === false || mutate === undefined) geojson = turf_clone_default(geojson);
-
-	  // Translate each coordinate
-	  coordEach(geojson, function (pointCoords) {
+	  if (mutate === false || mutate === void 0)
+	    geojson = clone(geojson);
+	  coordEach(geojson, function(pointCoords) {
 	    var newCoords = getCoords(
-	      turf_rhumb_destination_default(pointCoords, distance, direction, { units: units })
+	      rhumbDestination(pointCoords, distance, direction, { units })
 	    );
 	    pointCoords[0] = newCoords[0];
 	    pointCoords[1] = newCoords[1];
@@ -8786,6 +8283,8 @@
 	  });
 	  return geojson;
 	}
+	__name$1(transformTranslate, "transformTranslate");
+	var turf_transform_translate_default = transformTranslate;
 
 	class Move {
 		/**
@@ -8834,10 +8333,10 @@
 			if (!this.prevPosition) throw Error('previous position is undefined');
 			/** @type {[number, number]} */
 			const currentPosition = [event.lngLat.lng, event.lngLat.lat];
-			const bearingBetween = rhumbBearing(this.prevPosition, currentPosition);
-			const distanceBetween = rhumbDistance(this.prevPosition, currentPosition);
+			const bearingBetween = turf_rhumb_bearing_default(this.prevPosition, currentPosition);
+			const distanceBetween = turf_rhumb_distance_default(this.prevPosition, currentPosition);
 			const geojson = this.raster.polygonSource.source.data;
-			const transformed = transformTranslate(geojson, distanceBetween, bearingBetween);
+			const transformed = turf_transform_translate_default(geojson, distanceBetween, bearingBetween);
 			const position = /** @type {[number, number][]} */ (transformed.geometry.coordinates[0]);
 			this.onUpdate(position.slice(0, 4));
 			this.prevPosition = currentPosition;
@@ -8905,7 +8404,7 @@
 		 * }}
 		 */
 		get polygonSource() {
-			const feature = polygon$2([[...this.coordinates, this.coordinates[0]]], { id: this.id });
+			const feature = polygon$1([[...this.coordinates, this.coordinates[0]]], { id: this.id });
 			return {
 				id: `$polygon:${this.id}`,
 				source: {
@@ -8925,12 +8424,12 @@
 		 * }}
 		 */
 		get pointsSource() {
-			const features = this.coordinates.map((coordinate, index) => point$1(coordinate, { index }));
+			const features = this.coordinates.map((coordinate, index) => point(coordinate, { index }));
 			return {
 				id: `$points:${this.id}`,
 				source: {
 					type: 'geojson',
-					data: featureCollection$1(features),
+					data: featureCollection(features),
 				},
 			};
 		}
@@ -8998,39 +8497,49 @@
 		}
 	}
 
-	const image$1 = parseSVG(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-    <path d="M0 0h24v24H0V0z" fill="none"/>
-    <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14 6 17h12l-3.86-5.14z"/>
-</svg>
-`);
+	function image$1() {
+		return parseSVG(`
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+				<path d="M0 0h24v24H0V0z" fill="none"/>
+				<path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14 6 17h12l-3.86-5.14z"/>
+		</svg>
+	`);
+	}
 
-	const move = parseSVG(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-  <path d="M0 0h24v24H0V0z" fill="none"/>
-  <path d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"/>
-</svg>
-`);
+	function move() {
+		return parseSVG(`
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+			<path d="M0 0h24v24H0V0z" fill="none"/>
+			<path d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"/>
+		</svg>
+	`);
+	}
 
-	const scale = parseSVG(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-    <rect fill="none" height="24" width="24"/>
-    <polygon points="21,11 21,3 13,3 16.29,6.29 6.29,16.29 3,13 3,21 11,21 7.71,17.71 17.71,7.71"/>
-</svg>
-`);
+	function scale() {
+		return parseSVG(`
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+				<rect fill="none" height="24" width="24"/>
+				<polygon points="21,11 21,3 13,3 16.29,6.29 6.29,16.29 3,13 3,21 11,21 7.71,17.71 17.71,7.71"/>
+		</svg>
+	`);
+	}
 
-	const rotate = parseSVG(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="22" width="22" fill="currentColor">
-  <path d="M0 0h24v24H0V0z" fill="none"/>
-  <path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/>
-</svg>
-`);
+	function rotate() {
+		return parseSVG(`
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="22" width="22" fill="currentColor">
+			<path d="M0 0h24v24H0V0z" fill="none"/>
+			<path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/>
+		</svg>
+	`);
+	}
 
-	const remove = parseSVG(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" height="22" width="22" fill="currentColor">
-	<path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/>
-</svg>
-`);
+	function remove() {
+		return parseSVG(`
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" height="22" width="22" fill="currentColor">
+			<path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/>
+		</svg>
+	`);
+	}
 
 	const icons$4 = {
 		move,
@@ -9053,33 +8562,33 @@
 			this.fileInput = createFileInput();
 			this.buttonAdd = controlButton({
 				title: 'Add image',
-				icon: icons$4.image,
+				icon: icons$4.image(),
 				className: 'mapbox-ctrl-image-add',
 				onClick: () => this.fileInput.click(),
 			});
 			this.buttonMove = controlButton({
 				disabled: true,
 				title: 'Move image',
-				icon: icons$4.move,
+				icon: icons$4.move(),
 				onClick: () => this.setMode('move'),
 			});
 			this.buttonScale = controlButton({
 				disabled: true,
 				title: 'Scale image',
-				icon: icons$4.scale,
+				icon: icons$4.scale(),
 				onClick: () => this.setMode('scale'),
 			});
 			this.buttonRotate = controlButton({
 				disabled: true,
 				title: 'Rotate image',
-				icon: icons$4.rotate,
+				icon: icons$4.rotate(),
 				onClick: () => this.setMode('rotate'),
 			});
 			if (options.removeButton) {
 				this.buttonRemove = controlButton({
 					hidden: true,
 					title: 'Remove image',
-					icon: icons$4.remove,
+					icon: icons$4.remove(),
 					onClick: () => this.removeRaster(),
 				});
 			}
@@ -9253,7 +8762,7 @@
 		onMapClick = (event) => {
 			if (!this.map) throw Error('map is undefined');
 			const layersId = Object.values(this.rasters).map((i) => i.fillLayer.id);
-			// sometimes layers are removed from the map without destroing the control, e.g. style was changed
+			// sometimes layers are removed from the map without destroying the control, e.g. style was changed
 			const errorLayerId = layersId.find((id) => {
 				return !this.map?.getLayer(id);
 			});
@@ -9324,12 +8833,14 @@
 		}
 	}
 
-	const inspect = parseSVG(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-    <path d="M0 0h24v24H0z" fill="none"/>
-    <path d="M20 19.59V8l-6-6H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c.45 0 .85-.15 1.19-.4l-4.43-4.43c-.8.52-1.74.83-2.76.83-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5c0 1.02-.31 1.96-.83 2.75L20 19.59zM9 13c0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3-3 1.34-3 3z"/>
-</svg>
-`);
+	function inspect() {
+		return parseSVG(`
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+				<path d="M0 0h24v24H0z" fill="none"/>
+				<path d="M20 19.59V8l-6-6H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c.45 0 .85-.15 1.19-.4l-4.43-4.43c-.8.52-1.74.83-2.76.83-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5c0 1.02-.31 1.96-.83 2.75L20 19.59zM9 13c0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3-3 1.34-3 3z"/>
+		</svg>
+	`);
+	}
 
 	const icons$3 = {
 		inspect,
@@ -9443,7 +8954,7 @@
 			this.container = controlContainer('mapbox-ctrl-inspect');
 			this.button = controlButton({
 				title: 'Inspect',
-				icon: icons$3.inspect,
+				icon: icons$3.inspect(),
 				onClick: () => this.onControlButtonClick(),
 			});
 			this.isActive = false;
@@ -9654,52 +9165,36 @@
 		}
 	}
 
-	const ruler = parseSVG(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-    <rect fill="none" height="24" width="24"/>
-    <path d="M20,6H4C2.9,6,2,6.9,2,8v8c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2V8C22,6.9,21.1,6,20,6z M20,16H4V8h3v3c0,0.55,0.45,1,1,1h0 c0.55,0,1-0.45,1-1V8h2v3c0,0.55,0.45,1,1,1h0c0.55,0,1-0.45,1-1V8h2v3c0,0.55,0.45,1,1,1h0c0.55,0,1-0.45,1-1V8h3V16z"/>
-</svg>
-`);
+	function ruler() {
+		return parseSVG(`
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+				<rect fill="none" height="24" width="24"/>
+				<path d="M20,6H4C2.9,6,2,6.9,2,8v8c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2V8C22,6.9,21.1,6,20,6z M20,16H4V8h3v3c0,0.55,0.45,1,1,1h0 c0.55,0,1-0.45,1-1V8h2v3c0,0.55,0.45,1,1,1h0c0.55,0,1-0.45,1-1V8h2v3c0,0.55,0.45,1,1,1h0c0.55,0,1-0.45,1-1V8h3V16z"/>
+		</svg>
+	`);
+	}
 
 	const icons$2 = {
 		ruler,
 	};
 
-	//http://en.wikipedia.org/wiki/Haversine_formula
-	//http://www.movable-type.co.uk/scripts/latlong.html
-	/**
-	 * Calculates the distance between two {@link Point|points} in degrees, radians, miles, or kilometers.
-	 * This uses the [Haversine formula](http://en.wikipedia.org/wiki/Haversine_formula) to account for global curvature.
-	 *
-	 * @name distance
-	 * @param {Coord | Point} from origin point or coordinate
-	 * @param {Coord | Point} to destination point or coordinate
-	 * @param {Object} [options={}] Optional parameters
-	 * @param {string} [options.units='kilometers'] can be degrees, radians, miles, or kilometers
-	 * @returns {number} distance between the two points
-	 * @example
-	 * var from = turf.point([-75.343, 39.984]);
-	 * var to = turf.point([-75.534, 39.123]);
-	 * var options = {units: 'miles'};
-	 *
-	 * var distance = turf.distance(from, to, options);
-	 *
-	 * //addToMap
-	 * var addToMap = [from, to];
-	 * from.properties.distance = distance;
-	 * to.properties.distance = distance;
-	 */
+	var __defProp = Object.defineProperty;
+	var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 	function distance(from, to, options = {}) {
-	    var coordinates1 = getCoord(from);
-	    var coordinates2 = getCoord(to);
-	    var dLat = degreesToRadians$1(coordinates2[1] - coordinates1[1]);
-	    var dLon = degreesToRadians$1(coordinates2[0] - coordinates1[0]);
-	    var lat1 = degreesToRadians$1(coordinates1[1]);
-	    var lat2 = degreesToRadians$1(coordinates2[1]);
-	    var a = Math.pow(Math.sin(dLat / 2), 2) +
-	        Math.pow(Math.sin(dLon / 2), 2) * Math.cos(lat1) * Math.cos(lat2);
-	    return radiansToLength$1(2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)), options.units);
+	  var coordinates1 = getCoord(from);
+	  var coordinates2 = getCoord(to);
+	  var dLat = degreesToRadians(coordinates2[1] - coordinates1[1]);
+	  var dLon = degreesToRadians(coordinates2[0] - coordinates1[0]);
+	  var lat1 = degreesToRadians(coordinates1[1]);
+	  var lat2 = degreesToRadians(coordinates2[1]);
+	  var a = Math.pow(Math.sin(dLat / 2), 2) + Math.pow(Math.sin(dLon / 2), 2) * Math.cos(lat1) * Math.cos(lat2);
+	  return radiansToLength(
+	    2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)),
+	    options.units
+	  );
 	}
+	__name(distance, "distance");
+	var turf_distance_default = distance;
 
 	/** @param {number} value */
 	function defaultLabelFormat(value) {
@@ -9744,7 +9239,7 @@
 			type: 'FeatureCollection',
 			features: coordinates.map((coordinate, index) => {
 				if (index > 0) {
-					sum += distance(coordinates[index - 1], coordinate, { units });
+					sum += turf_distance_default(coordinates[index - 1], coordinate, { units });
 				}
 				return {
 					type: 'Feature',
@@ -9842,7 +9337,7 @@
 			if (!this.options.invisible) {
 				this.button = controlButton({
 					title: 'Ruler',
-					icon: icons$2.ruler,
+					icon: icons$2.ruler(),
 					onClick: () => this.onControlButtonClick(),
 				});
 			}
@@ -9996,7 +9491,7 @@
 
 			/** @param {MapLayerMouseEvent | MapLayerTouchEvent} event */
 			function onStart(event) {
-				// do not block multitouch actions
+				// do not block multi-touch actions
 				if (event.type === 'touchstart' && event.points.length !== 1) {
 					return;
 				}
@@ -10075,11 +9570,13 @@
 		}
 	}
 
-	const layers = parseSVG(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="22" height="22" fill="currentColor">
-  <path d="m24 41.5-18-14 2.5-1.85L24 37.7l15.5-12.05L42 27.5Zm0-7.6-18-14 18-14 18 14Zm0-15.05Zm0 11.25 13.1-10.2L24 9.7 10.9 19.9Z"/>
-</svg>
-`);
+	function layers() {
+		return parseSVG(`
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="22" height="22" fill="currentColor">
+			<path d="m24 41.5-18-14 2.5-1.85L24 37.7l15.5-12.05L42 27.5Zm0-7.6-18-14 18-14 18 14Zm0-15.05Zm0 11.25 13.1-10.2L24 9.7 10.9 19.9Z"/>
+		</svg>
+	`);
+	}
 
 	const icons$1 = {
 		layers,
@@ -10179,7 +9676,7 @@
 
 		compact() {
 			if (!this.map) throw Error('map is undefined');
-			const button = controlButton({ title: 'Styles', icon: icons$1.layers });
+			const button = controlButton({ title: 'Styles', icon: icons$1.layers() });
 			const select = document.createElement('select');
 			this.container.appendChild(button);
 			button.appendChild(select);
@@ -10315,19 +9812,23 @@
 		}
 	}
 
-	const plus = parseSVG(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-    <rect fill="none" height="24" width="24"/>
-    <path d="M18,13h-5v5c0,0.55-0.45,1-1,1l0,0c-0.55,0-1-0.45-1-1v-5H6c-0.55,0-1-0.45-1-1l0,0c0-0.55,0.45-1,1-1h5V6 c0-0.55,0.45-1,1-1l0,0c0.55,0,1,0.45,1,1v5h5c0.55,0,1,0.45,1,1l0,0C19,12.55,18.55,13,18,13z"/>
-</svg>
-`);
+	function plus() {
+		return parseSVG(`
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+				<rect fill="none" height="24" width="24"/>
+				<path d="M18,13h-5v5c0,0.55-0.45,1-1,1l0,0c-0.55,0-1-0.45-1-1v-5H6c-0.55,0-1-0.45-1-1l0,0c0-0.55,0.45-1,1-1h5V6 c0-0.55,0.45-1,1-1l0,0c0.55,0,1,0.45,1,1v5h5c0.55,0,1,0.45,1,1l0,0C19,12.55,18.55,13,18,13z"/>
+		</svg>
+	`);
+	}
 
-	const minus = parseSVG(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-    <rect fill="none" height="24" width="24"/>
-    <path d="M18,13H6c-0.55,0-1-0.45-1-1l0,0c0-0.55,0.45-1,1-1h12c0.55,0,1,0.45,1,1l0,0C19,12.55,18.55,13,18,13z"/>
-</svg>
-`);
+	function minus() {
+		return parseSVG(`
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+				<rect fill="none" height="24" width="24"/>
+				<path d="M18,13H6c-0.55,0-1-0.45-1-1l0,0c0-0.55,0.45-1,1-1h12c0.55,0,1,0.45,1,1l0,0C19,12.55,18.55,13,18,13z"/>
+		</svg>
+	`);
+	}
 
 	const icons = {
 		plus,
@@ -10339,12 +9840,12 @@
 			this.container = controlContainer('mapbox-ctrl-zoom');
 			this.buttonIn = controlButton({
 				title: 'Zoom In',
-				icon: icons.plus,
+				icon: icons.plus(),
 				onClick: () => this.map?.zoomIn(),
 			});
 			this.buttonOut = controlButton({
 				title: 'Zoom Out',
-				icon: icons.minus,
+				icon: icons.minus(),
 				onClick: () => this.map?.zoomOut(),
 			});
 		}

@@ -14,10 +14,10 @@ class CompassControl {
 	constructor(options = {}) {
 		this.options = { ...options };
 		this.container = controlContainer('mapbox-ctrl-compass');
-		this.icon = icons.compass;
+		this.icon = icons.compass();
 		this.button = controlButton({
 			title: 'Compass',
-			icon: icons.compass,
+			icon: this.icon,
 			onClick: () => this.onControlButtonClick(),
 		});
 	}

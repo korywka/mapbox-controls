@@ -1,2 +1,1 @@
-export function popup(features: GeoJSONFeature[]): HTMLDivElement;
-export type GeoJSONFeature = import('mapbox-gl').MapboxGeoJSONFeature;
+export function popup(features: import("mapbox-gl").GeoJSONFeature[]): HTMLDivElement;

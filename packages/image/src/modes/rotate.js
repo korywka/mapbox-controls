@@ -1,13 +1,13 @@
-import transformRotate from '@turf/transform-rotate';
-import { bearingToAzimuth } from '@turf/helpers';
-import centroid from '@turf/centroid';
 import bearing from '@turf/bearing';
+import centroid from '@turf/centroid';
+import { bearingToAzimuth } from '@turf/helpers';
+import transformRotate from '@turf/transform-rotate';
 
 export class Rotate {
 	/**
    * @param {import('mapbox-gl').Map} map
    * @param {import('../raster').Raster} raster
-   * @param {(coordinates: [number, number][]) => void} onUpdate
+   * @param {(coordinates: import('../types').RasterCoordinates) => void} onUpdate
    */
 	constructor(map, raster, onUpdate) {
 		this.map = map;
@@ -36,7 +36,7 @@ export class Rotate {
 	};
 
 	/**
-   * @param {import('mapbox-gl').MapLayerMouseEvent} event
+   * @param {import('mapbox-gl').MapMouseEvent} event
    */
 	onPointerDown = (event) => {
 		event.preventDefault();
@@ -60,8 +60,10 @@ export class Rotate {
 		const delta = azimuthB - azimuthA;
 		const geojson = this.raster.polygonSource.source.data;
 		const transformed = transformRotate(geojson, delta);
-		const position = /** @type {[number, number][]} */ (transformed.geometry.coordinates[0]);
-		this.onUpdate(position.slice(0, 4));
+		const transformedCoordinates = transformed.geometry.coordinates[0];
+		// remove closing 5th coordinate from polygon
+		const position = /** @type {import('../types').RasterCoordinates} */ (transformedCoordinates.slice(0, 4));
+		this.onUpdate(position);
 		this.startPoint = currentPosition;
 	};
 

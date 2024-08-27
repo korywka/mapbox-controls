@@ -1,6 +1,6 @@
 {
 	"name": "@mapbox-controls/tooltip",
-	"version": "2.1.0",
+	"version": "3.0.0",
 	"description": "Display tooltip on hover",
 	"type": "module",
 	"main": "./src/index.js",
@@ -8,8 +8,7 @@
 		"build": "tsc"
 	},
 	"devDependencies": {
-		"@types/mapbox-gl": "3.1.0",
-		"mapbox-gl": "3.4.0"
+		"mapbox-gl": "3.6.0"
 	},
 	"peerDependencies": {
 		"mapbox-gl": ">=1.0.0 <4.0.0"

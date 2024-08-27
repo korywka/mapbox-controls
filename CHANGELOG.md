@@ -18,3 +18,9 @@
 - Update `@turf` package from alpha version to release version
 - Fix Vite SSR for icons
 - Update dependencies
+
+## 3.0.0
+
+- Update `@turf` package
+- Update `@mapbox` package
+- Use new `mapbox` types instead of `DefinitelyTyped`

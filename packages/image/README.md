@@ -22,8 +22,8 @@ map.addControl(imageControl, 'bottom-right');
 ## Options
 
 ```ts
-export type ImageControlOptions = {
-  removeButton?: boolean;
+export type ControlOptions = {
+    removeButton?: boolean;
 };
 ```
 

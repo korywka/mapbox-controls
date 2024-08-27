@@ -36,14 +36,14 @@ Use mapbox [`style.load`](https://docs.mapbox.com/mapbox-gl-js/api/map/#map.even
 
 ```ts
 export type Style = {
-  label: string;
-  styleName: string;
-  styleUrl: string;
+    label: string;
+    styleName: string;
+    styleUrl: string;
 };
 
-export type StylesControlOptions = {
-  styles?: Style[];
-  onChange?: (style: Style) => void;
-  compact?: boolean;
+export type ControlOptions = {
+    styles?: Style[];
+    onChange?: (style: Style) => void;
+    compact?: boolean;
 };
 ```

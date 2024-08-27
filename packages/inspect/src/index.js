@@ -2,14 +2,8 @@ import { controlButton, controlContainer } from '@mapbox-controls/helpers';
 import { icons } from './icons.js';
 import { popup } from './popup.js';
 
-/**
- * @typedef {{
- * 	console?: boolean
- * }} InspectControlOptions
- */
-
 export default class InspectControl {
-	/** @param {InspectControlOptions} options */
+	/** @param {import('./types').ControlOptions} options */
 	constructor(options = {}) {
 		this.options = { ...options };
 		this.container = controlContainer('mapbox-ctrl-inspect');
@@ -62,7 +56,7 @@ export default class InspectControl {
 		return this.map.queryRenderedFeatures(queryBox);
 	}
 
-	/** @param {import('mapbox-gl').MapboxGeoJSONFeature[]} features */
+	/** @param {import('mapbox-gl').GeoJSONFeature[]} features */
 	showDetails(features) {
 		if (!this.map) throw Error('map is undefined');
 		this.detailsNode = popup(features);

@@ -1,20 +1,14 @@
 import { controlButton, controlContainer } from '@mapbox-controls/helpers';
-import { createFileInput, readFile, readUrl } from './file.js';
-import { centerPosition } from './center-position.js';
-import { Rotate } from './modes/rotate.js';
-import { Scale } from './modes/scale.js';
-import { Move } from './modes/move.js';
-import { Raster } from './raster.js';
 import { icons } from './icons.js';
-
-/**
- * @typedef {{
- * 	removeButton?: boolean
- * }} ImageControlOptions
- */
+import { Raster } from './raster.js';
+import { Move } from './modes/move.js';
+import { Scale } from './modes/scale.js';
+import { Rotate } from './modes/rotate.js';
+import { centerPosition } from './center-position.js';
+import { createFileInput, readFile, readUrl } from './file.js';
 
 class ImageControl {
-	/** @param {ImageControlOptions} options */
+	/** @param {import('./types').ControlOptions} options */
 	constructor(options = {}) {
 		this.container = controlContainer('mapbox-ctrl-image');
 		this.fileInput = createFileInput();
@@ -60,7 +54,7 @@ class ImageControl {
 
 	/**
    * @param {File} file
-	 * @param {[number, number][]=} coordinates
+	 * @param {import('./types').RasterCoordinates=} coordinates
    */
 	async addFile(file, coordinates) {
 		const image = await readFile(file);
@@ -70,7 +64,7 @@ class ImageControl {
 
 	/**
 	 * @param {string} url
-	 * @param {[number, number][]=} coordinates
+	 * @param {import('./types').RasterCoordinates=} coordinates
 	 */
 	async addUrl(url, coordinates) {
 		const image = await readUrl(url);
@@ -80,7 +74,7 @@ class ImageControl {
 
 	/**
 	 * @param {HTMLImageElement} image
-	 * @param {[number, number][]=} coordinates
+	 * @param {import('./types').RasterCoordinates=} coordinates
 	 */
 	async addImage(image, coordinates) {
 		if (!this.map) throw Error('map is undefined');
@@ -101,6 +95,7 @@ class ImageControl {
 		this.map.addSource(raster.pointsSource.id, raster.pointsSource.source);
 		this.map.addLayer(raster.rasterLayer);
 		this.map.addLayer(raster.fillLayer);
+		// @ts-ignore
 		this.map.fire('image.add', { id: raster.id });
 	}
 
@@ -116,6 +111,7 @@ class ImageControl {
 		this.map.removeSource(raster.rasterSource.id);
 		this.map.removeSource(raster.polygonSource.id);
 		this.map.removeSource(raster.pointsSource.id);
+		// @ts-ignore
 		this.map.fire('image.remove', { id: raster.id });
 	}
 
@@ -136,6 +132,7 @@ class ImageControl {
 			this.buttonAdd.hidden = true;
 			this.buttonRemove.hidden = false;
 		}
+		// @ts-ignore
 		this.map.fire('image.select', { id: this.currentRaster.id });
 	}
 
@@ -143,6 +140,7 @@ class ImageControl {
 		if (!this.map) throw Error('map is undefined');
 		if (!this.currentRaster) return;
 		this.map.removeLayer(this.currentRaster.contourLayer.id);
+		// @ts-ignore
 		this.map.fire('image.deselect', { id: this.currentRaster.id });
 		this.setMode(null);
 		this.currentRaster = null;
@@ -168,6 +166,7 @@ class ImageControl {
 			this.buttonRotate.classList.remove('-active');
 			this.currentMode.destroy();
 			this.currentMode = null;
+			// @ts-ignore
 			this.map.fire('image.mode', { mode: this.currentMode });
 			// click on active button just deactivates current mode
 			if (currentId === mode) return;
@@ -191,6 +190,7 @@ class ImageControl {
 			});
 		}
 		if (this.currentMode) {
+			// @ts-ignore
 			this.map.fire('image.mode', { mode: this.currentMode.id });
 		}
 	}
@@ -198,7 +198,7 @@ class ImageControl {
 	/**
 	 * @typedef {import('mapbox-gl').ImageSource} ImageSource
 	 * @typedef {import('mapbox-gl').GeoJSONSource} GeoJSONSource
-	 * @param {[number, number][]} coordinates
+	 * @param {import('./types').RasterCoordinates} coordinates
 	 */
 	updateCoordinates(coordinates) {
 		if (!this.map) throw Error('map is undefined');
@@ -211,6 +211,7 @@ class ImageControl {
 		rasterSource.setCoordinates(raster.coordinates);
 		polygonSource.setData(raster.polygonSource.source.data);
 		pointsSource.setData(raster.pointsSource.source.data);
+		// @ts-ignore
 		this.map.fire('image.update', { coordinates });
 	}
 
@@ -225,7 +226,7 @@ class ImageControl {
 			return !this.map?.getLayer(id);
 		});
 		if (errorLayerId) {
-			console.error(`layer with id ${errorLayerId} was removed from the map`);
+			return;
 		}
 		const features = this.map.queryRenderedFeatures(event.point, { layers: layersId });
 		if (features[0]) {

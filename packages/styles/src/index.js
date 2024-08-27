@@ -1,20 +1,6 @@
 import { controlButton, controlContainer } from '@mapbox-controls/helpers';
 import { icons } from './icons.js';
 
-/**
- * @typedef {{
- * 	label: string
- * 	styleName: string
- * 	styleUrl: string
- * }} Style
- *
- * @typedef {{
- * 	styles?: Style[]
- * 	onChange?: (style: Style) => void
- * 	compact?: boolean
- * }} StylesControlOptions
- */
-
 const defaults = [
 	{
 		label: 'Standard',
@@ -28,7 +14,7 @@ const defaults = [
 ];
 
 export default class StylesControl {
-	/** @param {StylesControlOptions} options */
+	/** @param {import('./types').ControlOptions} options */
 	constructor(options = {}) {
 		this.options = { styles: defaults, ...options };
 		this.container = controlContainer('mapbox-ctrl-styles');

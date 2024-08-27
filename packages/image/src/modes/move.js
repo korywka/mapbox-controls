@@ -1,12 +1,12 @@
-import transformTranslate from '@turf/transform-translate';
-import rhumbDistance from '@turf/rhumb-distance';
 import rhumbBearing from '@turf/rhumb-bearing';
+import rhumbDistance from '@turf/rhumb-distance';
+import transformTranslate from '@turf/transform-translate';
 
 export class Move {
 	/**
 	 * @param {import('mapbox-gl').Map} map
 	 * @param {import('../raster').Raster} raster
-	 * @param {(coordinates: [number, number][]) => void} onUpdate
+	 * @param {(coordinates: import('../types').RasterCoordinates) => void} onUpdate
 	 */
 	constructor(map, raster, onUpdate) {
 		this.map = map;
@@ -32,7 +32,7 @@ export class Move {
 	};
 
 	/**
-   * @param {import('mapbox-gl').MapLayerMouseEvent} event
+   * @param {import('mapbox-gl').MapMouseEvent} event
    */
 	onPointerDown = (event) => {
 		event.preventDefault();
@@ -53,8 +53,10 @@ export class Move {
 		const distanceBetween = rhumbDistance(this.prevPosition, currentPosition);
 		const geojson = this.raster.polygonSource.source.data;
 		const transformed = transformTranslate(geojson, distanceBetween, bearingBetween);
-		const position = /** @type {[number, number][]} */ (transformed.geometry.coordinates[0]);
-		this.onUpdate(position.slice(0, 4));
+		const transformedCoordinates = transformed.geometry.coordinates[0];
+		// remove closing 5th coordinate from polygon
+		const position = /** @type {import('../types').RasterCoordinates} */ (transformedCoordinates.slice(0, 4));
+		this.onUpdate(position);
 		this.prevPosition = currentPosition;
 	};
 

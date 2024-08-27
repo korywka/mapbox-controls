@@ -2,6 +2,6 @@ export namespace icons {
     export { plus };
     export { minus };
 }
-declare const plus: SVGElement;
-declare const minus: SVGElement;
+declare function plus(): SVGElement;
+declare function minus(): SVGElement;
 export {};

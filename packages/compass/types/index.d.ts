@@ -1,18 +1,15 @@
 export default CompassControl;
-export type CompassControlOptions = {
-    instant?: boolean;
-};
 declare class CompassControl {
-    constructor(options?: CompassControlOptions);
+    constructor(options?: import("./types").ControlOptions);
     options: {
-        instant?: boolean | undefined;
+        instant?: boolean;
     };
     container: HTMLDivElement;
     icon: SVGElement;
     button: HTMLButtonElement;
     onControlButtonClick(): void;
     onRotate(): void;
-    onAdd(map: import('mapbox-gl').Map): HTMLElement;
+    onAdd(map: import("mapbox-gl").Map): HTMLElement;
     map: import("mapbox-gl").Map | undefined;
     onRemove(): void;
 }

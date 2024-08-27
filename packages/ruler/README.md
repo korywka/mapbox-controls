@@ -22,16 +22,16 @@ map.on('ruler.off', () => console.log('Ruler deactivated'));
 ## Options
 
 ```ts
-export type RulerControlOptions = {
-  units?: import('@turf/helpers').Units;
-  labelFormat?: (n: number) => string;
-  lineLayout?: import('mapbox-gl').LineLayout;
-  linePaint?: import('mapbox-gl').LinePaint;
-  markerLayout?: import('mapbox-gl').CircleLayout;
-  markerPaint?: import('mapbox-gl').CirclePaint;
-  labelLayout?: import('mapbox-gl').SymbolLayout;
-  labelPaint?: import('mapbox-gl').SymbolPaint;
-  invisible?: boolean;
+export type ControlOptions = {
+    units?: import("@turf/helpers").Units;
+    labelFormat?: (n: number) => string;
+    lineLayout?: import("mapbox-gl").LineLayerSpecification["layout"];
+    linePaint?: import("mapbox-gl").LineLayerSpecification["paint"];
+    markerLayout?: import("mapbox-gl").CircleLayerSpecification["layout"];
+    markerPaint?: import("mapbox-gl").CircleLayerSpecification["paint"];
+    labelLayout?: import("mapbox-gl").SymbolLayerSpecification["layout"];
+    labelPaint?: import("mapbox-gl").SymbolLayerSpecification["paint"];
+    invisible?: boolean;
 };
 ```
 

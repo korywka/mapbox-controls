@@ -3,23 +3,9 @@ import { icons } from './icons.js';
 import { layers } from './layers.js';
 import { sources, toGeoJSONLine, toGeoJSONPoints } from './sources.js';
 
-/**
- * @typedef {{
- *  units?: import('@turf/helpers').Units
- *  labelFormat?: (n: number) => string
- *  lineLayout?: import('mapbox-gl').LineLayout
- *  linePaint?: import('mapbox-gl').LinePaint
- *  markerLayout?: import('mapbox-gl').CircleLayout
- *  markerPaint?: import('mapbox-gl').CirclePaint
- *  labelLayout?: import('mapbox-gl').SymbolLayout
- *  labelPaint?: import('mapbox-gl').SymbolPaint
- * 	invisible?: boolean
- * }} RulerControlOptions
- */
-
 export default class RulerControl {
 	/**
-   * @param {RulerControlOptions} options
+   * @param {import('./types').ControlOptions} options
    */
 	constructor(options = {}) {
 		this.options = options;
@@ -110,6 +96,7 @@ export default class RulerControl {
 		this.draw();
 		map.on('click', this.mapClickListener);
 		map.on('style.load', this.draw);
+		// @ts-ignore
 		map.fire('ruler.on');
 		if (this.button) {
 			this.button.classList.add('-active');
@@ -128,6 +115,7 @@ export default class RulerControl {
 		this.map.removeSource(sources.points);
 		this.map.off('click', this.mapClickListener);
 		this.map.off('style.load', this.draw);
+		// @ts-ignore
 		this.map.fire('ruler.off');
 		if (this.button) {
 			this.button.classList.remove('-active');
@@ -154,6 +142,7 @@ export default class RulerControl {
 
 	updateSource() {
 		if (!this.map) throw Error('map is undefined');
+		// @ts-ignore
 		this.map.fire('ruler.change', { coordinates: this.coordinates });
 		const lineSource = /** @type {import('mapbox-gl').GeoJSONSource} */(this.map.getSource(sources.line));
 		const pointsSource = /** @type {import('mapbox-gl').GeoJSONSource} */(this.map.getSource(sources.points));
@@ -169,8 +158,8 @@ export default class RulerControl {
 	addDragEvents() {
 		/** @typedef {import('mapbox-gl').MapMouseEvent} MapMouseEvent */
 		/** @typedef {import('mapbox-gl').MapTouchEvent} MapTouchEvent */
-		/** @typedef {import('mapbox-gl').MapLayerMouseEvent} MapLayerMouseEvent */
-		/** @typedef {import('mapbox-gl').MapLayerTouchEvent} MapLayerTouchEvent */
+		/** @typedef {import('mapbox-gl').MapMouseEvent} MapLayerMouseEvent */
+		/** @typedef {import('mapbox-gl').MapTouchEvent} MapLayerTouchEvent */
 		if (!this.map) throw Error('map is undefined');
 		const self = this;
 		const map = this.map;

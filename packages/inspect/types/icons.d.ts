@@ -1,5 +1,5 @@
 export namespace icons {
     export { inspect };
 }
-declare const inspect: SVGElement;
+declare function inspect(): SVGElement;
 export {};

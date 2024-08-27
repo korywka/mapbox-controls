@@ -1,26 +1,16 @@
 export default class StylesControl {
-    constructor(options?: StylesControlOptions);
+    constructor(options?: import("./types").ControlOptions);
     options: {
-        styles: Style[];
-        onChange?: ((style: Style) => void) | undefined;
-        compact?: boolean | undefined;
+        styles: import("./types").Style[];
+        onChange?: (style: import("./types").Style) => void;
+        compact?: boolean;
     };
     container: HTMLDivElement;
-    findStyle(name: string): Style;
+    findStyle(name: string): import("./types").Style;
     getCurrentStyleName(): string;
     expanded(): void;
     compact(): void;
-    onAdd(map: import('mapbox-gl').Map): HTMLElement;
+    onAdd(map: import("mapbox-gl").Map): HTMLElement;
     map: import("mapbox-gl").Map | undefined;
     onRemove(): void;
 }
-export type Style = {
-    label: string;
-    styleName: string;
-    styleUrl: string;
-};
-export type StylesControlOptions = {
-    styles?: Style[];
-    onChange?: (style: Style) => void;
-    compact?: boolean;
-};

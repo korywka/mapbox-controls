@@ -6,6 +6,8 @@
 
 Control to debug map style layers and sources.
 
+⚠️ Inspect Control doesn't work with new MapBox Standard style, since the MapBox API [doesn't work](https://github.com/mapbox/mapbox-gl-js/issues/13160) as documentated.
+
 ```
 npm i @mapbox-controls/inspect
 ```
@@ -20,7 +22,7 @@ map.addControl(new InspectControl(), 'bottom-right');
 ## Options
 
 ```ts
-export type InspectControlOptions = {
-  console?: boolean;
+export type ControlOptions = {
+    console?: boolean;
 };
 ```

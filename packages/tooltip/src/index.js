@@ -1,23 +1,14 @@
-/**
- * @typedef {import('mapbox-gl').MapLayerMouseEvent} MapLayerMouseEvent
- * @typedef {import('mapbox-gl').MapLayerEventType} MapLayerEventType
- * @typedef {{
- *  getContent: (event: MapLayerMouseEvent) => string
- *  layer?: string
- * }} TooltipControlOptions
- */
-
 class TooltipControl {
-	/** @param {TooltipControlOptions} options */
+	/** @param {import('./types').ControlOptions} options */
 	constructor(options) {
 		if (typeof options.getContent !== 'function') {
 			throw Error('getContent function must be defined');
 		}
 		this.options = { ...options };
 		this.container = document.createElement('div');
-		/** @type {keyof MapLayerEventType} */
+		/** @type {import('mapbox-gl').MapEventType} */
 		this.eventShow = this.options.layer ? 'mouseenter' : 'mouseover';
-		/** @type {keyof MapLayerEventType} */
+		/** @type {import('mapbox-gl').MapEventType} */
 		this.eventHide = this.options.layer ? 'mouseleave' : 'mouseout';
 		this.node = document.createElement('div');
 		this.node.classList.add('mapbox-ctrl-tooltip');
@@ -41,7 +32,7 @@ class TooltipControl {
 		this.map.off('move', this.updatePosition);
 	};
 
-	/** @param {MapLayerMouseEvent} event */
+	/** @param {import('mapbox-gl').MapMouseEvent} event */
 	move = (event) => {
 		this.node.innerHTML = this.options.getContent(event);
 		this.lngLat = event.lngLat;

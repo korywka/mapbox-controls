@@ -1,9 +1,6 @@
 export default ImageControl;
-export type ImageControlOptions = {
-    removeButton?: boolean;
-};
 declare class ImageControl {
-    constructor(options?: ImageControlOptions);
+    constructor(options?: import("./types").ControlOptions);
     container: HTMLDivElement;
     fileInput: HTMLInputElement;
     buttonAdd: HTMLButtonElement;
@@ -14,18 +11,18 @@ declare class ImageControl {
     rasters: Record<string, Raster>;
     currentRaster: Raster | null;
     currentMode: Move | Scale | Rotate | null;
-    addFile(file: File, coordinates?: [number, number][] | undefined): Promise<string>;
-    addUrl(url: string, coordinates?: [number, number][] | undefined): Promise<string>;
-    addImage(image: HTMLImageElement, coordinates?: [number, number][] | undefined): Promise<string>;
+    addFile(file: File, coordinates?: import("./types").RasterCoordinates | undefined): Promise<string>;
+    addUrl(url: string, coordinates?: import("./types").RasterCoordinates | undefined): Promise<string>;
+    addImage(image: HTMLImageElement, coordinates?: import("./types").RasterCoordinates | undefined): Promise<string>;
     addRaster(raster: Raster): void;
     removeRaster(): void;
     selectRaster(id: string): void;
     deselectRaster(): void;
-    setMode(mode: 'move' | 'scale' | 'rotate' | null): void;
-    updateCoordinates(coordinates: [number, number][]): void;
-    onMapClick: (event: import('mapbox-gl').MapMouseEvent) => void;
+    setMode(mode: "move" | "scale" | "rotate" | null): void;
+    updateCoordinates(coordinates: import("./types").RasterCoordinates): void;
+    onMapClick: (event: import("mapbox-gl").MapMouseEvent) => void;
     setLock: (id: string, isLocked: boolean) => void;
-    onAdd(map: import('mapbox-gl').Map): HTMLElement;
+    onAdd(map: import("mapbox-gl").Map): HTMLElement;
     map: import("mapbox-gl").Map | undefined;
     onRemove(): void;
 }

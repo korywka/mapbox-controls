@@ -1,6 +1,6 @@
 {
 	"name": "@mapbox-controls/image",
-	"version": "2.1.0",
+	"version": "3.0.0",
 	"description": "Move, scale and rotate image on a map",
 	"type": "module",
 	"main": "./src/index.js",
@@ -8,20 +8,19 @@
 		"build": "tsc"
 	},
 	"dependencies": {
-		"@mapbox-controls/helpers": "2.1.0",
-		"@turf/bearing": "7.0.0",
-		"@turf/centroid": "7.0.0",
-		"@turf/helpers": "7.0.0",
-		"@turf/rhumb-bearing": "7.0.0",
-		"@turf/rhumb-distance": "7.0.0",
-		"@turf/transform-rotate": "7.0.0",
-		"@turf/transform-scale": "7.0.0",
-		"@turf/transform-translate": "7.0.0"
+		"@mapbox-controls/helpers": "3.0.0",
+		"@turf/bearing": "7.1.0",
+		"@turf/centroid": "7.1.0",
+		"@turf/helpers": "7.1.0",
+		"@turf/rhumb-bearing": "7.1.0",
+		"@turf/rhumb-distance": "7.1.0",
+		"@turf/transform-rotate": "7.1.0",
+		"@turf/transform-scale": "7.1.0",
+		"@turf/transform-translate": "7.1.0"
 	},
 	"devDependencies": {
 		"@types/geojson": "7946.0.14",
-		"@types/mapbox-gl": "3.1.0",
-		"mapbox-gl": "3.4.0"
+		"mapbox-gl": "3.6.0"
 	},
 	"peerDependencies": {
 		"mapbox-gl": ">=1.0.0 <4.0.0"

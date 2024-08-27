@@ -1,5 +1,5 @@
 export namespace icons {
     export { layers };
 }
-declare const layers: SVGElement;
+declare function layers(): SVGElement;
 export {};

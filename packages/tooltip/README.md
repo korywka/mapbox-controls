@@ -23,8 +23,8 @@ map.addControl(new TooltipControl({
 ## Options
 
 ```ts
-export type TooltipControlOptions = {
-  getContent: (event: MapLayerMouseEvent) => string;
-  layer?: string;
+export type ControlOptions = {
+    getContent: (event: import("mapbox-gl").MapMouseEvent) => string;
+    layer?: string;
 };
 ```

@@ -1,1 +1,1 @@
-export function centerPosition(image: HTMLImageElement, map: import('mapbox-gl').Map, padding?: number): [number, number][];
+export function centerPosition(image: HTMLImageElement, map: import("mapbox-gl").Map, padding?: number): import("./types").RasterCoordinates;

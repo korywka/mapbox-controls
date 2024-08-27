@@ -1,5 +1,5 @@
 export namespace icons {
     export { ruler };
 }
-declare const ruler: SVGElement;
+declare function ruler(): SVGElement;
 export {};

@@ -17,14 +17,14 @@
 		"@mapbox-controls/styles": "workspace:*",
 		"@mapbox-controls/tooltip": "workspace:*",
 		"@mapbox-controls/zoom": "workspace:*",
-		"mapbox-gl": "3.4.0"
+		"mapbox-gl": "3.6.0"
 	},
 	"devDependencies": {
 		"@rollup/plugin-commonjs": "26.0.1",
 		"@rollup/plugin-node-resolve": "15.2.3",
 		"concurrently": "8.2.2",
-		"rollup": "4.18.0",
-		"rollup-plugin-import-css": "3.5.0",
+		"rollup": "4.21.1",
+		"rollup-plugin-import-css": "3.5.1",
 		"rollup-plugin-polyfill-node": "0.13.0",
 		"serve": "14.2.3"
 	}

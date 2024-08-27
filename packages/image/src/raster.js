@@ -3,7 +3,7 @@ import { featureCollection, polygon, point } from '@turf/helpers';
 export class Raster {
 	/**
 	 * @param {HTMLImageElement} image
-	 * @param {[number, number][]} coordinates
+	 * @param {import('./types').RasterCoordinates} coordinates
 	 */
 	constructor(image, coordinates) {
 		this.src = image.src;
@@ -22,7 +22,7 @@ export class Raster {
 	/**
 	 * @type {{
 	 * 	id: string,
-	 * 	source: import('mapbox-gl').ImageSourceRaw
+	 * 	source: import('mapbox-gl').ImageSourceSpecification
 	 * }}
 	 */
 	get rasterSource() {
@@ -76,7 +76,7 @@ export class Raster {
 		};
 	}
 
-	/** @type {import('mapbox-gl').RasterLayer} */
+	/** @type {import('mapbox-gl').RasterLayerSpecification} */
 	get rasterLayer() {
 		return {
 			id: `$raster:${this.id}`,
@@ -89,7 +89,7 @@ export class Raster {
 		};
 	}
 
-	/** @type {import('mapbox-gl').FillLayer} */
+	/** @type {import('mapbox-gl').FillLayerSpecification} */
 	get fillLayer() {
 		return {
 			id: `$fill:${this.id}`,
@@ -101,7 +101,7 @@ export class Raster {
 		};
 	}
 
-	/** @type {import('mapbox-gl').LineLayer} */
+	/** @type {import('mapbox-gl').LineLayerSpecification} */
 	get contourLayer() {
 		return {
 			id: `$contour:${this.id}`,
@@ -123,7 +123,7 @@ export class Raster {
 		};
 	}
 
-	/** @type {import('mapbox-gl').CircleLayer} */
+	/** @type {import('mapbox-gl').CircleLayerSpecification} */
 	get knobsLayer() {
 		return {
 			id: `$knobs:${this.id}`,

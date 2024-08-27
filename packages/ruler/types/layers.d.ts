@@ -1,6 +1,6 @@
 export const layers: Layers;
 export type Layers = {
-    line: import('mapbox-gl').LineLayer;
-    markers: import('mapbox-gl').CircleLayer;
-    labels: import('mapbox-gl').SymbolLayer;
+    line: import("mapbox-gl").LineLayerSpecification;
+    markers: import("mapbox-gl").CircleLayerSpecification;
+    labels: import("mapbox-gl").SymbolLayerSpecification;
 };

@@ -29,11 +29,11 @@ languageControl.setLanguage(event.target.value);
 ## Options
 
 ```ts
-export type LanguageControlOptions = {
-  supportedLanguages?: string[];
-  language?: string;
-  getLanguageKey?: (language: string) => string;
-  excludedLayerIds?: string[];
+export type ControlOptions = {
+    supportedLanguages?: string[];
+    language?: string;
+    getLanguageKey?: (language: string) => string;
+    excludedLayerIds?: string[];
 };
 ```
 

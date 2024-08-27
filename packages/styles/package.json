@@ -1,6 +1,6 @@
 {
 	"name": "@mapbox-controls/styles",
-	"version": "2.1.0",
+	"version": "3.0.0",
 	"description": "Change map style",
 	"type": "module",
 	"main": "./src/index.js",
@@ -8,11 +8,10 @@
 		"build": "tsc"
 	},
 	"dependencies": {
-		"@mapbox-controls/helpers": "2.1.0"
+		"@mapbox-controls/helpers": "3.0.0"
 	},
 	"devDependencies": {
-		"@types/mapbox-gl": "3.1.0",
-		"mapbox-gl": "3.4.0"
+		"mapbox-gl": "3.6.0"
 	},
 	"peerDependencies": {
 		"mapbox-gl": ">=1.0.0 <4.0.0"

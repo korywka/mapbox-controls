@@ -67,8 +67,6 @@ map.on('style.load', () => {
 
 map.addControl(new ZoomControl(), 'bottom-right');
 
-map.addControl(new CompassControl({ instant: true }), 'bottom-right');
-
 map.addControl(new InspectControl({ console: true }), 'bottom-right');
 
 map.addControl(new RulerControl(), 'bottom-right');
@@ -83,6 +81,8 @@ map.on('image.select', ({ id }) => console.log(`Selected image ${id}`));
 map.on('image.deselect', ({ id }) => console.log(`Deselected image ${id}`));
 map.on('image.update', ({ coordinates }) => console.log('Updated position:', coordinates));
 map.on('image.mode', ({ mode }) => console.log(`Changed mode: ${mode}`));
+
+map.addControl(new CompassControl({ instant: true }), 'bottom-right');
 
 (async function () {
 	await map.once('style.load');

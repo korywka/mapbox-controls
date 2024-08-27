@@ -12,7 +12,7 @@ export function centerPosition(image, map, padding = 20) {
 	const ratio = Math.min(maxWidth / image.width, maxHeight / image.height);
 	const scaleWidth = image.width * ratio;
 	const scaleHeight = image.height * ratio;
-	/** @type {[number, number][]} */
+	/** @type {import('./types').RasterCoordinates} */
 	const position = [
 		[(canvasWidth - scaleWidth) / 2, (canvasHeight - scaleHeight) / 2], // left top
 		[(canvasWidth + scaleWidth) / 2, (canvasHeight - scaleHeight) / 2], // right top
@@ -25,7 +25,7 @@ export function centerPosition(image, map, padding = 20) {
 	 */
 	map.setPitch(0);
 
-	return /** @type {[number, number][]} */ ([
+	return /** @type {import('./types').RasterCoordinates} */ ([
 		map.unproject(position[0]).toArray(),
 		map.unproject(position[1]).toArray(),
 		map.unproject(position[2]).toArray(),

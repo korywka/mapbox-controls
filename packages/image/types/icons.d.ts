@@ -5,9 +5,9 @@ export namespace icons {
     export { rotate };
     export { remove };
 }
-declare const move: SVGElement;
-declare const image: SVGElement;
-declare const scale: SVGElement;
-declare const rotate: SVGElement;
-declare const remove: SVGElement;
+declare function move(): SVGElement;
+declare function image(): SVGElement;
+declare function scale(): SVGElement;
+declare function rotate(): SVGElement;
+declare function remove(): SVGElement;
 export {};

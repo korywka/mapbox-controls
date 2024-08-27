@@ -1,15 +1,9 @@
 import { controlContainer, controlButton } from '@mapbox-controls/helpers';
 import { icons } from './icons.js';
 
-/**
- * @typedef {{
- * 	instant?: boolean;
- * }} CompassControlOptions
- */
-
 class CompassControl {
 	/**
-	 * @param {CompassControlOptions} options
+	 * @param {import('./types').ControlOptions} options
 	 */
 	constructor(options = {}) {
 		this.options = { ...options };
@@ -33,7 +27,7 @@ class CompassControl {
 		if (!this.options.instant) {
 			this.container.hidden = angle === 0;
 		}
-		this.icon.style.transform = `rotate(${angle}deg)`;
+		this.icon.style.rotate = `${angle}deg`;
 	}
 
 	/**

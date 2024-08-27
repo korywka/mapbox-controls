@@ -1,5 +1,5 @@
 export namespace icons {
     export { compass };
 }
-declare const compass: SVGElement;
+declare function compass(): SVGElement;
 export {};

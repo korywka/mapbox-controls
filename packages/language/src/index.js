@@ -1,16 +1,3 @@
-/** @typedef {import('mapbox-gl').StyleFunction} StyleFunction */
-/** @typedef {import('mapbox-gl').Expression} Expression */
-/** @typedef {string | StyleFunction | Expression} TextField */
-
-/**
- * @typedef {{
- * 	supportedLanguages?: string[]
- * 	language?: string
- * 	getLanguageKey?: (language: string) => string
- * 	excludedLayerIds?: string[]
- * }} LanguageControlOptions
- */
-
 const defaults = {
 	supportedLanguages: ['ar', 'de', 'en', 'es', 'fr', 'it', 'ja', 'ko', 'mul', 'pt', 'ru', 'vi', 'zh-Hans', 'zh-Hant'],
 	getLanguageKey: (/** @type {string} */ language) => (language === 'mul' ? 'name' : `name_${language}`),
@@ -18,7 +5,7 @@ const defaults = {
 };
 
 export default class LanguageControl {
-	/** @param {LanguageControlOptions} options */
+	/** @param {import('./types').ControlOptions} options */
 	constructor(options = {}) {
 		this.options = { ...defaults, ...options };
 		this.container = document.createElement('div');
@@ -38,7 +25,7 @@ export default class LanguageControl {
 			language = 'mul';
 		}
 		const style = this.map.getStyle();
-		if (!style.layers) return;
+		if (!style) return;
 		const languageKey = this.options.getLanguageKey(language);
 		const layers = style.layers.map((layer) => {
 			if (layer.type !== 'symbol') return layer;
@@ -70,9 +57,9 @@ export default class LanguageControl {
 	}
 
 	/**
-   * @param {TextField} field
+   * @param {import('./types').TextField} field
    * @param {string} languageKey
-   * @returns {TextField}
+   * @returns {import('./types').TextField}
    */
 	localizeTextField(field, languageKey) {
 		// string

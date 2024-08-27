@@ -2,9 +2,9 @@ import { sources } from './sources.js';
 
 /**
  * @typedef {{
- *  line: import('mapbox-gl').LineLayer
- *  markers: import('mapbox-gl').CircleLayer
- *  labels: import('mapbox-gl').SymbolLayer
+ *  line: import('mapbox-gl').LineLayerSpecification
+ *  markers: import('mapbox-gl').CircleLayerSpecification
+ *  labels: import('mapbox-gl').SymbolLayerSpecification
  * }} Layers
  */
 

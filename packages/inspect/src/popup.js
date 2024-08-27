@@ -1,9 +1,5 @@
 /**
- * @typedef {import('mapbox-gl').MapboxGeoJSONFeature} GeoJSONFeature
- */
-
-/**
- * @param {GeoJSONFeature[]} features
+ * @param {import('mapbox-gl').GeoJSONFeature[]} features
  * @param {number} current
  * @returns {string}
  */
@@ -11,6 +7,7 @@ function html(features, current) {
 	const feature = features[current];
 	const withProperties = feature.properties && Object.keys(feature.properties).length;
 	const properties = feature.properties || {};
+	const layer = /** @type {import('mapbox-gl').LayerSpecification} */ (feature.layer);
 
 	return (`
     <header>
@@ -32,19 +29,19 @@ function html(features, current) {
       </tr>
       <tr>
         <th>id</th>
-        <td>${feature.layer.id}</td>
+        <td>${layer.id}</td>
       </tr>
       <tr>
         <th>type</th>
-        <td>${feature.layer.type}</td>
+        <td>${layer.type}</td>
       </tr>
       <tr>
         <th>source</th>
-        <td>${feature.layer.source}</td>
+        <td>${layer.source}</td>
       </tr>
       <tr>
         <th>source-layer</th>
-        <td>${feature.layer['source-layer'] ?? '-'}</td>
+        <td>${layer['source-layer'] ?? '-'}</td>
       </tr>
       ${withProperties ? (`
         <tr>
@@ -62,7 +59,7 @@ function html(features, current) {
 }
 
 /**
- * @param {GeoJSONFeature[]} features
+ * @param {import('mapbox-gl').GeoJSONFeature[]} features
  * @returns {HTMLDivElement}
  */
 export function popup(features) {

@@ -1,11 +1,11 @@
-import transformScale from '@turf/transform-scale';
 import rhumbDistance from '@turf/rhumb-distance';
+import transformScale from '@turf/transform-scale';
 
 export class Scale {
 	/**
 	 * @param {import('mapbox-gl').Map} map
 	 * @param {import('../raster').Raster} raster
-	 * @param {(coordinates: [number, number][]) => void} onUpdate
+	 * @param {(coordinates: import('../types').RasterCoordinates) => void} onUpdate
 	 */
 	constructor(map, raster, onUpdate) {
 		this.map = map;
@@ -24,7 +24,7 @@ export class Scale {
 	}
 
 	/**
-   * @param {import('mapbox-gl').MapLayerMouseEvent} event
+   * @param {import('mapbox-gl').MapMouseEvent} event
    */
 	onPointerEnter = (event) => {
 		if (!event.features) return;
@@ -36,7 +36,7 @@ export class Scale {
 	};
 
 	/**
-   * @param {import('mapbox-gl').MapLayerMouseEvent} event
+   * @param {import('mapbox-gl').MapMouseEvent} event
    */
 	onPointerDown = (event) => {
 		event.preventDefault();
@@ -61,8 +61,10 @@ export class Scale {
 		const scale = distB0 / distA0;
 		const geojson = this.raster.polygonSource.source.data;
 		const transformed = transformScale(geojson, scale, { origin: point0 });
-		const position = /** @type {[number, number][]} */ (transformed.geometry.coordinates[0]);
-		this.onUpdate(position.slice(0, 4));
+		const transformedCoordinates = transformed.geometry.coordinates[0];
+		// remove closing 5th coordinate from polygon
+		const position = /** @type {import('../types').RasterCoordinates} */ (transformedCoordinates.slice(0, 4));
+		this.onUpdate(position);
 	};
 
 	onPointerUp = () => {

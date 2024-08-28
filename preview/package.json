@@ -17,7 +17,7 @@
 		"@mapbox-controls/styles": "workspace:*",
 		"@mapbox-controls/tooltip": "workspace:*",
 		"@mapbox-controls/zoom": "workspace:*",
-		"mapbox-gl": "3.6.0"
+		"mapbox-gl": "catalog:"
 	},
 	"devDependencies": {
 		"@rollup/plugin-commonjs": "26.0.1",

@@ -8,10 +8,10 @@
 		"build": "tsc"
 	},
 	"dependencies": {
-		"@mapbox-controls/helpers": "3.0.0"
+		"@mapbox-controls/helpers": "workspace:*"
 	},
 	"devDependencies": {
-		"mapbox-gl": "3.6.0"
+		"mapbox-gl": "catalog:"
 	},
 	"peerDependencies": {
 		"mapbox-gl": ">=1.0.0 <4.0.0"

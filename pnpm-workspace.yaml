@@ -1,3 +1,7 @@
 packages:
-  - 'packages/*'
-  - 'preview'
+  - "packages/*"
+  - "preview"
+
+catalog:
+  "mapbox-gl": 3.6.0
+  "@types/geojson": 7946.0.14

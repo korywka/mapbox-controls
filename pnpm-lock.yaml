@@ -4,6 +4,15 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@types/geojson':
+      specifier: 7946.0.14
+      version: 7946.0.14
+    mapbox-gl:
+      specifier: 3.6.0
+      version: 3.6.0
+
 importers:
 
   .:
@@ -24,27 +33,27 @@ importers:
   packages/compass:
     dependencies:
       '@mapbox-controls/helpers':
-        specifier: 3.0.0
-        version: 3.0.0(mapbox-gl@3.6.0)
+        specifier: workspace:*
+        version: link:../helpers
     devDependencies:
       mapbox-gl:
-        specifier: 3.6.0
+        specifier: 'catalog:'
         version: 3.6.0
 
   packages/helpers:
     devDependencies:
       '@types/geojson':
-        specifier: 7946.0.14
+        specifier: 'catalog:'
         version: 7946.0.14
       mapbox-gl:
-        specifier: 3.6.0
+        specifier: 'catalog:'
         version: 3.6.0
 
   packages/image:
     dependencies:
       '@mapbox-controls/helpers':
-        specifier: 3.0.0
-        version: 3.0.0(mapbox-gl@3.6.0)
+        specifier: workspace:*
+        version: link:../helpers
       '@turf/bearing':
         specifier: 7.1.0
         version: 7.1.0
@@ -71,33 +80,33 @@ importers:
         version: 7.1.0
     devDependencies:
       '@types/geojson':
-        specifier: 7946.0.14
+        specifier: 'catalog:'
         version: 7946.0.14
       mapbox-gl:
-        specifier: 3.6.0
+        specifier: 'catalog:'
         version: 3.6.0
 
   packages/inspect:
     dependencies:
       '@mapbox-controls/helpers':
-        specifier: 3.0.0
-        version: 3.0.0(mapbox-gl@3.6.0)
+        specifier: workspace:*
+        version: link:../helpers
     devDependencies:
       mapbox-gl:
-        specifier: 3.6.0
+        specifier: 'catalog:'
         version: 3.6.0
 
   packages/language:
     devDependencies:
       mapbox-gl:
-        specifier: 3.6.0
+        specifier: 'catalog:'
         version: 3.6.0
 
   packages/ruler:
     dependencies:
       '@mapbox-controls/helpers':
-        specifier: 3.0.0
-        version: 3.0.0(mapbox-gl@3.6.0)
+        specifier: workspace:*
+        version: link:../helpers
       '@turf/distance':
         specifier: 7.1.0
         version: 7.1.0
@@ -106,36 +115,36 @@ importers:
         version: 7.1.0
     devDependencies:
       '@types/geojson':
-        specifier: 7946.0.14
+        specifier: 'catalog:'
         version: 7946.0.14
       mapbox-gl:
-        specifier: 3.6.0
+        specifier: 'catalog:'
         version: 3.6.0
 
   packages/styles:
     dependencies:
       '@mapbox-controls/helpers':
-        specifier: 3.0.0
-        version: 3.0.0(mapbox-gl@3.6.0)
+        specifier: workspace:*
+        version: link:../helpers
     devDependencies:
       mapbox-gl:
-        specifier: 3.6.0
+        specifier: 'catalog:'
         version: 3.6.0
 
   packages/tooltip:
     devDependencies:
       mapbox-gl:
-        specifier: 3.6.0
+        specifier: 'catalog:'
         version: 3.6.0
 
   packages/zoom:
     dependencies:
       '@mapbox-controls/helpers':
-        specifier: 3.0.0
-        version: 3.0.0(mapbox-gl@3.6.0)
+        specifier: workspace:*
+        version: link:../helpers
     devDependencies:
       mapbox-gl:
-        specifier: 3.6.0
+        specifier: 'catalog:'
         version: 3.6.0
 
   preview:
@@ -165,7 +174,7 @@ importers:
         specifier: workspace:*
         version: link:../packages/zoom
       mapbox-gl:
-        specifier: 3.6.0
+        specifier: 'catalog:'
         version: 3.6.0
     devDependencies:
       '@rollup/plugin-commonjs':
@@ -192,8 +201,8 @@ importers:
 
 packages:
 
-  '@babel/runtime@7.24.6':
-    resolution: {integrity: sha512-Ja18XcETdEl5mzzACGd+DKgaGJzPTCow7EglgwTmHdwokzDFYh/MHua6lU6DV/hjF2IaOJ4oX2nqnjG7RElKOw==}
+  '@babel/runtime@7.25.4':
+    resolution: {integrity: sha512-DSgLeL/FNcpXuzav5wfYvHCGvynXkJbn3Zvc3823AEe9nPwW9IK4UoCSS5yGymmQzN0pCPvivtgS6/8U2kkm1w==}
     engines: {node: '>=6.9.0'}
 
   '@eslint-community/eslint-utils@4.4.0':
@@ -202,8 +211,8 @@ packages:
     peerDependencies:
       eslint: ^6.0.0 || ^7.0.0 || >=8.0.0
 
-  '@eslint-community/regexpp@4.10.0':
-    resolution: {integrity: sha512-Cu96Sd2By9mCNTx2iyKOmq10v22jUVQv0lQnlGNy16oE9589yE+QADPbrMGCkA51cKZSg3Pu/aTJVTGfL/qjUA==}
+  '@eslint-community/regexpp@4.11.0':
+    resolution: {integrity: sha512-G/M/tIiMrTAxEWRfLfQJMmGNX28IxBg4PBz8XqQhqUHLFI6TL2htpIB1iQCj144V5ee/JaKyT9/WZ0MGZWfA7A==}
     engines: {node: ^12.0.0 || ^14.0.0 || >=16.0.0}
 
   '@eslint/eslintrc@2.1.4':
@@ -217,6 +226,7 @@ packages:
   '@humanwhocodes/config-array@0.11.14':
     resolution: {integrity: sha512-3T8LkOmg45BV5FICb15QQMsyUSWrQ8AygVfC7ZG32zOalnqrilm018ZVCw0eapXux8FtA33q8PSRSstjee3jSg==}
     engines: {node: '>=10.10.0'}
+    deprecated: Use @eslint/config-array instead
 
   '@humanwhocodes/module-importer@1.0.1':
     resolution: {integrity: sha512-bxveV4V8v5Yb4ncFTT3rPSgZBOpCkjfK0y4oVVVJwIuDVBRMDXrPyXRL988i5ap9m9bnyEEjWfm5WkBmtffLfA==}
@@ -224,18 +234,14 @@ packages:
 
   '@humanwhocodes/object-schema@2.0.3':
     resolution: {integrity: sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==}
+    deprecated: Use @eslint/object-schema instead
 
   '@isaacs/cliui@8.0.2':
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
     engines: {node: '>=12'}
 
-  '@jridgewell/sourcemap-codec@1.4.15':
-    resolution: {integrity: sha512-eF2rxCRulEKXHTRiDrDy6erMYWqNw4LPdQ8UQA4huuxaQsVeRPFl2oM8oDGxMFhJUWZf9McpLtJasDDZb/Bpeg==}
-
-  '@mapbox-controls/helpers@3.0.0':
-    resolution: {integrity: sha512-XxCCKHNaxR8WeJM3syiXxBH/7Yfz7WytnDvhe/aQMgxYhJ68Z9aKAu6E4PtV0AI5dxyQb6UkdhQs8mg7Py0tjA==}
-    peerDependencies:
-      mapbox-gl: '>=1.0.0 <4.0.0'
+  '@jridgewell/sourcemap-codec@1.5.0':
+    resolution: {integrity: sha512-gv3ZRaISU3fjPAgNsriBRqGWQL6quFx04YMPW/zD8XMLsU32mhCCbfbO6KZFLjvYpCZ8zyDEgqsgf+PwPaM7GQ==}
 
   '@mapbox/jsonlint-lines-primitives@2.0.2':
     resolution: {integrity: sha512-rY0o9A5ECsTQRVhv7tL/OyDpGAoUB4tTvLiW1DSzQGq4bvTPhNw1VpSNjDJc5GFZ2XuyOtSWSVN05qOtcD71qQ==}
@@ -470,8 +476,8 @@ packages:
     peerDependencies:
       acorn: ^6.0.0 || ^7.0.0 || ^8.0.0
 
-  acorn@8.11.3:
-    resolution: {integrity: sha512-Y9rRfJG5jcKOE0CLisYbojUjIrIEE7AGMzA/Sm4BslANhbS+cDMpgBdcPT91oJ7OuJ9hYJBx59RjbhxVnrF8Xg==}
+  acorn@8.12.1:
+    resolution: {integrity: sha512-tcpGyI9zbizT9JbV6oYE477V6mTlXvvi0T0G3SNIYE2apm/G5huBa1+K89VGeovbg+jycCrfhl3ADxErOuO6Jg==}
     engines: {node: '>=0.4.0'}
     hasBin: true
 
@@ -614,8 +620,8 @@ packages:
       supports-color:
         optional: true
 
-  debug@4.3.5:
-    resolution: {integrity: sha512-pt0bNEmneDIvdL1Xsd9oDQ/wrQRkXDT4AUWlNZNPKvW5x/jyO9VFXkJUP07vQ2upmw5PlaITaPKc31jK13V+jg==}
+  debug@4.3.6:
+    resolution: {integrity: sha512-O/09Bd4Z1fBrU4VzkhFqVgpPzaGbw6Sm9FEkBT1A/YBXQFGuuSxa1dN2nxgxS34JmKXqYx8CZAwEVoJFImUXIg==}
     engines: {node: '>=6.0'}
     peerDependencies:
       supports-color: '*'
@@ -680,8 +686,8 @@ packages:
     resolution: {integrity: sha512-oruZaFkjorTpF32kDSI5/75ViwGeZginGGy2NoOSg3Q9bnwlnmDm4HLnkl0RE3n+njDXR037aY1+x58Z/zFdwQ==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
-  esquery@1.5.0:
-    resolution: {integrity: sha512-YQLXUplAwJgCydQ78IMJywZCceoqk1oH01OERdSAJc/7U2AylwjhSCLDEtqwg811idIS/9fIU5GjG73IgjKMVg==}
+  esquery@1.6.0:
+    resolution: {integrity: sha512-ca9pw9fomFcKPvFLXhBKUK90ZvGibiGOvRJNbjljY7s7uq/5YO4BOzcYtJqExdx99rF6aAcnRxHmcUHcz6sQsg==}
     engines: {node: '>=0.10'}
 
   esrecurse@4.3.0:
@@ -736,8 +742,8 @@ packages:
   flatted@3.3.1:
     resolution: {integrity: sha512-X8cqMLLie7KsNUDSdzeN8FYK9rEt4Dt67OsG/DNGnYTSDBG4uFAJFBnUeiV+zCVAvwFy56IjM9sH51jVaEhNxw==}
 
-  foreground-child@3.2.1:
-    resolution: {integrity: sha512-PXUUyLqrR2XCWICfv6ukppP96sdFwWbNEnfEMt7jNsISjMsvaLNinAHNDYyvkyU+SZG2BTSbT5NjG+vZslfGTA==}
+  foreground-child@3.3.0:
+    resolution: {integrity: sha512-Ld2g8rrAyMYFXBhEqMz8ZAHBi4J4uS1i/CxGMDnjyFWddMXLVcDp051DZfu+t7+ab7Wv6SMqpWmyFIj5UbfFvg==}
     engines: {node: '>=14'}
 
   fs.realpath@1.0.0:
@@ -769,9 +775,8 @@ packages:
     resolution: {integrity: sha512-XxwI8EOhVQgWp6iDL+3b0r86f4d6AX6zSU55HfB4ydCEuXLXc5FcYeOu+nnGftS4TEju/11rt4KJPTMgbfmv4A==}
     engines: {node: '>=10.13.0'}
 
-  glob@10.4.2:
-    resolution: {integrity: sha512-GwMlUF6PkPo3Gk21UxkCohOv0PLcIXVtKyLlpEI28R/cO/4eNOdmLk3CMW1wROV/WR/EsZOWAfBbBOqYvs88/w==}
-    engines: {node: '>=16 || 14 >=14.18'}
+  glob@10.4.5:
+    resolution: {integrity: sha512-7Bv8RF0k6xjo7d4A/PxYLbUCfb6c+Vpd2/mB2yRDlew7Jb5hEXiCD9ibfO7wpk8i4sevK6DFny9h7EYbM3/sHg==}
     hasBin: true
 
   glob@7.2.3:
@@ -803,8 +808,8 @@ packages:
   ieee754@1.2.1:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
 
-  ignore@5.3.1:
-    resolution: {integrity: sha512-5Fytz/IraMjqpwfd34ke28PTVMjZjJG2MPn5t7OE4eUCUNf8BAa7b5WUS9/Qvr6mwOQS7Mk6vdsMno5he+T8Xw==}
+  ignore@5.3.2:
+    resolution: {integrity: sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g==}
     engines: {node: '>= 4'}
 
   import-fresh@3.3.0:
@@ -829,8 +834,9 @@ packages:
     resolution: {integrity: sha512-BSLE3HnV2syZ0FK0iMA/yUGplUeMmNz4AW5fnTunbCIqZi4vG3WjJT9FHMy5D69xmAYBHXQhJdALdpwVxV501A==}
     engines: {node: '>=6'}
 
-  is-core-module@2.13.1:
-    resolution: {integrity: sha512-hHrIjvZsftOsvKSn2TRYl63zvxsgE0K+0mYMoH6gD4omR5IWB2KynivBQczo3+wF1cCkjzvptnI9Q0sPU66ilw==}
+  is-core-module@2.15.1:
+    resolution: {integrity: sha512-z0vtXSwucUJtANQWldhbtbt7BnL0vxiFjIdDLAatwhDYty2bad6s+rijD6Ri4YuYJubLzIJLUidCh09e1djEVQ==}
+    engines: {node: '>= 0.4'}
 
   is-docker@2.2.1:
     resolution: {integrity: sha512-F+i2BKsFrH66iaUFc0woD8sLy8getkwTwtOBjvs56Cx4CgJDeKQeqfz8wAYiSb8JOprWhHH5p77PbmYCvvUuXQ==}
@@ -874,9 +880,8 @@ packages:
   isexe@2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
 
-  jackspeak@3.4.0:
-    resolution: {integrity: sha512-JVYhQnN59LVPFCEcVa2C3CrEKYacvjRfqIQl+h8oi91aLYQVWRYbxjPcv1bUiUy/kLmQaANrYfNMCO3kuEDHfw==}
-    engines: {node: '>=14'}
+  jackspeak@3.4.3:
+    resolution: {integrity: sha512-OGlZQpz2yfahA/Rd1Y8Cd9SIEsqvXkLVoSw/cgwhnhFMDbsQFeZYoJJ7bIZBS9BcamUW96asq/npPWugM+RQBw==}
 
   js-yaml@4.1.0:
     resolution: {integrity: sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==}
@@ -914,12 +919,11 @@ packages:
   lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
 
-  lru-cache@10.2.2:
-    resolution: {integrity: sha512-9hp3Vp2/hFQUiIwKo8XCeFVnrg8Pk3TYNPIR7tJADKi5YfcF7vEaK7avFHTlSy3kOKYaJQaalfEo6YuXdceBOQ==}
-    engines: {node: 14 || >=16.14}
+  lru-cache@10.4.3:
+    resolution: {integrity: sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==}
 
-  magic-string@0.30.10:
-    resolution: {integrity: sha512-iIRwTIf0QKV3UAnYK4PU8uiEc4SRh5jX0mwpIwETPpHdhVM4f53RSwS/vXvN1JhGX+Cs7B8qIq3d6AH49O5fAQ==}
+  magic-string@0.30.11:
+    resolution: {integrity: sha512-+Wri9p0QHMy+545hKww7YAu5NyzF8iomPL/RQazugQ9+Ez4Ic3mERMd8ZTX5rfK944j+560ZJi8iAwgak1Ac7A==}
 
   mapbox-gl@3.6.0:
     resolution: {integrity: sha512-xjYHHIJDh6haYcKY+/9jh1eywwYfIOWCgT5Fowj4JriZexx/oOtg2S7BQDMZtpFyg9IN4VLCysmUWxY0pFNRWA==}
@@ -933,6 +937,10 @@ packages:
 
   mime-db@1.52.0:
     resolution: {integrity: sha512-sPU4uV7dYlvtWJxwwxHD0PuihVNiE7TyAbQ5SWxDCB9mUYvOgroQOwYQQOKPJ8CIbE+1ETVlOoK1UC2nU3gYvg==}
+    engines: {node: '>= 0.6'}
+
+  mime-db@1.53.0:
+    resolution: {integrity: sha512-oHlN/w+3MQ3rba9rqFr6V/ypF10LSkdwUysQL7GkXoTgIWeV+tcXGA852TBxH+gsh8UWoyhR1hKcoMJTuWflpg==}
     engines: {node: '>= 0.6'}
 
   mime-types@2.1.18:
@@ -1036,8 +1044,8 @@ packages:
   path-to-regexp@2.2.1:
     resolution: {integrity: sha512-gu9bD6Ta5bwGrrU8muHzVOBFFREpp2iRkVfhBJahwJ6p6Xw20SjT0MxLnwkjOibQmGSYhiUnf2FLe7k+jcFmGQ==}
 
-  pbf@3.2.1:
-    resolution: {integrity: sha512-ClrV7pNOn7rtmoQVF4TS1vyU0WhYRnP92fzbfF75jAIwpnzdJXf8iTd4CMEqO4yUenH6NDqLiwjqlh6QgZzgLQ==}
+  pbf@3.3.0:
+    resolution: {integrity: sha512-XDF38WCH3z5OV/OVa8GKUNtLAyneuzbCisx7QUCF8Q6Nutx0WnJrQe5O+kOtBlLfRNUws98Y58Lblp+NJG5T4Q==}
     hasBin: true
 
   picomatch@2.3.1:
@@ -1235,8 +1243,8 @@ packages:
     resolution: {integrity: sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==}
     hasBin: true
 
-  tslib@2.6.2:
-    resolution: {integrity: sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==}
+  tslib@2.7.0:
+    resolution: {integrity: sha512-gLXCKdN1/j47AiHiOkJN69hJmcbGTHI0ImLmbYLHykhgeN0jVGola9yVjFgzCUklsZQMW55o+dW7IXv3RCXDzA==}
 
   tweakpane@4.0.4:
     resolution: {integrity: sha512-RkWD54zDlEbnN01wQPk0ANHGbdCvlJx/E8A1QxhTfCbX+ROWos1Ws2MnhOm39aUGMOh+36TjUwpDmLfmwTr1Fg==}
@@ -1313,7 +1321,7 @@ packages:
 
 snapshots:
 
-  '@babel/runtime@7.24.6':
+  '@babel/runtime@7.25.4':
     dependencies:
       regenerator-runtime: 0.14.1
 
@@ -1322,15 +1330,15 @@ snapshots:
       eslint: 8.56.0
       eslint-visitor-keys: 3.4.3
 
-  '@eslint-community/regexpp@4.10.0': {}
+  '@eslint-community/regexpp@4.11.0': {}
 
   '@eslint/eslintrc@2.1.4':
     dependencies:
       ajv: 6.12.6
-      debug: 4.3.5
+      debug: 4.3.6
       espree: 9.6.1
       globals: 13.24.0
-      ignore: 5.3.1
+      ignore: 5.3.2
       import-fresh: 3.3.0
       js-yaml: 4.1.0
       minimatch: 3.1.2
@@ -1343,7 +1351,7 @@ snapshots:
   '@humanwhocodes/config-array@0.11.14':
     dependencies:
       '@humanwhocodes/object-schema': 2.0.3
-      debug: 4.3.5
+      debug: 4.3.6
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
@@ -1361,11 +1369,7 @@ snapshots:
       wrap-ansi: 8.1.0
       wrap-ansi-cjs: wrap-ansi@7.0.0
 
-  '@jridgewell/sourcemap-codec@1.4.15': {}
-
-  '@mapbox-controls/helpers@3.0.0(mapbox-gl@3.6.0)':
-    dependencies:
-      mapbox-gl: 3.6.0
+  '@jridgewell/sourcemap-codec@1.5.0': {}
 
   '@mapbox/jsonlint-lines-primitives@2.0.2': {}
 
@@ -1403,9 +1407,9 @@ snapshots:
       '@rollup/pluginutils': 5.1.0(rollup@4.21.1)
       commondir: 1.0.1
       estree-walker: 2.0.2
-      glob: 10.4.2
+      glob: 10.4.5
       is-reference: 1.2.1
-      magic-string: 0.30.10
+      magic-string: 0.30.11
     optionalDependencies:
       rollup: 4.21.1
 
@@ -1413,7 +1417,7 @@ snapshots:
     dependencies:
       '@rollup/pluginutils': 5.1.0(rollup@4.21.1)
       estree-walker: 2.0.2
-      magic-string: 0.30.10
+      magic-string: 0.30.11
     optionalDependencies:
       rollup: 4.21.1
 
@@ -1489,52 +1493,52 @@ snapshots:
       '@turf/helpers': 7.1.0
       '@turf/meta': 7.1.0
       '@types/geojson': 7946.0.14
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@turf/bearing@7.1.0':
     dependencies:
       '@turf/helpers': 7.1.0
       '@turf/invariant': 7.1.0
       '@types/geojson': 7946.0.14
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@turf/center@7.1.0':
     dependencies:
       '@turf/bbox': 7.1.0
       '@turf/helpers': 7.1.0
       '@types/geojson': 7946.0.14
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@turf/centroid@7.1.0':
     dependencies:
       '@turf/helpers': 7.1.0
       '@turf/meta': 7.1.0
       '@types/geojson': 7946.0.14
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@turf/clone@7.1.0':
     dependencies:
       '@turf/helpers': 7.1.0
       '@types/geojson': 7946.0.14
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@turf/distance@7.1.0':
     dependencies:
       '@turf/helpers': 7.1.0
       '@turf/invariant': 7.1.0
       '@types/geojson': 7946.0.14
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@turf/helpers@7.1.0':
     dependencies:
       '@types/geojson': 7946.0.14
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@turf/invariant@7.1.0':
     dependencies:
       '@turf/helpers': 7.1.0
       '@types/geojson': 7946.0.14
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@turf/meta@7.1.0':
     dependencies:
@@ -1546,21 +1550,21 @@ snapshots:
       '@turf/helpers': 7.1.0
       '@turf/invariant': 7.1.0
       '@types/geojson': 7946.0.14
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@turf/rhumb-destination@7.1.0':
     dependencies:
       '@turf/helpers': 7.1.0
       '@turf/invariant': 7.1.0
       '@types/geojson': 7946.0.14
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@turf/rhumb-distance@7.1.0':
     dependencies:
       '@turf/helpers': 7.1.0
       '@turf/invariant': 7.1.0
       '@types/geojson': 7946.0.14
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@turf/transform-rotate@7.1.0':
     dependencies:
@@ -1573,7 +1577,7 @@ snapshots:
       '@turf/rhumb-destination': 7.1.0
       '@turf/rhumb-distance': 7.1.0
       '@types/geojson': 7946.0.14
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@turf/transform-scale@7.1.0':
     dependencies:
@@ -1588,7 +1592,7 @@ snapshots:
       '@turf/rhumb-destination': 7.1.0
       '@turf/rhumb-distance': 7.1.0
       '@types/geojson': 7946.0.14
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@turf/transform-translate@7.1.0':
     dependencies:
@@ -1598,7 +1602,7 @@ snapshots:
       '@turf/meta': 7.1.0
       '@turf/rhumb-destination': 7.1.0
       '@types/geojson': 7946.0.14
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@types/estree@1.0.5': {}
 
@@ -1625,11 +1629,11 @@ snapshots:
       mime-types: 2.1.35
       negotiator: 0.6.3
 
-  acorn-jsx@5.3.2(acorn@8.11.3):
+  acorn-jsx@5.3.2(acorn@8.12.1):
     dependencies:
-      acorn: 8.11.3
+      acorn: 8.12.1
 
-  acorn@8.11.3: {}
+  acorn@8.12.1: {}
 
   ajv@6.12.6:
     dependencies:
@@ -1732,7 +1736,7 @@ snapshots:
 
   compressible@2.0.18:
     dependencies:
-      mime-db: 1.52.0
+      mime-db: 1.53.0
 
   compression@1.7.4:
     dependencies:
@@ -1772,13 +1776,13 @@ snapshots:
 
   date-fns@2.30.0:
     dependencies:
-      '@babel/runtime': 7.24.6
+      '@babel/runtime': 7.25.4
 
   debug@2.6.9:
     dependencies:
       ms: 2.0.0
 
-  debug@4.3.5:
+  debug@4.3.6:
     dependencies:
       ms: 2.1.2
 
@@ -1818,7 +1822,7 @@ snapshots:
   eslint@8.56.0:
     dependencies:
       '@eslint-community/eslint-utils': 4.4.0(eslint@8.56.0)
-      '@eslint-community/regexpp': 4.10.0
+      '@eslint-community/regexpp': 4.11.0
       '@eslint/eslintrc': 2.1.4
       '@eslint/js': 8.56.0
       '@humanwhocodes/config-array': 0.11.14
@@ -1828,13 +1832,13 @@ snapshots:
       ajv: 6.12.6
       chalk: 4.1.2
       cross-spawn: 7.0.3
-      debug: 4.3.5
+      debug: 4.3.6
       doctrine: 3.0.0
       escape-string-regexp: 4.0.0
       eslint-scope: 7.2.2
       eslint-visitor-keys: 3.4.3
       espree: 9.6.1
-      esquery: 1.5.0
+      esquery: 1.6.0
       esutils: 2.0.3
       fast-deep-equal: 3.1.3
       file-entry-cache: 6.0.1
@@ -1842,7 +1846,7 @@ snapshots:
       glob-parent: 6.0.2
       globals: 13.24.0
       graphemer: 1.4.0
-      ignore: 5.3.1
+      ignore: 5.3.2
       imurmurhash: 0.1.4
       is-glob: 4.0.3
       is-path-inside: 3.0.3
@@ -1860,11 +1864,11 @@ snapshots:
 
   espree@9.6.1:
     dependencies:
-      acorn: 8.11.3
-      acorn-jsx: 5.3.2(acorn@8.11.3)
+      acorn: 8.12.1
+      acorn-jsx: 5.3.2(acorn@8.12.1)
       eslint-visitor-keys: 3.4.3
 
-  esquery@1.5.0:
+  esquery@1.6.0:
     dependencies:
       estraverse: 5.3.0
 
@@ -1923,7 +1927,7 @@ snapshots:
 
   flatted@3.3.1: {}
 
-  foreground-child@3.2.1:
+  foreground-child@3.3.0:
     dependencies:
       cross-spawn: 7.0.3
       signal-exit: 4.1.0
@@ -1947,10 +1951,10 @@ snapshots:
     dependencies:
       is-glob: 4.0.3
 
-  glob@10.4.2:
+  glob@10.4.5:
     dependencies:
-      foreground-child: 3.2.1
-      jackspeak: 3.4.0
+      foreground-child: 3.3.0
+      jackspeak: 3.4.3
       minimatch: 9.0.5
       minipass: 7.1.2
       package-json-from-dist: 1.0.0
@@ -1983,7 +1987,7 @@ snapshots:
 
   ieee754@1.2.1: {}
 
-  ignore@5.3.1: {}
+  ignore@5.3.2: {}
 
   import-fresh@3.3.0:
     dependencies:
@@ -2005,7 +2009,7 @@ snapshots:
     dependencies:
       builtin-modules: 3.3.0
 
-  is-core-module@2.13.1:
+  is-core-module@2.15.1:
     dependencies:
       hasown: 2.0.2
 
@@ -2037,7 +2041,7 @@ snapshots:
 
   isexe@2.0.0: {}
 
-  jackspeak@3.4.0:
+  jackspeak@3.4.3:
     dependencies:
       '@isaacs/cliui': 8.0.2
     optionalDependencies:
@@ -2074,11 +2078,11 @@ snapshots:
 
   lodash@4.17.21: {}
 
-  lru-cache@10.2.2: {}
+  lru-cache@10.4.3: {}
 
-  magic-string@0.30.10:
+  magic-string@0.30.11:
     dependencies:
-      '@jridgewell/sourcemap-codec': 1.4.15
+      '@jridgewell/sourcemap-codec': 1.5.0
 
   mapbox-gl@3.6.0:
     dependencies:
@@ -2100,7 +2104,7 @@ snapshots:
       grid-index: 1.1.0
       kdbush: 4.0.2
       murmurhash-js: 1.0.0
-      pbf: 3.2.1
+      pbf: 3.3.0
       potpack: 2.0.0
       quickselect: 3.0.0
       rw: 1.3.3
@@ -2115,6 +2119,8 @@ snapshots:
   mime-db@1.33.0: {}
 
   mime-db@1.52.0: {}
+
+  mime-db@1.53.0: {}
 
   mime-types@2.1.18:
     dependencies:
@@ -2197,12 +2203,12 @@ snapshots:
 
   path-scurry@1.11.1:
     dependencies:
-      lru-cache: 10.2.2
+      lru-cache: 10.4.3
       minipass: 7.1.2
 
   path-to-regexp@2.2.1: {}
 
-  pbf@3.2.1:
+  pbf@3.3.0:
     dependencies:
       ieee754: 1.2.1
       resolve-protobuf-schema: 2.1.0
@@ -2257,7 +2263,7 @@ snapshots:
 
   resolve@1.22.8:
     dependencies:
-      is-core-module: 2.13.1
+      is-core-module: 2.15.1
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
 
@@ -2307,7 +2313,7 @@ snapshots:
 
   rxjs@7.8.1:
     dependencies:
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   safe-buffer@5.1.2: {}
 
@@ -2402,7 +2408,7 @@ snapshots:
 
   tree-kill@1.2.2: {}
 
-  tslib@2.6.2: {}
+  tslib@2.7.0: {}
 
   tweakpane@4.0.4: {}
 
@@ -2431,7 +2437,7 @@ snapshots:
     dependencies:
       '@mapbox/point-geometry': 0.1.0
       '@mapbox/vector-tile': 1.3.1
-      pbf: 3.2.1
+      pbf: 3.3.0
 
   which@2.0.2:
     dependencies:

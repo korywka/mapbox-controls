@@ -21,7 +21,7 @@
 
 ## 3.0.0
 
+- ⚠️ Use new `mapbox` types instead of `DefinitelyTyped`
 - Update `@turf` package
 - Update `@mapbox` package
-- Use new `mapbox` types instead of `DefinitelyTyped`
 - Increase icon size for 1px for pixel perfect centering inside buttons

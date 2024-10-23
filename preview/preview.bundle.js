@@ -2690,7 +2690,7 @@
 	};
 
 	const map = new mapboxgl.Map({
-		accessToken: 'pk.eyJ1Ijoia29yeXdrYSIsImEiOiJja2p1ajdlOWozMnF2MzBtajRvOTVzZDRpIn0.nnlX7TDuZ3zuGkZGr_oA3A',
+		accessToken: 'pk.eyJ1Ijoia29yeXdrYSIsImEiOiJjbTJreGo1bHkwNWx1MmtxdGJtN2phdmEwIn0.Rct4IUBzwzsKF90Riz81dA',
 		container: 'map',
 		style: 'mapbox://styles/mapbox/standard',
 		zoom: 14,

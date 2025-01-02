@@ -1,10 +1,15 @@
-## 1.1.0
+## 3.0.0
 
-- **ImageControl**: add option for remove button [#51](../../issues/51)
+- ⚠️ Use new `mapbox` types instead of `DefinitelyTyped`
+- Update `@turf` package
+- Update `@mapbox` package
+- Increase icon size for 1px for pixel perfect centering inside buttons
 
-## 1.2.0
+## 2.1.0
 
-- **StyleControl**: fix for MapBox Standard style [#55](../../pull/55)
+- Update `@turf` package from alpha version to release version
+- Fix Vite SSR for icons
+- Update dependencies
 
 ## 2.0.0
 
@@ -13,15 +18,10 @@
 - **ImageControl**: add error hint for missing layers
 - Update dependencies
 
-## 2.1.0
+## 1.2.0
 
-- Update `@turf` package from alpha version to release version
-- Fix Vite SSR for icons
-- Update dependencies
+- **StyleControl**: fix for MapBox Standard style [#55](../../pull/55)
 
-## 3.0.0
+## 1.1.0
 
-- ⚠️ Use new `mapbox` types instead of `DefinitelyTyped`
-- Update `@turf` package
-- Update `@mapbox` package
-- Increase icon size for 1px for pixel perfect centering inside buttons
+- **ImageControl**: add option for remove button [#51](../../issues/51)

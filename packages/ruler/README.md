@@ -4,7 +4,7 @@
 
 ![](https://github.com/korywka/mapbox-controls/assets/988471/1c90555c-2e22-4785-8365-14c1bacabb18)
 
-Control to measure distance between points on a map.
+Control to measure distance between points on a map and area size.
 
 ```
 npm i @mapbox-controls/ruler
@@ -17,6 +17,7 @@ import '@mapbox-controls/ruler/src/index.css';
 map.addControl(new RulerControl(), 'bottom-right');
 map.on('ruler.on', () => console.log('Ruler activated'));
 map.on('ruler.off', () => console.log('Ruler deactivated'));
+map.on('ruler.change', ({ coordinates }) => console.log('Ruler LineString', coordinates));
 ```
 
 ## Options
@@ -24,7 +25,9 @@ map.on('ruler.off', () => console.log('Ruler deactivated'));
 ```ts
 export type ControlOptions = {
     units?: import("@turf/helpers").Units;
-    labelFormat?: (n: number) => string;
+    areaUnits?: import('@turf/helpers').AreaUnits;
+    labelFormat?: (n: number, units?: import('@turf/helpers').Units) => string;
+    labelAreaFormat?: (v: number, units?: import('@turf/helpers').AreaUnits) => string;
     lineLayout?: import("mapbox-gl").LineLayerSpecification["layout"];
     linePaint?: import("mapbox-gl").LineLayerSpecification["paint"];
     markerLayout?: import("mapbox-gl").CircleLayerSpecification["layout"];
@@ -32,6 +35,7 @@ export type ControlOptions = {
     labelLayout?: import("mapbox-gl").SymbolLayerSpecification["layout"];
     labelPaint?: import("mapbox-gl").SymbolLayerSpecification["paint"];
     invisible?: boolean;
+    disableArea?: boolean;
 };
 ```
 

@@ -23,6 +23,7 @@ export const layers = {
 	markers: {
 		id: 'mapbox-control-ruler-markers',
 		type: 'circle',
+		filter: ['has', 'distance'],
 		source: sources.points,
 		paint: {
 			'circle-radius': 5,
@@ -36,16 +37,33 @@ export const layers = {
 		type: 'symbol',
 		source: sources.points,
 		layout: {
-			'text-field': '{distance}',
-			'text-font': ['Roboto Medium'],
-			'text-anchor': 'top',
-			'text-size': 12,
+			'text-field': ['concat', ['get', 'distance'], ['get', 'area']],
+			'text-font': [
+				'case',
+				['has', 'area'],
+				['literal', ['Roboto Bold']],
+				['literal', ['Roboto Medium']],
+			],
+			'text-size': [
+				'case',
+				['has', 'area'],
+				16,
+				12,
+			],
 			'text-offset': [0, 0.8],
+			'text-anchor': 'top',
+			'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
+			'text-allow-overlap': true,
 		},
 		paint: {
 			'text-color': '#263238',
 			'text-halo-color': '#fff',
-			'text-halo-width': 1,
+			'text-halo-width': [
+				'case',
+				['has', 'area'],
+				3,
+				1,
+			],
 		},
 	},
 };

@@ -149,7 +149,10 @@ export default class RulerControl {
 		const geoJSONLine = toGeoJSONLine(this.coordinates);
 		const geoJSONPoints = toGeoJSONPoints(this.coordinates, {
 			units: this.options.units,
+			areaUnits: this.options.areaUnits,
 			labelFormat: this.options.labelFormat,
+			labelAreaFormat: this.options.labelAreaFormat,
+			showArea: this.options.disableArea !== true,
 		});
 		lineSource.setData(geoJSONLine);
 		pointsSource.setData(geoJSONPoints);

@@ -240,6 +240,270 @@
 	};
 
 	// index.ts
+	var earthRadius$1 = 63710088e-1;
+	var factors$1 = {
+	  centimeters: earthRadius$1 * 100,
+	  centimetres: earthRadius$1 * 100,
+	  degrees: 360 / (2 * Math.PI),
+	  feet: earthRadius$1 * 3.28084,
+	  inches: earthRadius$1 * 39.37,
+	  kilometers: earthRadius$1 / 1e3,
+	  kilometres: earthRadius$1 / 1e3,
+	  meters: earthRadius$1,
+	  metres: earthRadius$1,
+	  miles: earthRadius$1 / 1609.344,
+	  millimeters: earthRadius$1 * 1e3,
+	  millimetres: earthRadius$1 * 1e3,
+	  nauticalmiles: earthRadius$1 / 1852,
+	  radians: 1,
+	  yards: earthRadius$1 * 1.0936
+	};
+	function feature$1(geom, properties, options = {}) {
+	  const feat = { type: "Feature" };
+	  if (options.id === 0 || options.id) {
+	    feat.id = options.id;
+	  }
+	  if (options.bbox) {
+	    feat.bbox = options.bbox;
+	  }
+	  feat.properties = properties || {};
+	  feat.geometry = geom;
+	  return feat;
+	}
+	function point$1(coordinates, properties, options = {}) {
+	  if (!coordinates) {
+	    throw new Error("coordinates is required");
+	  }
+	  if (!Array.isArray(coordinates)) {
+	    throw new Error("coordinates must be an Array");
+	  }
+	  if (coordinates.length < 2) {
+	    throw new Error("coordinates must be at least 2 numbers long");
+	  }
+	  if (!isNumber$1(coordinates[0]) || !isNumber$1(coordinates[1])) {
+	    throw new Error("coordinates must contain numbers");
+	  }
+	  const geom = {
+	    type: "Point",
+	    coordinates
+	  };
+	  return feature$1(geom, properties, options);
+	}
+	function polygon$2(coordinates, properties, options = {}) {
+	  for (const ring of coordinates) {
+	    if (ring.length < 4) {
+	      throw new Error(
+	        "Each LinearRing of a Polygon must have 4 or more Positions."
+	      );
+	    }
+	    if (ring[ring.length - 1].length !== ring[0].length) {
+	      throw new Error("First and last Position are not equivalent.");
+	    }
+	    for (let j = 0; j < ring[ring.length - 1].length; j++) {
+	      if (ring[ring.length - 1][j] !== ring[0][j]) {
+	        throw new Error("First and last Position are not equivalent.");
+	      }
+	    }
+	  }
+	  const geom = {
+	    type: "Polygon",
+	    coordinates
+	  };
+	  return feature$1(geom, properties, options);
+	}
+	function featureCollection$1(features, options = {}) {
+	  const fc = { type: "FeatureCollection" };
+	  if (options.id) {
+	    fc.id = options.id;
+	  }
+	  if (options.bbox) {
+	    fc.bbox = options.bbox;
+	  }
+	  fc.features = features;
+	  return fc;
+	}
+	function radiansToLength$1(radians, units = "kilometers") {
+	  const factor = factors$1[units];
+	  if (!factor) {
+	    throw new Error(units + " units is invalid");
+	  }
+	  return radians * factor;
+	}
+	function lengthToRadians$1(distance, units = "kilometers") {
+	  const factor = factors$1[units];
+	  if (!factor) {
+	    throw new Error(units + " units is invalid");
+	  }
+	  return distance / factor;
+	}
+	function bearingToAzimuth(bearing) {
+	  let angle = bearing % 360;
+	  if (angle < 0) {
+	    angle += 360;
+	  }
+	  return angle;
+	}
+	function radiansToDegrees(radians) {
+	  const degrees = radians % (2 * Math.PI);
+	  return degrees * 180 / Math.PI;
+	}
+	function degreesToRadians$1(degrees) {
+	  const radians = degrees % 360;
+	  return radians * Math.PI / 180;
+	}
+	function convertLength$1(length, originalUnit = "kilometers", finalUnit = "kilometers") {
+	  if (!(length >= 0)) {
+	    throw new Error("length must be a positive number");
+	  }
+	  return radiansToLength$1(lengthToRadians$1(length, originalUnit), finalUnit);
+	}
+	function isNumber$1(num) {
+	  return !isNaN(num) && num !== null && !Array.isArray(num);
+	}
+	function isObject(input) {
+	  return input !== null && typeof input === "object" && !Array.isArray(input);
+	}
+
+	class Raster {
+		/**
+		 * @param {HTMLImageElement} image
+		 * @param {import('./types').RasterCoordinates} coordinates
+		 */
+		constructor(image, coordinates) {
+			this.src = image.src;
+			this.width = image.width;
+			this.height = image.height;
+			this.coordinates = coordinates;
+			this.locked = false;
+		}
+
+		get id() {
+			const id = this.src.split('/').pop();
+			if (!id) throw Error(`can't get id from '${this.src}' source`);
+			return id;
+		}
+
+		/**
+		 * @type {{
+		 * 	id: string,
+		 * 	source: import('mapbox-gl').ImageSourceSpecification
+		 * }}
+		 */
+		get rasterSource() {
+			return {
+				id: `$raster:${this.id}`,
+				source: {
+					type: 'image',
+					url: this.src,
+					coordinates: this.coordinates,
+				},
+			};
+		}
+
+		/**
+		 * @type {{
+		 * 	id: string,
+		 * 	source: {
+		 * 		type: 'geojson',
+		 * 		data: import('geojson').Feature<import('geojson').Polygon>
+		 * 	}
+		 * }}
+		 */
+		get polygonSource() {
+			const feature = polygon$2([[...this.coordinates, this.coordinates[0]]], { id: this.id });
+			return {
+				id: `$polygon:${this.id}`,
+				source: {
+					type: 'geojson',
+					data: feature,
+				},
+			};
+		}
+
+		/**
+		 * @type {{
+		 * 	id: string,
+		 * 	source: {
+		 * 		type: 'geojson',
+		 * 		data: import('geojson').FeatureCollection<import('geojson').Point>
+		 * 	}
+		 * }}
+		 */
+		get pointsSource() {
+			const features = this.coordinates.map((coordinate, index) => point$1(coordinate, { index }));
+			return {
+				id: `$points:${this.id}`,
+				source: {
+					type: 'geojson',
+					data: featureCollection$1(features),
+				},
+			};
+		}
+
+		/** @type {import('mapbox-gl').RasterLayerSpecification} */
+		get rasterLayer() {
+			return {
+				id: `$raster:${this.id}`,
+				type: 'raster',
+				source: this.rasterSource.id,
+				paint: {
+					'raster-fade-duration': 0,
+					'raster-opacity': 0.5,
+				},
+			};
+		}
+
+		/** @type {import('mapbox-gl').FillLayerSpecification} */
+		get fillLayer() {
+			return {
+				id: `$fill:${this.id}`,
+				type: 'fill',
+				source: this.polygonSource.id,
+				paint: {
+					'fill-opacity': 0,
+				},
+			};
+		}
+
+		/** @type {import('mapbox-gl').LineLayerSpecification} */
+		get contourLayer() {
+			return {
+				id: `$contour:${this.id}`,
+				type: 'line',
+				source: this.polygonSource.id,
+				layout: {
+					'line-cap': 'round',
+					'line-join': 'round',
+				},
+				paint: {
+					'line-dasharray': [0.2, 2],
+					'line-color': 'rgb(61, 90, 254)',
+					'line-width': [
+						'interpolate', ['linear'], ['zoom'],
+						12, 1,
+						14, 2,
+					],
+				},
+			};
+		}
+
+		/** @type {import('mapbox-gl').CircleLayerSpecification} */
+		get knobsLayer() {
+			return {
+				id: `$knobs:${this.id}`,
+				type: 'circle',
+				source: this.pointsSource.id,
+				paint: {
+					'circle-radius': 5,
+					'circle-color': 'rgb(61, 90, 254)',
+					'circle-stroke-width': 3,
+					'circle-stroke-color': '#fff',
+				},
+			};
+		}
+	}
+
+	// index.ts
 	var earthRadius = 63710088e-1;
 	var factors = {
 	  centimeters: earthRadius * 100,
@@ -257,6 +521,23 @@
 	  nauticalmiles: earthRadius / 1852,
 	  radians: 1,
 	  yards: earthRadius * 1.0936
+	};
+	var areaFactors = {
+	  acres: 247105e-9,
+	  centimeters: 1e4,
+	  centimetres: 1e4,
+	  feet: 10.763910417,
+	  hectares: 1e-4,
+	  inches: 1550.003100006,
+	  kilometers: 1e-6,
+	  kilometres: 1e-6,
+	  meters: 1,
+	  metres: 1,
+	  miles: 386e-9,
+	  nauticalmiles: 29155334959812285e-23,
+	  millimeters: 1e6,
+	  millimetres: 1e6,
+	  yards: 1.195990046
 	};
 	function feature(geom, properties, options = {}) {
 	  const feat = { type: "Feature" };
@@ -336,20 +617,9 @@
 	  }
 	  return distance / factor;
 	}
-	function bearingToAzimuth(bearing) {
-	  let angle = bearing % 360;
-	  if (angle < 0) {
-	    angle += 360;
-	  }
-	  return angle;
-	}
-	function radiansToDegrees(radians) {
-	  const degrees = radians % (2 * Math.PI);
-	  return degrees * 180 / Math.PI;
-	}
 	function degreesToRadians(degrees) {
-	  const radians = degrees % 360;
-	  return radians * Math.PI / 180;
+	  const normalisedDegrees = degrees % 360;
+	  return normalisedDegrees * Math.PI / 180;
 	}
 	function convertLength(length, originalUnit = "kilometers", finalUnit = "kilometers") {
 	  if (!(length >= 0)) {
@@ -357,154 +627,26 @@
 	  }
 	  return radiansToLength(lengthToRadians(length, originalUnit), finalUnit);
 	}
+	function convertArea(area, originalUnit = "meters", finalUnit = "kilometers") {
+	  if (!(area >= 0)) {
+	    throw new Error("area must be a positive number");
+	  }
+	  const startFactor = areaFactors[originalUnit];
+	  if (!startFactor) {
+	    throw new Error("invalid original units");
+	  }
+	  const finalFactor = areaFactors[finalUnit];
+	  if (!finalFactor) {
+	    throw new Error("invalid final units");
+	  }
+	  return area / startFactor * finalFactor;
+	}
 	function isNumber(num) {
 	  return !isNaN(num) && num !== null && !Array.isArray(num);
 	}
-	function isObject(input) {
-	  return input !== null && typeof input === "object" && !Array.isArray(input);
-	}
-
-	class Raster {
-		/**
-		 * @param {HTMLImageElement} image
-		 * @param {import('./types').RasterCoordinates} coordinates
-		 */
-		constructor(image, coordinates) {
-			this.src = image.src;
-			this.width = image.width;
-			this.height = image.height;
-			this.coordinates = coordinates;
-			this.locked = false;
-		}
-
-		get id() {
-			const id = this.src.split('/').pop();
-			if (!id) throw Error(`can't get id from '${this.src}' source`);
-			return id;
-		}
-
-		/**
-		 * @type {{
-		 * 	id: string,
-		 * 	source: import('mapbox-gl').ImageSourceSpecification
-		 * }}
-		 */
-		get rasterSource() {
-			return {
-				id: `$raster:${this.id}`,
-				source: {
-					type: 'image',
-					url: this.src,
-					coordinates: this.coordinates,
-				},
-			};
-		}
-
-		/**
-		 * @type {{
-		 * 	id: string,
-		 * 	source: {
-		 * 		type: 'geojson',
-		 * 		data: import('geojson').Feature<import('geojson').Polygon>
-		 * 	}
-		 * }}
-		 */
-		get polygonSource() {
-			const feature = polygon$1([[...this.coordinates, this.coordinates[0]]], { id: this.id });
-			return {
-				id: `$polygon:${this.id}`,
-				source: {
-					type: 'geojson',
-					data: feature,
-				},
-			};
-		}
-
-		/**
-		 * @type {{
-		 * 	id: string,
-		 * 	source: {
-		 * 		type: 'geojson',
-		 * 		data: import('geojson').FeatureCollection<import('geojson').Point>
-		 * 	}
-		 * }}
-		 */
-		get pointsSource() {
-			const features = this.coordinates.map((coordinate, index) => point(coordinate, { index }));
-			return {
-				id: `$points:${this.id}`,
-				source: {
-					type: 'geojson',
-					data: featureCollection(features),
-				},
-			};
-		}
-
-		/** @type {import('mapbox-gl').RasterLayerSpecification} */
-		get rasterLayer() {
-			return {
-				id: `$raster:${this.id}`,
-				type: 'raster',
-				source: this.rasterSource.id,
-				paint: {
-					'raster-fade-duration': 0,
-					'raster-opacity': 0.5,
-				},
-			};
-		}
-
-		/** @type {import('mapbox-gl').FillLayerSpecification} */
-		get fillLayer() {
-			return {
-				id: `$fill:${this.id}`,
-				type: 'fill',
-				source: this.polygonSource.id,
-				paint: {
-					'fill-opacity': 0,
-				},
-			};
-		}
-
-		/** @type {import('mapbox-gl').LineLayerSpecification} */
-		get contourLayer() {
-			return {
-				id: `$contour:${this.id}`,
-				type: 'line',
-				source: this.polygonSource.id,
-				layout: {
-					'line-cap': 'round',
-					'line-join': 'round',
-				},
-				paint: {
-					'line-dasharray': [0.2, 2],
-					'line-color': 'rgb(61, 90, 254)',
-					'line-width': [
-						'interpolate', ['linear'], ['zoom'],
-						12, 1,
-						14, 2,
-					],
-				},
-			};
-		}
-
-		/** @type {import('mapbox-gl').CircleLayerSpecification} */
-		get knobsLayer() {
-			return {
-				id: `$knobs:${this.id}`,
-				type: 'circle',
-				source: this.pointsSource.id,
-				paint: {
-					'circle-radius': 5,
-					'circle-color': 'rgb(61, 90, 254)',
-					'circle-stroke-width': 3,
-					'circle-stroke-color': '#fff',
-				},
-			};
-		}
-	}
 
 	// index.ts
-	function getCoord(coord) {
+	function getCoord$1(coord) {
 	  if (!coord) {
 	    throw new Error("coord is required");
 	  }
@@ -555,17 +697,17 @@
 	function rhumbBearing(start, end, options = {}) {
 	  let bear360;
 	  if (options.final) {
-	    bear360 = calculateRhumbBearing(getCoord(end), getCoord(start));
+	    bear360 = calculateRhumbBearing(getCoord$1(end), getCoord$1(start));
 	  } else {
-	    bear360 = calculateRhumbBearing(getCoord(start), getCoord(end));
+	    bear360 = calculateRhumbBearing(getCoord$1(start), getCoord$1(end));
 	  }
 	  const bear180 = bear360 > 180 ? -(360 - bear360) : bear360;
 	  return bear180;
 	}
 	function calculateRhumbBearing(from, to) {
-	  const phi1 = degreesToRadians(from[1]);
-	  const phi2 = degreesToRadians(to[1]);
-	  let deltaLambda = degreesToRadians(to[0] - from[0]);
+	  const phi1 = degreesToRadians$1(from[1]);
+	  const phi2 = degreesToRadians$1(to[1]);
+	  let deltaLambda = degreesToRadians$1(to[0] - from[0]);
 	  if (deltaLambda > Math.PI) {
 	    deltaLambda -= 2 * Math.PI;
 	  }
@@ -582,15 +724,15 @@
 
 	// index.ts
 	function rhumbDistance(from, to, options = {}) {
-	  const origin = getCoord(from);
-	  const destination = getCoord(to);
+	  const origin = getCoord$1(from);
+	  const destination = getCoord$1(to);
 	  destination[0] += destination[0] - origin[0] > 180 ? -360 : origin[0] - destination[0] > 180 ? 360 : 0;
 	  const distanceInMeters = calculateRhumbDistance(origin, destination);
-	  const distance = convertLength(distanceInMeters, "meters", options.units);
+	  const distance = convertLength$1(distanceInMeters, "meters", options.units);
 	  return distance;
 	}
 	function calculateRhumbDistance(origin, destination, radius) {
-	  radius = radius === void 0 ? earthRadius : Number(radius);
+	  radius = radius === void 0 ? earthRadius$1 : Number(radius);
 	  const R = radius;
 	  const phi1 = origin[1] * Math.PI / 180;
 	  const phi2 = destination[1] * Math.PI / 180;
@@ -612,7 +754,7 @@
 	var turf_rhumb_distance_default = rhumbDistance;
 
 	// index.js
-	function coordEach(geojson, callback, excludeWrapCoord) {
+	function coordEach$1(geojson, callback, excludeWrapCoord) {
 	  if (geojson === null)
 	    return;
 	  var j, k, l, geometry, stopG, coords, geometryMaybeCollection, wrapShrink = 0, coordIndex = 0, isGeometryCollection, type = geojson.type, isFeatureCollection = type === "FeatureCollection", isFeature = type === "Feature", stop = isFeatureCollection ? geojson.features.length : 1;
@@ -706,7 +848,7 @@
 	          break;
 	        case "GeometryCollection":
 	          for (j = 0; j < geometry.geometries.length; j++)
-	            if (coordEach(geometry.geometries[j], callback, excludeWrapCoord) === false)
+	            if (coordEach$1(geometry.geometries[j], callback, excludeWrapCoord) === false)
 	              return false;
 	          break;
 	        default:
@@ -715,7 +857,7 @@
 	    }
 	  }
 	}
-	function featureEach(geojson, callback) {
+	function featureEach$1(geojson, callback) {
 	  if (geojson.type === "Feature") {
 	    callback(geojson, 0);
 	  } else if (geojson.type === "FeatureCollection") {
@@ -727,15 +869,15 @@
 	}
 
 	// index.ts
-	function clone(geojson) {
+	function clone$1(geojson) {
 	  if (!geojson) {
 	    throw new Error("geojson is required");
 	  }
 	  switch (geojson.type) {
 	    case "Feature":
-	      return cloneFeature(geojson);
+	      return cloneFeature$1(geojson);
 	    case "FeatureCollection":
-	      return cloneFeatureCollection(geojson);
+	      return cloneFeatureCollection$1(geojson);
 	    case "Point":
 	    case "LineString":
 	    case "Polygon":
@@ -743,12 +885,12 @@
 	    case "MultiLineString":
 	    case "MultiPolygon":
 	    case "GeometryCollection":
-	      return cloneGeometry(geojson);
+	      return cloneGeometry$1(geojson);
 	    default:
 	      throw new Error("unknown GeoJSON type");
 	  }
 	}
-	function cloneFeature(geojson) {
+	function cloneFeature$1(geojson) {
 	  const cloned = { type: "Feature" };
 	  Object.keys(geojson).forEach((key) => {
 	    switch (key) {
@@ -760,15 +902,15 @@
 	        cloned[key] = geojson[key];
 	    }
 	  });
-	  cloned.properties = cloneProperties(geojson.properties);
+	  cloned.properties = cloneProperties$1(geojson.properties);
 	  if (geojson.geometry == null) {
 	    cloned.geometry = null;
 	  } else {
-	    cloned.geometry = cloneGeometry(geojson.geometry);
+	    cloned.geometry = cloneGeometry$1(geojson.geometry);
 	  }
 	  return cloned;
 	}
-	function cloneProperties(properties) {
+	function cloneProperties$1(properties) {
 	  const cloned = {};
 	  if (!properties) {
 	    return cloned;
@@ -783,7 +925,7 @@
 	          return item;
 	        });
 	      } else {
-	        cloned[key] = cloneProperties(value);
+	        cloned[key] = cloneProperties$1(value);
 	      }
 	    } else {
 	      cloned[key] = value;
@@ -791,7 +933,7 @@
 	  });
 	  return cloned;
 	}
-	function cloneFeatureCollection(geojson) {
+	function cloneFeatureCollection$1(geojson) {
 	  const cloned = { type: "FeatureCollection" };
 	  Object.keys(geojson).forEach((key) => {
 	    switch (key) {
@@ -803,31 +945,31 @@
 	    }
 	  });
 	  cloned.features = geojson.features.map((feature) => {
-	    return cloneFeature(feature);
+	    return cloneFeature$1(feature);
 	  });
 	  return cloned;
 	}
-	function cloneGeometry(geometry) {
+	function cloneGeometry$1(geometry) {
 	  const geom = { type: geometry.type };
 	  if (geometry.bbox) {
 	    geom.bbox = geometry.bbox;
 	  }
 	  if (geometry.type === "GeometryCollection") {
 	    geom.geometries = geometry.geometries.map((g) => {
-	      return cloneGeometry(g);
+	      return cloneGeometry$1(g);
 	    });
 	    return geom;
 	  }
-	  geom.coordinates = deepSlice(geometry.coordinates);
+	  geom.coordinates = deepSlice$1(geometry.coordinates);
 	  return geom;
 	}
-	function deepSlice(coords) {
+	function deepSlice$1(coords) {
 	  const cloned = coords;
 	  if (typeof cloned[0] !== "object") {
 	    return cloned.slice();
 	  }
 	  return cloned.map((coord) => {
-	    return deepSlice(coord);
+	    return deepSlice$1(coord);
 	  });
 	}
 
@@ -841,7 +983,7 @@
 	  );
 	  if (wasNegativeDistance)
 	    distanceInMeters = -Math.abs(distanceInMeters);
-	  const coords = getCoord(origin);
+	  const coords = getCoord$1(origin);
 	  const destination = calculateRhumbDestination(
 	    coords,
 	    distanceInMeters,
@@ -897,8 +1039,8 @@
 	    direction = direction + 180;
 	  }
 	  if (mutate === false || mutate === void 0)
-	    geojson = clone(geojson);
-	  coordEach(geojson, function(pointCoords) {
+	    geojson = clone$1(geojson);
+	  coordEach$1(geojson, function(pointCoords) {
 	    var newCoords = getCoords(
 	      rhumbDestination(pointCoords, distance, direction, { units })
 	    );
@@ -986,12 +1128,12 @@
 	}
 
 	// index.ts
-	function bbox(geojson, options = {}) {
+	function bbox$1(geojson, options = {}) {
 	  if (geojson.bbox != null && true !== options.recompute) {
 	    return geojson.bbox;
 	  }
 	  const result = [Infinity, Infinity, -Infinity, -Infinity];
-	  coordEach(geojson, (coord) => {
+	  coordEach$1(geojson, (coord) => {
 	    if (result[0] > coord[0]) {
 	      result[0] = coord[0];
 	    }
@@ -1009,8 +1151,8 @@
 	}
 
 	// index.ts
-	function center(geojson, options = {}) {
-	  const ext = bbox(geojson);
+	function center$1(geojson, options = {}) {
+	  const ext = bbox$1(geojson);
 	  const x = (ext[0] + ext[2]) / 2;
 	  const y = (ext[1] + ext[3]) / 2;
 	  return point([x, y], options.properties, options);
@@ -1021,7 +1163,7 @@
 	  let xSum = 0;
 	  let ySum = 0;
 	  let len = 0;
-	  coordEach(
+	  coordEach$1(
 	    geojson,
 	    function(coord) {
 	      xSum += coord[0];
@@ -1030,7 +1172,7 @@
 	    },
 	    true
 	  );
-	  return point([xSum / len, ySum / len], options.properties);
+	  return point$1([xSum / len, ySum / len], options.properties);
 	}
 	var turf_centroid_default = centroid;
 
@@ -1047,9 +1189,9 @@
 	    throw new Error("invalid factor");
 	  const originIsPoint = Array.isArray(origin) || typeof origin === "object";
 	  if (mutate !== true)
-	    geojson = clone(geojson);
+	    geojson = clone$1(geojson);
 	  if (geojson.type === "FeatureCollection" && !originIsPoint) {
-	    featureEach(geojson, function(feature, index) {
+	    featureEach$1(geojson, function(feature, index) {
 	      geojson.features[index] = scale(
 	        feature,
 	        factor,
@@ -1065,7 +1207,7 @@
 	  const originCoord = defineOrigin(feature, origin);
 	  if (factor === 1 || isPoint)
 	    return feature;
-	  coordEach(feature, function(coord) {
+	  coordEach$1(feature, function(coord) {
 	    const originalDistance = rhumbDistance(originCoord, coord);
 	    const bearing = rhumbBearing(originCoord, coord);
 	    const newDistance = originalDistance * factor;
@@ -1084,35 +1226,35 @@
 	  if (origin === void 0 || origin === null)
 	    origin = "centroid";
 	  if (Array.isArray(origin) || typeof origin === "object")
-	    return getCoord(origin);
-	  const bbox$1 = geojson.bbox ? geojson.bbox : bbox(geojson, { recompute: true });
-	  const west = bbox$1[0];
-	  const south = bbox$1[1];
-	  const east = bbox$1[2];
-	  const north = bbox$1[3];
+	    return getCoord$1(origin);
+	  const bbox = geojson.bbox ? geojson.bbox : bbox$1(geojson, { recompute: true });
+	  const west = bbox[0];
+	  const south = bbox[1];
+	  const east = bbox[2];
+	  const north = bbox[3];
 	  switch (origin) {
 	    case "sw":
 	    case "southwest":
 	    case "westsouth":
 	    case "bottomleft":
-	      return point([west, south]);
+	      return point$1([west, south]);
 	    case "se":
 	    case "southeast":
 	    case "eastsouth":
 	    case "bottomright":
-	      return point([east, south]);
+	      return point$1([east, south]);
 	    case "nw":
 	    case "northwest":
 	    case "westnorth":
 	    case "topleft":
-	      return point([west, north]);
+	      return point$1([west, north]);
 	    case "ne":
 	    case "northeast":
 	    case "eastnorth":
 	    case "topright":
-	      return point([east, north]);
+	      return point$1([east, north]);
 	    case "center":
-	      return center(geojson);
+	      return center$1(geojson);
 	    case void 0:
 	    case null:
 	    case "centroid":
@@ -1209,12 +1351,12 @@
 	  if (options.final === true) {
 	    return calculateFinalBearing(start, end);
 	  }
-	  const coordinates1 = getCoord(start);
-	  const coordinates2 = getCoord(end);
-	  const lon1 = degreesToRadians(coordinates1[0]);
-	  const lon2 = degreesToRadians(coordinates2[0]);
-	  const lat1 = degreesToRadians(coordinates1[1]);
-	  const lat2 = degreesToRadians(coordinates2[1]);
+	  const coordinates1 = getCoord$1(start);
+	  const coordinates2 = getCoord$1(end);
+	  const lon1 = degreesToRadians$1(coordinates1[0]);
+	  const lon2 = degreesToRadians$1(coordinates2[0]);
+	  const lat1 = degreesToRadians$1(coordinates1[1]);
+	  const lat2 = degreesToRadians$1(coordinates2[1]);
 	  const a = Math.sin(lon2 - lon1) * Math.cos(lat2);
 	  const b = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1);
 	  return radiansToDegrees(Math.atan2(a, b));
@@ -1241,8 +1383,8 @@
 	    return geojson;
 	  const pivotCoord = pivot != null ? pivot : centroid(geojson);
 	  if (mutate === false || mutate === void 0)
-	    geojson = clone(geojson);
-	  coordEach(geojson, function(pointCoords) {
+	    geojson = clone$1(geojson);
+	  coordEach$1(geojson, function(pointCoords) {
 	    const initialAngle = rhumbBearing(pivotCoord, pointCoords);
 	    const finalAngle = initialAngle + angle;
 	    const distance = rhumbDistance(pivotCoord, pointCoords);
@@ -2019,6 +2161,277 @@
 		ruler,
 	};
 
+	// index.js
+	function coordEach(geojson, callback, excludeWrapCoord) {
+	  if (geojson === null) return;
+	  var j, k, l, geometry, stopG, coords, geometryMaybeCollection, wrapShrink = 0, coordIndex = 0, isGeometryCollection, type = geojson.type, isFeatureCollection = type === "FeatureCollection", isFeature = type === "Feature", stop = isFeatureCollection ? geojson.features.length : 1;
+	  for (var featureIndex = 0; featureIndex < stop; featureIndex++) {
+	    geometryMaybeCollection = isFeatureCollection ? geojson.features[featureIndex].geometry : isFeature ? geojson.geometry : geojson;
+	    isGeometryCollection = geometryMaybeCollection ? geometryMaybeCollection.type === "GeometryCollection" : false;
+	    stopG = isGeometryCollection ? geometryMaybeCollection.geometries.length : 1;
+	    for (var geomIndex = 0; geomIndex < stopG; geomIndex++) {
+	      var multiFeatureIndex = 0;
+	      var geometryIndex = 0;
+	      geometry = isGeometryCollection ? geometryMaybeCollection.geometries[geomIndex] : geometryMaybeCollection;
+	      if (geometry === null) continue;
+	      coords = geometry.coordinates;
+	      var geomType = geometry.type;
+	      wrapShrink = 0;
+	      switch (geomType) {
+	        case null:
+	          break;
+	        case "Point":
+	          if (callback(
+	            coords,
+	            coordIndex,
+	            featureIndex,
+	            multiFeatureIndex,
+	            geometryIndex
+	          ) === false)
+	            return false;
+	          coordIndex++;
+	          multiFeatureIndex++;
+	          break;
+	        case "LineString":
+	        case "MultiPoint":
+	          for (j = 0; j < coords.length; j++) {
+	            if (callback(
+	              coords[j],
+	              coordIndex,
+	              featureIndex,
+	              multiFeatureIndex,
+	              geometryIndex
+	            ) === false)
+	              return false;
+	            coordIndex++;
+	            if (geomType === "MultiPoint") multiFeatureIndex++;
+	          }
+	          if (geomType === "LineString") multiFeatureIndex++;
+	          break;
+	        case "Polygon":
+	        case "MultiLineString":
+	          for (j = 0; j < coords.length; j++) {
+	            for (k = 0; k < coords[j].length - wrapShrink; k++) {
+	              if (callback(
+	                coords[j][k],
+	                coordIndex,
+	                featureIndex,
+	                multiFeatureIndex,
+	                geometryIndex
+	              ) === false)
+	                return false;
+	              coordIndex++;
+	            }
+	            if (geomType === "MultiLineString") multiFeatureIndex++;
+	            if (geomType === "Polygon") geometryIndex++;
+	          }
+	          if (geomType === "Polygon") multiFeatureIndex++;
+	          break;
+	        case "MultiPolygon":
+	          for (j = 0; j < coords.length; j++) {
+	            geometryIndex = 0;
+	            for (k = 0; k < coords[j].length; k++) {
+	              for (l = 0; l < coords[j][k].length - wrapShrink; l++) {
+	                if (callback(
+	                  coords[j][k][l],
+	                  coordIndex,
+	                  featureIndex,
+	                  multiFeatureIndex,
+	                  geometryIndex
+	                ) === false)
+	                  return false;
+	                coordIndex++;
+	              }
+	              geometryIndex++;
+	            }
+	            multiFeatureIndex++;
+	          }
+	          break;
+	        case "GeometryCollection":
+	          for (j = 0; j < geometry.geometries.length; j++)
+	            if (coordEach(geometry.geometries[j], callback) === false)
+	              return false;
+	          break;
+	        default:
+	          throw new Error("Unknown Geometry Type");
+	      }
+	    }
+	  }
+	}
+	function featureEach(geojson, callback) {
+	  if (geojson.type === "Feature") {
+	    callback(geojson, 0);
+	  } else if (geojson.type === "FeatureCollection") {
+	    for (var i = 0; i < geojson.features.length; i++) {
+	      if (callback(geojson.features[i], i) === false) break;
+	    }
+	  }
+	}
+	function geomEach(geojson, callback) {
+	  var i, j, g, geometry, stopG, geometryMaybeCollection, isGeometryCollection, featureProperties, featureBBox, featureId, featureIndex = 0, isFeatureCollection = geojson.type === "FeatureCollection", isFeature = geojson.type === "Feature", stop = isFeatureCollection ? geojson.features.length : 1;
+	  for (i = 0; i < stop; i++) {
+	    geometryMaybeCollection = isFeatureCollection ? geojson.features[i].geometry : isFeature ? geojson.geometry : geojson;
+	    featureProperties = isFeatureCollection ? geojson.features[i].properties : isFeature ? geojson.properties : {};
+	    featureBBox = isFeatureCollection ? geojson.features[i].bbox : isFeature ? geojson.bbox : void 0;
+	    featureId = isFeatureCollection ? geojson.features[i].id : isFeature ? geojson.id : void 0;
+	    isGeometryCollection = geometryMaybeCollection ? geometryMaybeCollection.type === "GeometryCollection" : false;
+	    stopG = isGeometryCollection ? geometryMaybeCollection.geometries.length : 1;
+	    for (g = 0; g < stopG; g++) {
+	      geometry = isGeometryCollection ? geometryMaybeCollection.geometries[g] : geometryMaybeCollection;
+	      if (geometry === null) {
+	        if (callback(
+	          null,
+	          featureIndex,
+	          featureProperties,
+	          featureBBox,
+	          featureId
+	        ) === false)
+	          return false;
+	        continue;
+	      }
+	      switch (geometry.type) {
+	        case "Point":
+	        case "LineString":
+	        case "MultiPoint":
+	        case "Polygon":
+	        case "MultiLineString":
+	        case "MultiPolygon": {
+	          if (callback(
+	            geometry,
+	            featureIndex,
+	            featureProperties,
+	            featureBBox,
+	            featureId
+	          ) === false)
+	            return false;
+	          break;
+	        }
+	        case "GeometryCollection": {
+	          for (j = 0; j < geometry.geometries.length; j++) {
+	            if (callback(
+	              geometry.geometries[j],
+	              featureIndex,
+	              featureProperties,
+	              featureBBox,
+	              featureId
+	            ) === false)
+	              return false;
+	          }
+	          break;
+	        }
+	        default:
+	          throw new Error("Unknown Geometry Type");
+	      }
+	    }
+	    featureIndex++;
+	  }
+	}
+	function geomReduce(geojson, callback, initialValue) {
+	  var previousValue = initialValue;
+	  geomEach(
+	    geojson,
+	    function(currentGeometry, featureIndex, featureProperties, featureBBox, featureId) {
+	      if (featureIndex === 0 && initialValue === void 0)
+	        previousValue = currentGeometry;
+	      else
+	        previousValue = callback(
+	          previousValue,
+	          currentGeometry,
+	          featureIndex,
+	          featureProperties,
+	          featureBBox,
+	          featureId
+	        );
+	    }
+	  );
+	  return previousValue;
+	}
+
+	// index.ts
+	function area(geojson) {
+	  return geomReduce(
+	    geojson,
+	    (value, geom) => {
+	      return value + calculateArea(geom);
+	    },
+	    0
+	  );
+	}
+	function calculateArea(geom) {
+	  let total = 0;
+	  let i;
+	  switch (geom.type) {
+	    case "Polygon":
+	      return polygonArea(geom.coordinates);
+	    case "MultiPolygon":
+	      for (i = 0; i < geom.coordinates.length; i++) {
+	        total += polygonArea(geom.coordinates[i]);
+	      }
+	      return total;
+	    case "Point":
+	    case "MultiPoint":
+	    case "LineString":
+	    case "MultiLineString":
+	      return 0;
+	  }
+	  return 0;
+	}
+	function polygonArea(coords) {
+	  let total = 0;
+	  if (coords && coords.length > 0) {
+	    total += Math.abs(ringArea(coords[0]));
+	    for (let i = 1; i < coords.length; i++) {
+	      total -= Math.abs(ringArea(coords[i]));
+	    }
+	  }
+	  return total;
+	}
+	var FACTOR = earthRadius * earthRadius / 2;
+	var PI_OVER_180 = Math.PI / 180;
+	function ringArea(coords) {
+	  const coordsLength = coords.length - 1;
+	  if (coordsLength <= 2) return 0;
+	  let total = 0;
+	  let i = 0;
+	  while (i < coordsLength) {
+	    const lower = coords[i];
+	    const middle = coords[i + 1 === coordsLength ? 0 : i + 1];
+	    const upper = coords[i + 2 >= coordsLength ? (i + 2) % coordsLength : i + 2];
+	    const lowerX = lower[0] * PI_OVER_180;
+	    const middleY = middle[1] * PI_OVER_180;
+	    const upperX = upper[0] * PI_OVER_180;
+	    total += (upperX - lowerX) * Math.sin(middleY);
+	    i++;
+	  }
+	  return total * FACTOR;
+	}
+	var turf_area_default = area;
+
+	// index.ts
+	function getCoord(coord) {
+	  if (!coord) {
+	    throw new Error("coord is required");
+	  }
+	  if (!Array.isArray(coord)) {
+	    if (coord.type === "Feature" && coord.geometry !== null && coord.geometry.type === "Point") {
+	      return [...coord.geometry.coordinates];
+	    }
+	    if (coord.type === "Point") {
+	      return [...coord.coordinates];
+	    }
+	  }
+	  if (Array.isArray(coord) && coord.length >= 2 && !Array.isArray(coord[0]) && !Array.isArray(coord[1])) {
+	    return [...coord];
+	  }
+	  throw new Error("coord must be GeoJSON Point or an Array of numbers");
+	}
+	function getGeom(geojson) {
+	  if (geojson.type === "Feature") {
+	    return geojson.geometry;
+	  }
+	  return geojson;
+	}
+
 	// index.ts
 	function distance(from, to, options = {}) {
 	  var coordinates1 = getCoord(from);
@@ -2035,11 +2448,721 @@
 	}
 	var turf_distance_default = distance;
 
-	/** @param {number} value */
-	function defaultLabelFormat(value) {
-		return value < 1
-			? `${(value * 1000).toFixed()} m`
-			: `${value.toFixed(2)} km`;
+	// index.ts
+	function explode(geojson) {
+	  const points = [];
+	  if (geojson.type === "FeatureCollection") {
+	    featureEach(geojson, function(feature) {
+	      coordEach(feature, function(coord) {
+	        points.push(point(coord, feature.properties));
+	      });
+	    });
+	  } else if (geojson.type === "Feature") {
+	    coordEach(geojson, function(coord) {
+	      points.push(point(coord, geojson.properties));
+	    });
+	  } else {
+	    coordEach(geojson, function(coord) {
+	      points.push(point(coord));
+	    });
+	  }
+	  return featureCollection(points);
+	}
+
+	// index.ts
+	function bbox(geojson, options = {}) {
+	  if (geojson.bbox != null && true !== options.recompute) {
+	    return geojson.bbox;
+	  }
+	  const result = [Infinity, Infinity, -Infinity, -Infinity];
+	  coordEach(geojson, (coord) => {
+	    if (result[0] > coord[0]) {
+	      result[0] = coord[0];
+	    }
+	    if (result[1] > coord[1]) {
+	      result[1] = coord[1];
+	    }
+	    if (result[2] < coord[0]) {
+	      result[2] = coord[0];
+	    }
+	    if (result[3] < coord[1]) {
+	      result[3] = coord[1];
+	    }
+	  });
+	  return result;
+	}
+
+	// index.ts
+	function center(geojson, options = {}) {
+	  const ext = bbox(geojson);
+	  const x = (ext[0] + ext[2]) / 2;
+	  const y = (ext[1] + ext[3]) / 2;
+	  return point([x, y], options.properties, options);
+	}
+
+	// index.ts
+	function clone(geojson) {
+	  if (!geojson) {
+	    throw new Error("geojson is required");
+	  }
+	  switch (geojson.type) {
+	    case "Feature":
+	      return cloneFeature(geojson);
+	    case "FeatureCollection":
+	      return cloneFeatureCollection(geojson);
+	    case "Point":
+	    case "LineString":
+	    case "Polygon":
+	    case "MultiPoint":
+	    case "MultiLineString":
+	    case "MultiPolygon":
+	    case "GeometryCollection":
+	      return cloneGeometry(geojson);
+	    default:
+	      throw new Error("unknown GeoJSON type");
+	  }
+	}
+	function cloneFeature(geojson) {
+	  const cloned = { type: "Feature" };
+	  Object.keys(geojson).forEach((key) => {
+	    switch (key) {
+	      case "type":
+	      case "properties":
+	      case "geometry":
+	        return;
+	      default:
+	        cloned[key] = geojson[key];
+	    }
+	  });
+	  cloned.properties = cloneProperties(geojson.properties);
+	  if (geojson.geometry == null) {
+	    cloned.geometry = null;
+	  } else {
+	    cloned.geometry = cloneGeometry(geojson.geometry);
+	  }
+	  return cloned;
+	}
+	function cloneProperties(properties) {
+	  const cloned = {};
+	  if (!properties) {
+	    return cloned;
+	  }
+	  Object.keys(properties).forEach((key) => {
+	    const value = properties[key];
+	    if (typeof value === "object") {
+	      if (value === null) {
+	        cloned[key] = null;
+	      } else if (Array.isArray(value)) {
+	        cloned[key] = value.map((item) => {
+	          return item;
+	        });
+	      } else {
+	        cloned[key] = cloneProperties(value);
+	      }
+	    } else {
+	      cloned[key] = value;
+	    }
+	  });
+	  return cloned;
+	}
+	function cloneFeatureCollection(geojson) {
+	  const cloned = { type: "FeatureCollection" };
+	  Object.keys(geojson).forEach((key) => {
+	    switch (key) {
+	      case "type":
+	      case "features":
+	        return;
+	      default:
+	        cloned[key] = geojson[key];
+	    }
+	  });
+	  cloned.features = geojson.features.map((feature) => {
+	    return cloneFeature(feature);
+	  });
+	  return cloned;
+	}
+	function cloneGeometry(geometry) {
+	  const geom = { type: geometry.type };
+	  if (geometry.bbox) {
+	    geom.bbox = geometry.bbox;
+	  }
+	  if (geometry.type === "GeometryCollection") {
+	    geom.geometries = geometry.geometries.map((g) => {
+	      return cloneGeometry(g);
+	    });
+	    return geom;
+	  }
+	  geom.coordinates = deepSlice(geometry.coordinates);
+	  return geom;
+	}
+	function deepSlice(coords) {
+	  const cloned = coords;
+	  if (typeof cloned[0] !== "object") {
+	    return cloned.slice();
+	  }
+	  return cloned.map((coord) => {
+	    return deepSlice(coord);
+	  });
+	}
+
+	var __defProp = Object.defineProperty;
+	var __defProps = Object.defineProperties;
+	var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
+	var __getOwnPropSymbols = Object.getOwnPropertySymbols;
+	var __hasOwnProp = Object.prototype.hasOwnProperty;
+	var __propIsEnum = Object.prototype.propertyIsEnumerable;
+	var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+	var __spreadValues = (a, b) => {
+	  for (var prop in b || (b = {}))
+	    if (__hasOwnProp.call(b, prop))
+	      __defNormalProp(a, prop, b[prop]);
+	  if (__getOwnPropSymbols)
+	    for (var prop of __getOwnPropSymbols(b)) {
+	      if (__propIsEnum.call(b, prop))
+	        __defNormalProp(a, prop, b[prop]);
+	    }
+	  return a;
+	};
+	var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
+	function nearestPoint(targetPoint, points, options = {}) {
+	  if (!targetPoint) throw new Error("targetPoint is required");
+	  if (!points) throw new Error("points is required");
+	  let minDist = Infinity;
+	  let bestFeatureIndex = 0;
+	  featureEach(points, (pt, featureIndex) => {
+	    const distanceToPoint = distance(targetPoint, pt, options);
+	    if (distanceToPoint < minDist) {
+	      bestFeatureIndex = featureIndex;
+	      minDist = distanceToPoint;
+	    }
+	  });
+	  const nearestPoint2 = clone(points.features[bestFeatureIndex]);
+	  return __spreadProps(__spreadValues({}, nearestPoint2), {
+	    properties: __spreadProps(__spreadValues({}, nearestPoint2.properties), {
+	      featureIndex: bestFeatureIndex,
+	      distanceToPoint: minDist
+	    })
+	  });
+	}
+
+	const epsilon = 1.1102230246251565e-16;
+	const splitter = 134217729;
+	const resulterrbound = (3 + 8 * epsilon) * epsilon;
+
+	// fast_expansion_sum_zeroelim routine from oritinal code
+	function sum(elen, e, flen, f, h) {
+	    let Q, Qnew, hh, bvirt;
+	    let enow = e[0];
+	    let fnow = f[0];
+	    let eindex = 0;
+	    let findex = 0;
+	    if ((fnow > enow) === (fnow > -enow)) {
+	        Q = enow;
+	        enow = e[++eindex];
+	    } else {
+	        Q = fnow;
+	        fnow = f[++findex];
+	    }
+	    let hindex = 0;
+	    if (eindex < elen && findex < flen) {
+	        if ((fnow > enow) === (fnow > -enow)) {
+	            Qnew = enow + Q;
+	            hh = Q - (Qnew - enow);
+	            enow = e[++eindex];
+	        } else {
+	            Qnew = fnow + Q;
+	            hh = Q - (Qnew - fnow);
+	            fnow = f[++findex];
+	        }
+	        Q = Qnew;
+	        if (hh !== 0) {
+	            h[hindex++] = hh;
+	        }
+	        while (eindex < elen && findex < flen) {
+	            if ((fnow > enow) === (fnow > -enow)) {
+	                Qnew = Q + enow;
+	                bvirt = Qnew - Q;
+	                hh = Q - (Qnew - bvirt) + (enow - bvirt);
+	                enow = e[++eindex];
+	            } else {
+	                Qnew = Q + fnow;
+	                bvirt = Qnew - Q;
+	                hh = Q - (Qnew - bvirt) + (fnow - bvirt);
+	                fnow = f[++findex];
+	            }
+	            Q = Qnew;
+	            if (hh !== 0) {
+	                h[hindex++] = hh;
+	            }
+	        }
+	    }
+	    while (eindex < elen) {
+	        Qnew = Q + enow;
+	        bvirt = Qnew - Q;
+	        hh = Q - (Qnew - bvirt) + (enow - bvirt);
+	        enow = e[++eindex];
+	        Q = Qnew;
+	        if (hh !== 0) {
+	            h[hindex++] = hh;
+	        }
+	    }
+	    while (findex < flen) {
+	        Qnew = Q + fnow;
+	        bvirt = Qnew - Q;
+	        hh = Q - (Qnew - bvirt) + (fnow - bvirt);
+	        fnow = f[++findex];
+	        Q = Qnew;
+	        if (hh !== 0) {
+	            h[hindex++] = hh;
+	        }
+	    }
+	    if (Q !== 0 || hindex === 0) {
+	        h[hindex++] = Q;
+	    }
+	    return hindex;
+	}
+
+	function estimate(elen, e) {
+	    let Q = e[0];
+	    for (let i = 1; i < elen; i++) Q += e[i];
+	    return Q;
+	}
+
+	function vec(n) {
+	    return new Float64Array(n);
+	}
+
+	const ccwerrboundA = (3 + 16 * epsilon) * epsilon;
+	const ccwerrboundB = (2 + 12 * epsilon) * epsilon;
+	const ccwerrboundC = (9 + 64 * epsilon) * epsilon * epsilon;
+
+	const B = vec(4);
+	const C1 = vec(8);
+	const C2 = vec(12);
+	const D = vec(16);
+	const u = vec(4);
+
+	function orient2dadapt(ax, ay, bx, by, cx, cy, detsum) {
+	    let acxtail, acytail, bcxtail, bcytail;
+	    let bvirt, c, ahi, alo, bhi, blo, _i, _j, _0, s1, s0, t1, t0, u3;
+
+	    const acx = ax - cx;
+	    const bcx = bx - cx;
+	    const acy = ay - cy;
+	    const bcy = by - cy;
+
+	    s1 = acx * bcy;
+	    c = splitter * acx;
+	    ahi = c - (c - acx);
+	    alo = acx - ahi;
+	    c = splitter * bcy;
+	    bhi = c - (c - bcy);
+	    blo = bcy - bhi;
+	    s0 = alo * blo - (s1 - ahi * bhi - alo * bhi - ahi * blo);
+	    t1 = acy * bcx;
+	    c = splitter * acy;
+	    ahi = c - (c - acy);
+	    alo = acy - ahi;
+	    c = splitter * bcx;
+	    bhi = c - (c - bcx);
+	    blo = bcx - bhi;
+	    t0 = alo * blo - (t1 - ahi * bhi - alo * bhi - ahi * blo);
+	    _i = s0 - t0;
+	    bvirt = s0 - _i;
+	    B[0] = s0 - (_i + bvirt) + (bvirt - t0);
+	    _j = s1 + _i;
+	    bvirt = _j - s1;
+	    _0 = s1 - (_j - bvirt) + (_i - bvirt);
+	    _i = _0 - t1;
+	    bvirt = _0 - _i;
+	    B[1] = _0 - (_i + bvirt) + (bvirt - t1);
+	    u3 = _j + _i;
+	    bvirt = u3 - _j;
+	    B[2] = _j - (u3 - bvirt) + (_i - bvirt);
+	    B[3] = u3;
+
+	    let det = estimate(4, B);
+	    let errbound = ccwerrboundB * detsum;
+	    if (det >= errbound || -det >= errbound) {
+	        return det;
+	    }
+
+	    bvirt = ax - acx;
+	    acxtail = ax - (acx + bvirt) + (bvirt - cx);
+	    bvirt = bx - bcx;
+	    bcxtail = bx - (bcx + bvirt) + (bvirt - cx);
+	    bvirt = ay - acy;
+	    acytail = ay - (acy + bvirt) + (bvirt - cy);
+	    bvirt = by - bcy;
+	    bcytail = by - (bcy + bvirt) + (bvirt - cy);
+
+	    if (acxtail === 0 && acytail === 0 && bcxtail === 0 && bcytail === 0) {
+	        return det;
+	    }
+
+	    errbound = ccwerrboundC * detsum + resulterrbound * Math.abs(det);
+	    det += (acx * bcytail + bcy * acxtail) - (acy * bcxtail + bcx * acytail);
+	    if (det >= errbound || -det >= errbound) return det;
+
+	    s1 = acxtail * bcy;
+	    c = splitter * acxtail;
+	    ahi = c - (c - acxtail);
+	    alo = acxtail - ahi;
+	    c = splitter * bcy;
+	    bhi = c - (c - bcy);
+	    blo = bcy - bhi;
+	    s0 = alo * blo - (s1 - ahi * bhi - alo * bhi - ahi * blo);
+	    t1 = acytail * bcx;
+	    c = splitter * acytail;
+	    ahi = c - (c - acytail);
+	    alo = acytail - ahi;
+	    c = splitter * bcx;
+	    bhi = c - (c - bcx);
+	    blo = bcx - bhi;
+	    t0 = alo * blo - (t1 - ahi * bhi - alo * bhi - ahi * blo);
+	    _i = s0 - t0;
+	    bvirt = s0 - _i;
+	    u[0] = s0 - (_i + bvirt) + (bvirt - t0);
+	    _j = s1 + _i;
+	    bvirt = _j - s1;
+	    _0 = s1 - (_j - bvirt) + (_i - bvirt);
+	    _i = _0 - t1;
+	    bvirt = _0 - _i;
+	    u[1] = _0 - (_i + bvirt) + (bvirt - t1);
+	    u3 = _j + _i;
+	    bvirt = u3 - _j;
+	    u[2] = _j - (u3 - bvirt) + (_i - bvirt);
+	    u[3] = u3;
+	    const C1len = sum(4, B, 4, u, C1);
+
+	    s1 = acx * bcytail;
+	    c = splitter * acx;
+	    ahi = c - (c - acx);
+	    alo = acx - ahi;
+	    c = splitter * bcytail;
+	    bhi = c - (c - bcytail);
+	    blo = bcytail - bhi;
+	    s0 = alo * blo - (s1 - ahi * bhi - alo * bhi - ahi * blo);
+	    t1 = acy * bcxtail;
+	    c = splitter * acy;
+	    ahi = c - (c - acy);
+	    alo = acy - ahi;
+	    c = splitter * bcxtail;
+	    bhi = c - (c - bcxtail);
+	    blo = bcxtail - bhi;
+	    t0 = alo * blo - (t1 - ahi * bhi - alo * bhi - ahi * blo);
+	    _i = s0 - t0;
+	    bvirt = s0 - _i;
+	    u[0] = s0 - (_i + bvirt) + (bvirt - t0);
+	    _j = s1 + _i;
+	    bvirt = _j - s1;
+	    _0 = s1 - (_j - bvirt) + (_i - bvirt);
+	    _i = _0 - t1;
+	    bvirt = _0 - _i;
+	    u[1] = _0 - (_i + bvirt) + (bvirt - t1);
+	    u3 = _j + _i;
+	    bvirt = u3 - _j;
+	    u[2] = _j - (u3 - bvirt) + (_i - bvirt);
+	    u[3] = u3;
+	    const C2len = sum(C1len, C1, 4, u, C2);
+
+	    s1 = acxtail * bcytail;
+	    c = splitter * acxtail;
+	    ahi = c - (c - acxtail);
+	    alo = acxtail - ahi;
+	    c = splitter * bcytail;
+	    bhi = c - (c - bcytail);
+	    blo = bcytail - bhi;
+	    s0 = alo * blo - (s1 - ahi * bhi - alo * bhi - ahi * blo);
+	    t1 = acytail * bcxtail;
+	    c = splitter * acytail;
+	    ahi = c - (c - acytail);
+	    alo = acytail - ahi;
+	    c = splitter * bcxtail;
+	    bhi = c - (c - bcxtail);
+	    blo = bcxtail - bhi;
+	    t0 = alo * blo - (t1 - ahi * bhi - alo * bhi - ahi * blo);
+	    _i = s0 - t0;
+	    bvirt = s0 - _i;
+	    u[0] = s0 - (_i + bvirt) + (bvirt - t0);
+	    _j = s1 + _i;
+	    bvirt = _j - s1;
+	    _0 = s1 - (_j - bvirt) + (_i - bvirt);
+	    _i = _0 - t1;
+	    bvirt = _0 - _i;
+	    u[1] = _0 - (_i + bvirt) + (bvirt - t1);
+	    u3 = _j + _i;
+	    bvirt = u3 - _j;
+	    u[2] = _j - (u3 - bvirt) + (_i - bvirt);
+	    u[3] = u3;
+	    const Dlen = sum(C2len, C2, 4, u, D);
+
+	    return D[Dlen - 1];
+	}
+
+	function orient2d(ax, ay, bx, by, cx, cy) {
+	    const detleft = (ay - cy) * (bx - cx);
+	    const detright = (ax - cx) * (by - cy);
+	    const det = detleft - detright;
+
+	    const detsum = Math.abs(detleft + detright);
+	    if (Math.abs(det) >= ccwerrboundA * detsum) return det;
+
+	    return -orient2dadapt(ax, ay, bx, by, cx, cy, detsum);
+	}
+
+	function pointInPolygon(p, polygon) {
+	    var i;
+	    var ii;
+	    var k = 0;
+	    var f;
+	    var u1;
+	    var v1;
+	    var u2;
+	    var v2;
+	    var currentP;
+	    var nextP;
+
+	    var x = p[0];
+	    var y = p[1];
+
+	    var numContours = polygon.length;
+	    for (i = 0; i < numContours; i++) {
+	        ii = 0;
+	        var contour = polygon[i];
+	        var contourLen = contour.length - 1;
+
+	        currentP = contour[0];
+	        if (currentP[0] !== contour[contourLen][0] &&
+	            currentP[1] !== contour[contourLen][1]) {
+	            throw new Error('First and last coordinates in a ring must be the same')
+	        }
+
+	        u1 = currentP[0] - x;
+	        v1 = currentP[1] - y;
+
+	        for (ii; ii < contourLen; ii++) {
+	            nextP = contour[ii + 1];
+
+	            u2 = nextP[0] - x;
+	            v2 = nextP[1] - y;
+
+	            if (v1 === 0 && v2 === 0) {
+	                if ((u2 <= 0 && u1 >= 0) || (u1 <= 0 && u2 >= 0)) { return 0 }
+	            } else if ((v2 >= 0 && v1 <= 0) || (v2 <= 0 && v1 >= 0)) {
+	                f = orient2d(u1, u2, v1, v2, 0, 0);
+	                if (f === 0) { return 0 }
+	                if ((f > 0 && v2 > 0 && v1 <= 0) || (f < 0 && v2 <= 0 && v1 > 0)) { k++; }
+	            }
+	            currentP = nextP;
+	            v1 = v2;
+	            u1 = u2;
+	        }
+	    }
+
+	    if (k % 2 === 0) { return false }
+	    return true
+	}
+
+	// index.ts
+	function booleanPointInPolygon(point, polygon, options = {}) {
+	  if (!point) {
+	    throw new Error("point is required");
+	  }
+	  if (!polygon) {
+	    throw new Error("polygon is required");
+	  }
+	  const pt = getCoord(point);
+	  const geom = getGeom(polygon);
+	  const type = geom.type;
+	  const bbox = polygon.bbox;
+	  let polys = geom.coordinates;
+	  if (bbox && inBBox(pt, bbox) === false) {
+	    return false;
+	  }
+	  if (type === "Polygon") {
+	    polys = [polys];
+	  }
+	  let result = false;
+	  for (var i = 0; i < polys.length; ++i) {
+	    const polyResult = pointInPolygon(pt, polys[i]);
+	    if (polyResult === 0) return options.ignoreBoundary ? false : true;
+	    else if (polyResult) result = true;
+	  }
+	  return result;
+	}
+	function inBBox(pt, bbox) {
+	  return bbox[0] <= pt[0] && bbox[1] <= pt[1] && bbox[2] >= pt[0] && bbox[3] >= pt[1];
+	}
+
+	// index.ts
+	function pointOnFeature(geojson) {
+	  const fc = normalize(geojson);
+	  const cent = center(fc);
+	  let onSurface = false;
+	  let i = 0;
+	  while (!onSurface && i < fc.features.length) {
+	    const geom = fc.features[i].geometry;
+	    let x, y, x1, y1, x2, y2;
+	    let onLine = false;
+	    if (geom.type === "Point") {
+	      if (cent.geometry.coordinates[0] === geom.coordinates[0] && cent.geometry.coordinates[1] === geom.coordinates[1]) {
+	        onSurface = true;
+	      }
+	    } else if (geom.type === "MultiPoint") {
+	      let onMultiPoint = false;
+	      let k = 0;
+	      while (!onMultiPoint && k < geom.coordinates.length) {
+	        if (cent.geometry.coordinates[0] === geom.coordinates[k][0] && cent.geometry.coordinates[1] === geom.coordinates[k][1]) {
+	          onSurface = true;
+	          onMultiPoint = true;
+	        }
+	        k++;
+	      }
+	    } else if (geom.type === "LineString") {
+	      let k = 0;
+	      while (!onLine && k < geom.coordinates.length - 1) {
+	        x = cent.geometry.coordinates[0];
+	        y = cent.geometry.coordinates[1];
+	        x1 = geom.coordinates[k][0];
+	        y1 = geom.coordinates[k][1];
+	        x2 = geom.coordinates[k + 1][0];
+	        y2 = geom.coordinates[k + 1][1];
+	        if (pointOnSegment(x, y, x1, y1, x2, y2)) {
+	          onLine = true;
+	          onSurface = true;
+	        }
+	        k++;
+	      }
+	    } else if (geom.type === "MultiLineString") {
+	      let j = 0;
+	      while (j < geom.coordinates.length) {
+	        onLine = false;
+	        let k = 0;
+	        const line = geom.coordinates[j];
+	        while (!onLine && k < line.length - 1) {
+	          x = cent.geometry.coordinates[0];
+	          y = cent.geometry.coordinates[1];
+	          x1 = line[k][0];
+	          y1 = line[k][1];
+	          x2 = line[k + 1][0];
+	          y2 = line[k + 1][1];
+	          if (pointOnSegment(x, y, x1, y1, x2, y2)) {
+	            onLine = true;
+	            onSurface = true;
+	          }
+	          k++;
+	        }
+	        j++;
+	      }
+	    } else if (geom.type === "Polygon" || geom.type === "MultiPolygon") {
+	      if (booleanPointInPolygon(cent, geom)) {
+	        onSurface = true;
+	      }
+	    }
+	    i++;
+	  }
+	  if (onSurface) {
+	    return cent;
+	  } else {
+	    const vertices = featureCollection([]);
+	    for (let f = 0; f < fc.features.length; f++) {
+	      vertices.features = vertices.features.concat(
+	        explode(fc.features[f]).features
+	      );
+	    }
+	    return point(nearestPoint(cent, vertices).geometry.coordinates);
+	  }
+	}
+	function normalize(geojson) {
+	  if (geojson.type !== "FeatureCollection") {
+	    if (geojson.type !== "Feature") {
+	      return featureCollection([feature(geojson)]);
+	    }
+	    return featureCollection([geojson]);
+	  }
+	  return geojson;
+	}
+	function pointOnSegment(x, y, x1, y1, x2, y2) {
+	  const ab = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+	  const ap = Math.sqrt((x - x1) * (x - x1) + (y - y1) * (y - y1));
+	  const pb = Math.sqrt((x2 - x) * (x2 - x) + (y2 - y) * (y2 - y));
+	  return ab === ap + pb;
+	}
+	var turf_point_on_feature_default = pointOnFeature;
+
+	/**
+	 * @type {Record<import('@turf/helpers').Units | import('@turf/helpers').AreaUnits, string>}
+	 */
+	const UNIT_SYMBOLS = {
+		acres: 'ac',
+		centimeters: 'cm',
+		centimetres: 'cm',
+		degrees: '°',
+		feet: 'ft',
+		hectares: 'ha',
+		inches: 'in',
+		kilometers: 'km',
+		kilometres: 'km',
+		meters: 'm',
+		metres: 'm',
+		miles: 'mi',
+		millimeters: 'mm',
+		millimetres: 'mm',
+		nauticalmiles: 'nmi',
+		radians: 'rad',
+		yards: 'yd',
+	};
+
+	/**
+	 * @param {number} value
+	 * @param {number} maximumFractionDigits
+	 * @returns {string}
+	 */
+	function formatNumber(value, maximumFractionDigits = 2) {
+		return value.toLocaleString(undefined, { maximumFractionDigits });
+	}
+
+	/**
+	 * @param {number} value
+	 * @param {import('@turf/helpers').Units} units
+	 * @returns {string}
+	 */
+	function defaultLabelFormat(value, units = 'kilometers') {
+		switch (units) {
+			case 'meters':
+				return value < 1000
+					? `${formatNumber(value, 0)} m`
+					: `${formatNumber(value / 1000)} km`;
+			case 'kilometers':
+				return value < 1
+					? `${formatNumber(value * 1000, 0)} m`
+					: `${formatNumber(value)} km`;
+			default:
+				return `${formatNumber(value)} ${UNIT_SYMBOLS[units] ?? units}`;
+		}
+	}
+
+	/**
+	 * @param {number} valueSquareMeters
+	 * @param {import('@turf/helpers').AreaUnits} units
+	 * @returns {string}
+	 */
+	function defaultLabelAreaFormat(valueSquareMeters, units = 'kilometers') {
+		const value = convertArea(valueSquareMeters, 'meters', units);
+		switch (units) {
+			case 'meters':
+				return value < 1_000_000
+					? `${formatNumber(value, 0)} m²`
+					: `${formatNumber(value / 1_000_000)} km²`;
+			case 'kilometers':
+				return value < 1
+					? `${formatNumber(value * 1_000_000, 0)} m²`
+					: `${formatNumber(value)} km²`;
+			default: {
+				const hasSqrSymbol = !['acres', 'hectares'].includes(units);
+				return `${formatNumber(value)} ${UNIT_SYMBOLS[units] ?? units}${hasSqrSymbol ? '²' : ''}`;		}
+		}
 	}
 
 	const sources = {
@@ -2066,25 +3189,29 @@
 	 * @param {[number, number][]} coordinates
 	 * @param {{
 	 *  units?: import('@turf/helpers').Units,
-	 *  labelFormat?: (v: number) => string
+	 *  areaUnits?: import('@turf/helpers').AreaUnits,
+	 *  labelFormat?: (v: number, units?: import('@turf/helpers').Units) => string
+	 *  labelAreaFormat?: (v: number, units?: import('@turf/helpers').AreaUnits) => string
+	 *  showArea?: boolean,
 	 * }} options
 	 * @returns {import('geojson').FeatureCollection<import('geojson').Point>}
 	 */
 	function toGeoJSONPoints(coordinates, options = {}) {
 		const labelFormat = options.labelFormat ?? defaultLabelFormat;
-		const units = options.units ?? 'kilometers';
-		let sum = 0;
-		return {
-			type: 'FeatureCollection',
+		const distanceUnits = options.units ?? 'kilometers';
+		let sumDist = 0;
+		/** @type {import('geojson').FeatureCollection<import('geojson').Point>} */
+		const pointsFeatureCollection = {
+			type: ('FeatureCollection'),
 			features: coordinates.map((coordinate, index) => {
 				if (index > 0) {
-					sum += turf_distance_default(coordinates[index - 1], coordinate, { units });
+					sumDist += turf_distance_default(coordinates[index - 1], coordinate, { units: distanceUnits });
 				}
 				return {
 					type: 'Feature',
 					id: String(index),
 					properties: {
-						distance: labelFormat(sum),
+						distance: labelFormat(sumDist, distanceUnits),
 					},
 					geometry: {
 						type: 'Point',
@@ -2093,6 +3220,30 @@
 				};
 			}),
 		};
+
+		if (options.showArea && coordinates.length > 2) {
+			const first = coordinates[0];
+			const closingDistance = turf_distance_default(first, coordinates[coordinates.length - 1], { units: distanceUnits });
+			if (closingDistance < (sumDist * 0.01)) {
+				const labelAreaFormat = options.labelAreaFormat ?? defaultLabelAreaFormat;
+				const areaUnits = options.areaUnits ?? 'kilometers';
+				const polygonFeature = polygon$1([[...coordinates, first]]);
+				const polygonAreaSquareMeters = turf_area_default(polygonFeature);
+				const labelPoint = turf_point_on_feature_default(polygonFeature);
+				pointsFeatureCollection.features.push({
+					type: 'Feature',
+					id: 'area',
+					properties: {
+						area: labelAreaFormat(polygonAreaSquareMeters, areaUnits),
+					},
+					geometry: {
+						type: 'Point',
+						coordinates: labelPoint.geometry.coordinates,
+					},
+				});
+			}
+		}
+		return pointsFeatureCollection;
 	}
 
 	/**
@@ -2118,6 +3269,7 @@
 		markers: {
 			id: 'mapbox-control-ruler-markers',
 			type: 'circle',
+			filter: ['has', 'distance'],
 			source: sources.points,
 			paint: {
 				'circle-radius': 5,
@@ -2131,16 +3283,33 @@
 			type: 'symbol',
 			source: sources.points,
 			layout: {
-				'text-field': '{distance}',
-				'text-font': ['Roboto Medium'],
-				'text-anchor': 'top',
-				'text-size': 12,
+				'text-field': ['concat', ['get', 'distance'], ['get', 'area']],
+				'text-font': [
+					'case',
+					['has', 'area'],
+					['literal', ['Roboto Bold']],
+					['literal', ['Roboto Medium']],
+				],
+				'text-size': [
+					'case',
+					['has', 'area'],
+					16,
+					12,
+				],
 				'text-offset': [0, 0.8],
+				'text-anchor': 'top',
+				'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
+				'text-allow-overlap': true,
 			},
 			paint: {
 				'text-color': '#263238',
 				'text-halo-color': '#fff',
-				'text-halo-width': 1,
+				'text-halo-width': [
+					'case',
+					['has', 'area'],
+					3,
+					1,
+				],
 			},
 		},
 	};
@@ -2291,7 +3460,10 @@
 			const geoJSONLine = toGeoJSONLine(this.coordinates);
 			const geoJSONPoints = toGeoJSONPoints(this.coordinates, {
 				units: this.options.units,
+				areaUnits: this.options.areaUnits,
 				labelFormat: this.options.labelFormat,
+				labelAreaFormat: this.options.labelAreaFormat,
+				showArea: this.options.disableArea !== true,
 			});
 			lineSource.setData(geoJSONLine);
 			pointsSource.setData(geoJSONPoints);
@@ -2690,7 +3862,7 @@
 	};
 
 	const map = new mapboxgl.Map({
-		accessToken: 'pk.eyJ1Ijoia29yeXdrYSIsImEiOiJjbTJreGo1bHkwNWx1MmtxdGJtN2phdmEwIn0.Rct4IUBzwzsKF90Riz81dA',
+		accessToken: 'pk.eyJ1IjoiZWFydGhiYW5jIiwiYSI6ImNsZHVhdmo3MDA0MXEzcm85enNsbDVyN3kifQ.RyrM7nFvHlk8aXaCmtgohA',
 		container: 'map',
 		style: 'mapbox://styles/mapbox/standard',
 		zoom: 14,
@@ -2712,16 +3884,16 @@
 		});
 	});
 
-	map.addControl(new ZoomControl(), 'bottom-right');
+	map.addControl(new ZoomControl(), 'bottom-left');
 
-	map.addControl(new InspectControl({ console: true }), 'bottom-right');
+	map.addControl(new InspectControl({ console: true }), 'bottom-left');
 
-	map.addControl(new RulerControl(), 'bottom-right');
+	map.addControl(new RulerControl(), 'bottom-left');
 	map.on('ruler.on', () => console.log('Ruler activated'));
 	map.on('ruler.off', () => console.log('Ruler deactivated'));
 
 	const image = new ImageControl({ removeButton: true });
-	map.addControl(image, 'bottom-right');
+	map.addControl(image, 'bottom-left');
 	map.on('image.add', ({ id }) => console.log(`Added image ${id}`));
 	map.on('image.remove', ({ id }) => console.log(`Removed image ${id}`));
 	map.on('image.select', ({ id }) => console.log(`Selected image ${id}`));
@@ -2729,7 +3901,7 @@
 	map.on('image.update', ({ coordinates }) => console.log('Updated position:', coordinates));
 	map.on('image.mode', ({ mode }) => console.log(`Changed mode: ${mode}`));
 
-	map.addControl(new CompassControl({ instant: true }), 'bottom-right');
+	map.addControl(new CompassControl({ instant: true }), 'bottom-left');
 
 	(async function () {
 		await map.once('style.load');

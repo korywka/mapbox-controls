@@ -46,7 +46,10 @@ export default class RulerControl {
 			type: 'geojson',
 			data: toGeoJSONPoints(this.coordinates, {
 				units: this.options.units,
+				areaUnits: this.options.areaUnits,
 				labelFormat: this.options.labelFormat,
+				labelAreaFormat: this.options.labelAreaFormat,
+				showArea: this.options.disableArea !== true,
 			}),
 		});
 

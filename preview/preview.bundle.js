@@ -3283,7 +3283,7 @@
 			type: 'symbol',
 			source: sources.points,
 			layout: {
-				'text-field': ['concat', ['get', 'distance'], ['get', 'area']],
+				'text-field': ['coalesce', ['get', 'distance'], ['get', 'area']],
 				'text-font': [
 					'case',
 					['has', 'area'],
@@ -3308,7 +3308,7 @@
 					'case',
 					['has', 'area'],
 					3,
-					1,
+					1.5,
 				],
 			},
 		},
@@ -3357,7 +3357,10 @@
 				type: 'geojson',
 				data: toGeoJSONPoints(this.coordinates, {
 					units: this.options.units,
+					areaUnits: this.options.areaUnits,
 					labelFormat: this.options.labelFormat,
+					labelAreaFormat: this.options.labelAreaFormat,
+					showArea: this.options.disableArea !== true,
 				}),
 			});
 
@@ -3862,7 +3865,7 @@
 	};
 
 	const map = new mapboxgl.Map({
-		accessToken: 'pk.eyJ1IjoiZWFydGhiYW5jIiwiYSI6ImNsZHVhdmo3MDA0MXEzcm85enNsbDVyN3kifQ.RyrM7nFvHlk8aXaCmtgohA',
+		accessToken: 'pk.eyJ1Ijoia29yeXdrYSIsImEiOiJjbTJreGo1bHkwNWx1MmtxdGJtN2phdmEwIn0.Rct4IUBzwzsKF90Riz81dA',
 		container: 'map',
 		style: 'mapbox://styles/mapbox/standard',
 		zoom: 14,
@@ -3884,16 +3887,16 @@
 		});
 	});
 
-	map.addControl(new ZoomControl(), 'bottom-left');
+	map.addControl(new ZoomControl(), 'bottom-right');
 
-	map.addControl(new InspectControl({ console: true }), 'bottom-left');
+	map.addControl(new InspectControl({ console: true }), 'bottom-right');
 
-	map.addControl(new RulerControl(), 'bottom-left');
+	map.addControl(new RulerControl(), 'bottom-right');
 	map.on('ruler.on', () => console.log('Ruler activated'));
 	map.on('ruler.off', () => console.log('Ruler deactivated'));
 
 	const image = new ImageControl({ removeButton: true });
-	map.addControl(image, 'bottom-left');
+	map.addControl(image, 'bottom-right');
 	map.on('image.add', ({ id }) => console.log(`Added image ${id}`));
 	map.on('image.remove', ({ id }) => console.log(`Removed image ${id}`));
 	map.on('image.select', ({ id }) => console.log(`Selected image ${id}`));
@@ -3901,7 +3904,7 @@
 	map.on('image.update', ({ coordinates }) => console.log('Updated position:', coordinates));
 	map.on('image.mode', ({ mode }) => console.log(`Changed mode: ${mode}`));
 
-	map.addControl(new CompassControl({ instant: true }), 'bottom-left');
+	map.addControl(new CompassControl({ instant: true }), 'bottom-right');
 
 	(async function () {
 		await map.once('style.load');

@@ -37,7 +37,7 @@ export const layers = {
 		type: 'symbol',
 		source: sources.points,
 		layout: {
-			'text-field': ['concat', ['get', 'distance'], ['get', 'area']],
+			'text-field': ['coalesce', ['get', 'distance'], ['get', 'area']],
 			'text-font': [
 				'case',
 				['has', 'area'],
@@ -62,7 +62,7 @@ export const layers = {
 				'case',
 				['has', 'area'],
 				3,
-				1,
+				1.5,
 			],
 		},
 	},

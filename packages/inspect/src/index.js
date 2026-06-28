@@ -2,6 +2,10 @@ import { controlButton, controlContainer } from '@mapbox-controls/helpers';
 import { icons } from './icons.js';
 import { popup } from './popup.js';
 
+/**
+ * @import { IControl } from './types'
+ * @implements {IControl}
+ */
 export default class InspectControl {
 	/** @param {import('./types').ControlOptions} options */
 	constructor(options = {}) {

@@ -1,20 +1,16 @@
 {
-  "compilerOptions": {
-    "strict": true,
-    "checkJs": true,
-    "allowJs": true,
-    "declaration": true,
-    "skipLibCheck": true,
-    "emitDeclarationOnly": true,
-    "esModuleInterop": true,
-    "removeComments": true,
-    "lib": [
-      "dom",
-      "esnext"
-    ],
-    "outDir": "types"
-  },
-  "include": [
-    "src"
-  ]
+	"compilerOptions": {
+		"strict": true,
+		"checkJs": true,
+		"allowJs": true,
+		"declaration": true,
+		"emitDeclarationOnly": true,
+		"esModuleInterop": true,
+		"removeComments": true,
+		"skipLibCheck": true,
+		"rootDir": "${configDir}/src",
+		"outDir": "${configDir}/types",
+		"lib": ["dom", "esnext"],
+	},
+	"include": ["${configDir}/src"],
 }

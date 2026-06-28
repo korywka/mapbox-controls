@@ -1,1 +1,3 @@
-../../tsconfig.shared.json
+{
+	"extends": "../../tsconfig.shared.json",
+}

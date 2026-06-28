@@ -1,6 +1,10 @@
 import { controlContainer, controlButton } from '@mapbox-controls/helpers';
 import { icons } from './icons.js';
 
+/**
+ * @import { IControl } from './types'
+ * @implements {IControl}
+ */
 class CompassControl {
 	/**
 	 * @param {import('./types').ControlOptions} options
@@ -23,7 +27,7 @@ class CompassControl {
 
 	onRotate() {
 		if (!this.map) throw Error('map is undefined');
-		const angle = this.map.getBearing() * (-1);
+		const angle = this.map.getBearing() * -1;
 		if (!this.options.instant) {
 			this.container.hidden = angle === 0;
 		}

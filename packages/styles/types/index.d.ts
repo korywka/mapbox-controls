@@ -1,12 +1,20 @@
-export default class StylesControl {
+export default class StylesControl implements IControl {
     constructor(options?: import("./types").ControlOptions);
     options: {
-        styles: import("./types").Style[];
+        styles: {
+            label: string;
+            styleName: string;
+            styleUrl: string;
+        }[];
         onChange?: (style: import("./types").Style) => void;
         compact?: boolean;
     };
     container: HTMLDivElement;
-    findStyle(name: string): import("./types").Style;
+    findStyle(name: string): {
+        label: string;
+        styleName: string;
+        styleUrl: string;
+    };
     getCurrentStyleName(): string;
     expanded(): void;
     compact(): void;
@@ -14,3 +22,4 @@ export default class StylesControl {
     map: import("mapbox-gl").Map | undefined;
     onRemove(): void;
 }
+import type { IControl } from './types';

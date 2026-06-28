@@ -1,5 +1,5 @@
 export default CompassControl;
-declare class CompassControl {
+declare class CompassControl implements IControl {
     constructor(options?: import("./types").ControlOptions);
     options: {
         instant?: boolean;
@@ -13,3 +13,4 @@ declare class CompassControl {
     map: import("mapbox-gl").Map | undefined;
     onRemove(): void;
 }
+import type { IControl } from './types';

@@ -3,10 +3,14 @@ import { icons } from './icons.js';
 import { layers } from './layers.js';
 import { sources, toGeoJSONLine, toGeoJSONPoints } from './sources.js';
 
+/**
+ * @import { IControl } from './types'
+ * @implements {IControl}
+ */
 export default class RulerControl {
 	/**
-   * @param {import('./types').ControlOptions} options
-   */
+	 * @param {import('./types').ControlOptions} options
+	 */
 	constructor(options = {}) {
 		this.options = options;
 		this.container = controlContainer('mapbox-ctrl-ruler');
@@ -123,8 +127,8 @@ export default class RulerControl {
 	}
 
 	/**
-   * @param {import('mapbox-gl').MapMouseEvent} event
-   */
+	 * @param {import('mapbox-gl').MapMouseEvent} event
+	 */
 	mapClickListener = (event) => {
 		if (!this.map) throw Error('map is undefined');
 		this.addCoordinate([event.lngLat.lng, event.lngLat.lat]);

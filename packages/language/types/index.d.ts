@@ -1,4 +1,4 @@
-export default class LanguageControl {
+export default class LanguageControl implements IControl {
     constructor(options?: import("./types").ControlOptions);
     options: {
         supportedLanguages: string[];
@@ -15,3 +15,4 @@ export default class LanguageControl {
     map: import("mapbox-gl").Map | undefined;
     onRemove(): void;
 }
+import type { IControl } from './types';

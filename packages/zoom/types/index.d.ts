@@ -1,5 +1,5 @@
 export default ZoomControl;
-declare class ZoomControl {
+declare class ZoomControl implements IControl {
     container: HTMLDivElement;
     buttonIn: HTMLButtonElement;
     buttonOut: HTMLButtonElement;
@@ -7,3 +7,4 @@ declare class ZoomControl {
     map: import("mapbox-gl").Map | undefined;
     onRemove(): void;
 }
+import type { IControl } from './types';

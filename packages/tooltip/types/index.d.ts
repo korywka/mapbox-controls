@@ -1,5 +1,5 @@
 export default TooltipControl;
-declare class TooltipControl {
+declare class TooltipControl implements IControl {
     constructor(options: import("./types").ControlOptions);
     options: {
         getContent: (event: import("mapbox-gl").MapMouseEvent) => string;
@@ -19,3 +19,4 @@ declare class TooltipControl {
     map: import("mapbox-gl").Map | undefined;
     onRemove(): void;
 }
+import type { IControl } from './types';

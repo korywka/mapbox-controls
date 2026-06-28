@@ -3,5 +3,5 @@ packages:
   - "preview"
 
 catalog:
-  "mapbox-gl": 3.6.0
+  "mapbox-gl": 3.25.0
   "@types/geojson": 7946.0.14

@@ -20,12 +20,12 @@
 		"mapbox-gl": "catalog:"
 	},
 	"devDependencies": {
-		"@rollup/plugin-commonjs": "26.0.1",
-		"@rollup/plugin-node-resolve": "15.2.3",
-		"concurrently": "8.2.2",
-		"rollup": "4.21.1",
-		"rollup-plugin-import-css": "3.5.1",
+		"@rollup/plugin-commonjs": "29.0.3",
+		"@rollup/plugin-node-resolve": "16.0.3",
+		"concurrently": "10.0.3",
+		"rollup": "4.62.2",
+		"rollup-plugin-import-css": "4.2.1",
 		"rollup-plugin-polyfill-node": "0.13.0",
-		"serve": "14.2.3"
+		"serve": "14.2.6"
 	}
 }

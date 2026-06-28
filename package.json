@@ -1,15 +1,22 @@
 {
 	"name": "mapbox-gl-controls",
 	"private": true,
+	"type": "module",
 	"scripts": {
-		"lint": "eslint packages/**/src/*.js",
+		"lint": "eslint packages",
 		"publish": "pnpm --recursive publish",
 		"build": "pnpm --recursive build"
 	},
 	"devDependencies": {
-		"eslint": "8.56.0",
-		"eslint-config-ecmascript": "2.7.0",
-		"pnpm": "9.9.0",
-		"typescript": "5.5.4"
+		"@eslint/js": "10.0.1",
+		"eslint": "10.6.0",
+		"globals": "17.7.0",
+		"typescript": "6.0.3"
+	},
+	"devEngines": {
+		"packageManager": {
+			"name": "pnpm",
+			"version": ">=11.0.0"
+		}
 	}
 }

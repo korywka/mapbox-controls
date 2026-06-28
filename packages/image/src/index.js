@@ -7,6 +7,10 @@ import { Rotate } from './modes/rotate.js';
 import { centerPosition } from './center-position.js';
 import { createFileInput, readFile, readUrl } from './file.js';
 
+/**
+ * @import { IControl } from './types'
+ * @implements {IControl}
+ */
 class ImageControl {
 	/** @param {import('./types').ControlOptions} options */
 	constructor(options = {}) {
@@ -53,9 +57,9 @@ class ImageControl {
 	}
 
 	/**
-   * @param {File} file
+	 * @param {File} file
 	 * @param {import('./types').RasterCoordinates=} coordinates
-   */
+	 */
 	async addFile(file, coordinates) {
 		const image = await readFile(file);
 		const id = this.addImage(image, coordinates);
@@ -85,8 +89,8 @@ class ImageControl {
 	}
 
 	/**
-   * @param {Raster} raster
-   */
+	 * @param {Raster} raster
+	 */
 	addRaster(raster) {
 		if (!this.map) throw Error('map is undefined');
 		this.rasters[raster.id] = raster;
@@ -116,8 +120,8 @@ class ImageControl {
 	}
 
 	/**
-   * @param {string} id
-   */
+	 * @param {string} id
+	 */
 	selectRaster(id) {
 		if (!this.map) throw Error('map is undefined');
 		this.deselectRaster();
@@ -154,8 +158,8 @@ class ImageControl {
 	}
 
 	/**
-   * @param {'move' | 'scale' | 'rotate' | null} mode
-   */
+	 * @param {'move' | 'scale' | 'rotate' | null} mode
+	 */
 	setMode(mode) {
 		if (!this.map) throw Error('map is undefined');
 		if (!this.currentRaster) throw Error('no raster is selected');
@@ -216,8 +220,8 @@ class ImageControl {
 	}
 
 	/**
-   * @param {import('mapbox-gl').MapMouseEvent} event
-   */
+	 * @param {import('mapbox-gl').MapMouseEvent} event
+	 */
 	onMapClick = (event) => {
 		if (!this.map) throw Error('map is undefined');
 		const layersId = Object.values(this.rasters).map((i) => i.fillLayer.id);
@@ -264,9 +268,9 @@ class ImageControl {
 	};
 
 	/**
-   * @param {import('mapbox-gl').Map} map
-   * @returns {HTMLElement}
-   */
+	 * @param {import('mapbox-gl').Map} map
+	 * @returns {HTMLElement}
+	 */
 	onAdd(map) {
 		this.map = map;
 		this.container.appendChild(this.fileInput);

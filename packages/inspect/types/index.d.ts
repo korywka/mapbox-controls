@@ -1,4 +1,4 @@
-export default class InspectControl {
+export default class InspectControl implements IControl {
     constructor(options?: import("./types").ControlOptions);
     options: {
         console?: boolean;
@@ -9,7 +9,7 @@ export default class InspectControl {
     onControlButtonClick(): void;
     activate(): void;
     deactivate(): void;
-    getPointFeatures(point: import("mapbox-gl").Point): import("mapbox-gl").GeoJSONFeature[];
+    getPointFeatures(point: any): import("mapbox-gl").GeoJSONFeature[];
     showDetails(features: import("mapbox-gl").GeoJSONFeature[]): void;
     detailsNode: HTMLDivElement | undefined;
     hideDetails(): void;
@@ -20,3 +20,4 @@ export default class InspectControl {
     map: import("mapbox-gl").Map | undefined;
     onRemove(): void;
 }
+import type { IControl } from './types';

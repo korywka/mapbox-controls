@@ -1,3 +1,7 @@
+/**
+ * @import { IControl } from './types'
+ * @implements {IControl}
+ */
 class TooltipControl {
 	/** @param {import('./types').ControlOptions} options */
 	constructor(options) {

@@ -14,3 +14,22 @@ Some handy controls for `mapbox-gl-js` structured as monorepo. [Example of all c
 - [💅 @mapbox-controls/styles](packages/styles) - Change map style
 - [🏷️ @mapbox-controls/tooltip](packages/tooltip) - Display tooltip on hover
 - [🔍 @mapbox-controls/zoom](packages/zoom) - Zoom in and zoom out map
+
+## Development
+
+1. Update versions
+
+```
+pnpm -r --filter "./packages/*" exec npm version x.y.z --no-git-tag-version
+```
+
+2. Build types
+```
+pnpm run build
+```
+
+3. Publish
+
+```
+pnpm run publish
+```

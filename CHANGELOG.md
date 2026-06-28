@@ -25,3 +25,7 @@
 - Update `@turf` package
 - Update `@mapbox` package
 - Increase icon size for 1px for pixel perfect centering inside buttons
+
+## 4.0.0
+
+- Update package for new `mapbox-gl/esm` imports

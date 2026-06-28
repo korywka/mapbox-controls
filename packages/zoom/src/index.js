@@ -1,6 +1,10 @@
 import { controlButton, controlContainer } from '@mapbox-controls/helpers';
 import { icons } from './icons.js';
 
+/**
+ * @import { IControl } from './types'
+ * @implements {IControl}
+ */
 class ZoomControl {
 	constructor() {
 		this.container = controlContainer('mapbox-ctrl-zoom');

@@ -13,6 +13,10 @@ const defaults = [
 	},
 ];
 
+/**
+ * @import { IControl } from './types'
+ * @implements {IControl}
+ */
 export default class StylesControl {
 	/** @param {import('./types').ControlOptions} options */
 	constructor(options = {}) {

@@ -1,5 +1,5 @@
 export default ImageControl;
-declare class ImageControl {
+declare class ImageControl implements IControl {
     constructor(options?: import("./types").ControlOptions);
     container: HTMLDivElement;
     fileInput: HTMLInputElement;
@@ -26,6 +26,7 @@ declare class ImageControl {
     map: import("mapbox-gl").Map | undefined;
     onRemove(): void;
 }
+import type { IControl } from './types';
 import { Raster } from './raster.js';
 import { Move } from './modes/move.js';
 import { Scale } from './modes/scale.js';

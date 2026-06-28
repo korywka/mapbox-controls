@@ -1,11 +1,11 @@
 {
 	"name": "@mapbox-controls/language",
-	"version": "3.0.0",
+	"version": "4.0.0",
 	"description": "Change map language",
 	"type": "module",
 	"main": "./src/index.js",
 	"scripts": {
-		"build": "tsc"
+		"build": "tsc && cp src/*.d.ts types/"
 	},
 	"devDependencies": {
 		"mapbox-gl": "catalog:"

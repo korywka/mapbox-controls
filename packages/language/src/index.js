@@ -4,6 +4,10 @@ const defaults = {
 	excludedLayerIds: [],
 };
 
+/**
+ * @import { IControl } from './types'
+ * @implements {IControl}
+ */
 export default class LanguageControl {
 	/** @param {import('./types').ControlOptions} options */
 	constructor(options = {}) {
@@ -57,10 +61,10 @@ export default class LanguageControl {
 	}
 
 	/**
-   * @param {import('./types').TextField} field
-   * @param {string} languageKey
-   * @returns {import('./types').TextField}
-   */
+	 * @param {import('./types').TextField} field
+	 * @param {string} languageKey
+	 * @returns {import('./types').TextField}
+	 */
 	localizeTextField(field, languageKey) {
 		// string
 		if (typeof field === 'string') {

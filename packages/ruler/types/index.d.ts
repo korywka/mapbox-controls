@@ -1,4 +1,4 @@
-export default class RulerControl {
+export default class RulerControl implements IControl {
     constructor(options?: import("./types").ControlOptions);
     options: import("./types").ControlOptions;
     container: HTMLDivElement;
@@ -18,3 +18,4 @@ export default class RulerControl {
     map: import("mapbox-gl").Map | undefined;
     onRemove(): void;
 }
+import type { IControl } from './types';

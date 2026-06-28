@@ -23,6 +23,6 @@
 		"access": "public",
 		"registry": "https://registry.npmjs.org/"
 	},
-	"repository": "korywka/mapbox-gl-controls",
+	"repository": "korywka/mapbox-controls",
 	"license": "MIT"
 }

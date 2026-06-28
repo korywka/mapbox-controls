@@ -52,11 +52,11 @@ class TooltipControl {
 	};
 
 	/**
-	 * @param {import('mapbox-gl').Map} map
+	 * @param {any} map
 	 * @returns {HTMLElement}
 	 */
 	onAdd(map) {
-		this.map = map;
+		this.map = /** @type {import('mapbox-gl').Map} */ (map);
 		if (this.options.layer) {
 			this.map.on(this.eventShow, this.options.layer, this.show);
 			this.map.on('mousemove', this.options.layer, this.move);

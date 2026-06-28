@@ -86,11 +86,11 @@ export default class LanguageControl {
 	}
 
 	/**
-	 * @param {import('mapbox-gl').Map} map
+	 * @param {any} map
 	 * @returns {HTMLElement}
 	 */
 	onAdd(map) {
-		this.map = map;
+		this.map = /** @type {import('mapbox-gl').Map} */ (map);
 		this.map.on('styledata', this.styleChangeListener);
 		return this.container;
 	}

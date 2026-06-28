@@ -156,11 +156,11 @@
 		}
 
 		/**
-		 * @param {import('mapbox-gl').Map} map
+		 * @param {any} map
 		 * @returns {HTMLElement}
 		 */
 		onAdd(map) {
-			this.map = map;
+			this.map = /** @type {import('mapbox-gl').Map} */ (map);
 			if (!this.options.instant) {
 				this.container.hidden = true;
 			}
@@ -1660,11 +1660,11 @@
 		};
 
 		/**
-		 * @param {import('mapbox-gl').Map} map
+		 * @param {any} map
 		 * @returns {HTMLElement}
 		 */
 		onAdd(map) {
-			this.map = map;
+			this.map = /** @type {import('mapbox-gl').Map} */ (map);
 			this.container.appendChild(this.fileInput);
 			this.container.appendChild(this.buttonAdd);
 			if (this.buttonRemove) {
@@ -1888,11 +1888,11 @@
 		};
 
 		/**
-		 * @param {import('mapbox-gl').Map} map
+		 * @param {any} map
 		 * @returns {HTMLElement}
 		 */
 		onAdd(map) {
-			this.map = map;
+			this.map = /** @type {import('mapbox-gl').Map} */ (map);
 			this.container.appendChild(this.button);
 			return this.container;
 		}
@@ -1991,11 +1991,11 @@
 		}
 
 		/**
-		 * @param {import('mapbox-gl').Map} map
+		 * @param {any} map
 		 * @returns {HTMLElement}
 		 */
 		onAdd(map) {
-			this.map = map;
+			this.map = /** @type {import('mapbox-gl').Map} */ (map);
 			this.map.on('styledata', this.styleChangeListener);
 			return this.container;
 		}
@@ -2379,11 +2379,11 @@
 		}
 
 		/**
-		 * @param {import('mapbox-gl').Map} map
+		 * @param {any} map
 		 * @returns {HTMLElement}
 		 */
 		onAdd(map) {
-			this.map = map;
+			this.map = /** @type {import('mapbox-gl').Map} */ (map);
 			if (this.button) {
 				this.container.appendChild(this.button);
 			}
@@ -2523,11 +2523,11 @@
 		}
 
 		/**
-		 * @param {import('mapbox-gl').Map} map
+		 * @param {any} map
 		 * @returns {HTMLElement}
 		 */
 		onAdd(map) {
-			this.map = map;
+			this.map = /** @type {import('mapbox-gl').Map} */ (map);
 			if (this.options.compact) {
 				this.compact();
 			} else {
@@ -2595,11 +2595,11 @@
 		};
 
 		/**
-		 * @param {import('mapbox-gl').Map} map
+		 * @param {any} map
 		 * @returns {HTMLElement}
 		 */
 		onAdd(map) {
-			this.map = map;
+			this.map = /** @type {import('mapbox-gl').Map} */ (map);
 			if (this.options.layer) {
 				this.map.on(this.eventShow, this.options.layer, this.show);
 				this.map.on('mousemove', this.options.layer, this.move);
@@ -2672,11 +2672,11 @@
 		}
 
 		/**
-		 * @param {import('mapbox-gl').Map} map
+		 * @param {any} map
 		 * @returns {HTMLElement}
 		 */
 		onAdd(map) {
-			this.map = map;
+			this.map = /** @type {import('mapbox-gl').Map} */ (map);
 			this.container.appendChild(this.buttonIn);
 			this.container.appendChild(this.buttonOut);
 			return this.container;

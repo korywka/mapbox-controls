@@ -268,11 +268,11 @@ class ImageControl {
 	};
 
 	/**
-	 * @param {import('mapbox-gl').Map} map
+	 * @param {any} map
 	 * @returns {HTMLElement}
 	 */
 	onAdd(map) {
-		this.map = map;
+		this.map = /** @type {import('mapbox-gl').Map} */ (map);
 		this.container.appendChild(this.fileInput);
 		this.container.appendChild(this.buttonAdd);
 		if (this.buttonRemove) {

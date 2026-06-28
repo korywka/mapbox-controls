@@ -35,11 +35,11 @@ class CompassControl {
 	}
 
 	/**
-	 * @param {import('mapbox-gl').Map} map
+	 * @param {any} map
 	 * @returns {HTMLElement}
 	 */
 	onAdd(map) {
-		this.map = map;
+		this.map = /** @type {import('mapbox-gl').Map} */ (map);
 		if (!this.options.instant) {
 			this.container.hidden = true;
 		}

@@ -21,11 +21,11 @@ class ZoomControl {
 	}
 
 	/**
-	 * @param {import('mapbox-gl').Map} map
+	 * @param {any} map
 	 * @returns {HTMLElement}
 	 */
 	onAdd(map) {
-		this.map = map;
+		this.map = /** @type {import('mapbox-gl').Map} */ (map);
 		this.container.appendChild(this.buttonIn);
 		this.container.appendChild(this.buttonOut);
 		return this.container;

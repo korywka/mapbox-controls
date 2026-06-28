@@ -97,11 +97,11 @@ export default class InspectControl {
 	};
 
 	/**
-	 * @param {import('mapbox-gl').Map} map
+	 * @param {any} map
 	 * @returns {HTMLElement}
 	 */
 	onAdd(map) {
-		this.map = map;
+		this.map = /** @type {import('mapbox-gl').Map} */ (map);
 		this.container.appendChild(this.button);
 		return this.container;
 	}

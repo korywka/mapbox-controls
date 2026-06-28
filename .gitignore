@@ -1,6 +1,5 @@
-# nodejs
 node_modules/
-
-
-# osx
 .DS_Store
+
+# build output generated and published from CI
+packages/*/types/

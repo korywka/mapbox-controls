@@ -1,7 +1,7 @@
 import type { Map } from 'mapbox-gl';
+import type { ControlOptions, Style } from './types.js';
 import { Control, controlButton, isMapLibre } from '@mapbox-controls/helpers';
 import { icons } from './icons.js';
-import type { ControlOptions, Style } from './types.js';
 
 const defaults: Style[] = [
 	{

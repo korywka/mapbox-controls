@@ -1,0 +1,8 @@
+{
+  "languages": {
+    "TypeScript": {
+      "prettier": { "allowed": false },
+      "formatter": { "language_server": { "name": "oxfmt" } },
+    },
+  },
+}

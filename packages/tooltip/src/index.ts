@@ -1,6 +1,6 @@
 import type { LngLat, Map, MapEventType, MapMouseEvent } from 'mapbox-gl';
-import { Control } from '@mapbox-controls/helpers';
 import type { ControlOptions } from './types.js';
+import { Control } from '@mapbox-controls/helpers';
 
 class TooltipControl extends Control<Map> {
 	options: ControlOptions;

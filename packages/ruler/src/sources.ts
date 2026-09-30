@@ -1,6 +1,6 @@
-import distance from '@turf/distance';
 import type { Units } from '@turf/helpers';
 import type { Feature, FeatureCollection, LineString, Point } from 'geojson';
+import distance from '@turf/distance';
 
 function defaultLabelFormat(value: number) {
 	return value < 1 ? `${(value * 1000).toFixed()} m` : `${value.toFixed(2)} km`;

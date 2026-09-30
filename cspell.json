@@ -3,6 +3,7 @@
 		"mapgl",
 		"mapbox",
 		"oxlint",
+		"oxfmt",
 		"unproject",
 		"bbox",
 		"styledata",

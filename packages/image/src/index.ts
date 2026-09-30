@@ -1,13 +1,13 @@
 import type { GeoJSONSource, ImageSource, Map, MapMouseEvent } from 'mapbox-gl';
+import type { ControlOptions, RasterCoordinates } from './types.js';
 import { Control, controlButton } from '@mapbox-controls/helpers';
-import { icons } from './icons.js';
-import { Raster } from './raster.js';
-import { Move } from './modes/move.js';
-import { Scale } from './modes/scale.js';
-import { Rotate } from './modes/rotate.js';
 import { centerPosition } from './center-position.js';
 import { createFileInput, readFile, readUrl } from './file.js';
-import type { ControlOptions, RasterCoordinates } from './types.js';
+import { icons } from './icons.js';
+import { Move } from './modes/move.js';
+import { Rotate } from './modes/rotate.js';
+import { Scale } from './modes/scale.js';
+import { Raster } from './raster.js';
 
 class ImageControl extends Control<Map> {
 	fileInput: HTMLInputElement;

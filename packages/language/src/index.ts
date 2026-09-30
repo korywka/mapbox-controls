@@ -1,6 +1,6 @@
 import type { Map } from 'mapbox-gl';
-import { Control, isMapLibre } from '@mapbox-controls/helpers';
 import type { ControlOptions, TextField } from './types.js';
+import { Control, isMapLibre } from '@mapbox-controls/helpers';
 
 const languages = ['ar', 'de', 'en', 'es', 'fr', 'it', 'ja', 'ko', 'mul', 'pt', 'ru', 'vi', 'zh-Hans', 'zh-Hant'];
 

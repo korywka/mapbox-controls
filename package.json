@@ -1,27 +1,22 @@
 {
-	"name": "mapbox-gl-controls",
-	"private": true,
-	"type": "module",
-	"scripts": {
-		"build": "tsc -b",
-		"publish": "pnpm --recursive publish",
-		"lint": "oxlint --deny-warnings packages && prettier --check 'packages/*/src/**/*.ts'",
-		"format": "prettier --write 'packages/*/src/**/*.ts'"
-	},
-	"devDependencies": {
-		"oxlint": "1.86.0",
-		"prettier": "3.9.9",
-		"typescript": "7.0.2"
-	},
-	"devEngines": {
-		"packageManager": {
-			"name": "pnpm",
-			"version": "12.8.1"
-		}
-	},
-	"prettier": {
-		"printWidth": 120,
-		"useTabs": true,
-		"singleQuote": true
-	}
+  "name": "mapbox-gl-controls",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -b",
+    "publish": "pnpm --recursive publish",
+    "lint": "oxlint --deny-warnings packages && oxfmt --check 'packages/*/src/**/*.ts'",
+    "format": "oxfmt 'packages/*/src/**/*.ts'"
+  },
+  "devDependencies": {
+    "oxfmt": "0.71.0",
+    "oxlint": "1.86.0",
+    "typescript": "7.0.2"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "12.8.1"
+    }
+  }
 }

@@ -1,9 +1,9 @@
 import type { GeoJSONSource, Map, MapMouseEvent, MapTouchEvent } from 'mapbox-gl';
+import type { ControlOptions } from './types.js';
 import { Control, controlButton } from '@mapbox-controls/helpers';
 import { icons } from './icons.js';
 import { layers } from './layers.js';
 import { sources, toGeoJSONLine, toGeoJSONPoints } from './sources.js';
-import type { ControlOptions } from './types.js';
 
 export default class RulerControl extends Control<Map> {
 	options: ControlOptions;

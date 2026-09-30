@@ -50,7 +50,7 @@ function html(features: GeoJSONFeature[], current: number): string {
 export function popup(features: GeoJSONFeature[]): HTMLDivElement {
 	const node = document.createElement('div');
 	let current = 0;
-	node.classList.add('mapbox-ctrl-inspect-popup');
+	node.classList.add('mapgl-inspect-popup');
 
 	if (!features.length) {
 		node.textContent = 'No features';

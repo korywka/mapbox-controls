@@ -1,18 +1,16 @@
-import type { IControl, Map } from 'mapbox-gl';
+import type { Map } from 'mapbox-gl';
 import type { ControlOptions } from './types.js';
-import { controlContainer, controlButton } from '@mapbox-controls/helpers';
+import { Control, controlButton } from '@mapbox-controls/helpers';
 import { icons } from './icons.js';
 
-class CompassControl implements IControl {
+export class CompassControl extends Control<Map> {
 	options: ControlOptions;
-	container: HTMLDivElement;
 	icon: SVGElement;
 	button: HTMLButtonElement;
-	map: Map | undefined;
 
 	constructor(options: ControlOptions = {}) {
+		super('mapgl-compass');
 		this.options = { ...options };
-		this.container = controlContainer('mapbox-ctrl-compass');
 		this.icon = icons.compass();
 		this.button = controlButton({
 			title: 'Compass',
@@ -22,32 +20,28 @@ class CompassControl implements IControl {
 	}
 
 	onControlButtonClick() {
-		if (!this.map) throw Error('map is undefined');
 		this.map.easeTo({ bearing: 0, pitch: 0 });
 	}
 
-	onRotate() {
-		if (!this.map) throw Error('map is undefined');
+	onRotate = () => {
 		const angle = this.map.getBearing() * -1;
 		if (!this.options.instant) {
 			this.container.hidden = angle === 0;
 		}
 		this.icon.style.rotate = `${angle}deg`;
-	}
+	};
 
-	onAdd(map: unknown): HTMLElement {
-		this.map = map as Map;
+	protected mount() {
 		if (!this.options.instant) {
 			this.container.hidden = true;
 		}
 		this.container.appendChild(this.button);
 		this.onRotate();
-		this.map.on('rotate', () => this.onRotate());
-		return this.container;
+		this.map.on('rotate', this.onRotate);
 	}
 
-	onRemove() {
-		this.container.parentNode?.removeChild(this.container);
+	protected unmount() {
+		this.map.off('rotate', this.onRotate);
 	}
 }
 

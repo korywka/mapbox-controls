@@ -3,8 +3,9 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"start": "esbuild preview.ts --bundle --format=iife --outfile=preview.bundle.js --main-fields=source,browser,module,main --servedir=. --serve=localhost:8000 --watch",
-		"build": "esbuild preview.ts --bundle --format=iife --outfile=preview.bundle.js --main-fields=source,browser,module,main"
+		"start": "pnpm copy-worker && esbuild preview.ts --bundle --format=esm --outfile=preview.bundle.js --main-fields=source,browser,module,main --servedir=. --serve=localhost:8000 --watch",
+		"build": "pnpm copy-worker && esbuild preview.ts --bundle --format=esm --outfile=preview.bundle.js --main-fields=source,browser,module,main",
+		"copy-worker": "cp node_modules/maplibre-gl/dist/maplibre-gl-worker.mjs node_modules/maplibre-gl/dist/maplibre-gl-shared.mjs ."
 	},
 	"dependencies": {
 		"@mapbox-controls/compass": "workspace:*",
@@ -15,7 +16,8 @@
 		"@mapbox-controls/styles": "workspace:*",
 		"@mapbox-controls/tooltip": "workspace:*",
 		"@mapbox-controls/zoom": "workspace:*",
-		"mapbox-gl": "catalog:"
+		"mapbox-gl": "catalog:",
+		"maplibre-gl": "catalog:"
 	},
 	"devDependencies": {
 		"@types/geojson": "catalog:",

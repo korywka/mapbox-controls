@@ -1,10 +1,11 @@
 {
 	"name": "@mapbox-controls/inspect",
-	"version": "4.1.0",
+	"version": "5.0.0",
 	"description": "Debug map style layers and sources",
 	"type": "module",
 	"main": "./dist/index.js",
 	"source": "./src/index.ts",
+	"types": "./dist/index.d.ts",
 	"dependencies": {
 		"@mapbox-controls/helpers": "workspace:*"
 	},
@@ -12,10 +13,6 @@
 		"@types/geojson": "catalog:",
 		"mapbox-gl": "catalog:"
 	},
-	"peerDependencies": {
-		"mapbox-gl": ">=1.0.0 <4.0.0"
-	},
-	"types": "./dist/index.d.ts",
 	"files": [
 		"dist",
 		"src"

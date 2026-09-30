@@ -14,17 +14,19 @@ npm i @mapbox-controls/tooltip
 import TooltipControl from '@mapbox-controls/tooltip';
 import '@mapbox-controls/tooltip/src/index.css';
 
-map.addControl(new TooltipControl({
-  getContent: (event) => `${event.lngLat.lng.toFixed(6)}, ${event.lngLat.lat.toFixed(6)}`,
-  layer: 'some-layer-id',
-}));
+map.addControl(
+	new TooltipControl({
+		getContent: (event) => `${event.lngLat.lng.toFixed(6)}, ${event.lngLat.lat.toFixed(6)}`,
+		layer: 'some-layer-id',
+	}),
+);
 ```
 
 ## Options
 
 ```ts
 export type ControlOptions = {
-    getContent: (event: import("mapbox-gl").MapMouseEvent) => string;
-    layer?: string;
+	getContent: (event: MapMouseEvent) => string;
+	layer?: string;
 };
 ```

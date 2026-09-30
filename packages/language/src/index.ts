@@ -1,63 +1,57 @@
-import type { IControl, Map } from 'mapbox-gl';
+import type { Map } from 'mapbox-gl';
+import { Control, isMapLibre } from '@mapbox-controls/helpers';
 import type { ControlOptions, TextField } from './types.js';
 
-const defaults = {
-	supportedLanguages: ['ar', 'de', 'en', 'es', 'fr', 'it', 'ja', 'ko', 'mul', 'pt', 'ru', 'vi', 'zh-Hans', 'zh-Hant'],
-	getLanguageKey: (language: string) => (language === 'mul' ? 'name' : `name_${language}`),
-	excludedLayerIds: [] as string[],
-};
+const languages = ['ar', 'de', 'en', 'es', 'fr', 'it', 'ja', 'ko', 'mul', 'pt', 'ru', 'vi', 'zh-Hans', 'zh-Hant'];
 
-export default class LanguageControl implements IControl {
-	options: typeof defaults & ControlOptions;
-	container: HTMLDivElement;
-	map: Map | undefined;
+export default class LanguageControl extends Control<Map> {
+	options: ControlOptions;
 
 	constructor(options: ControlOptions = {}) {
-		this.options = { ...defaults, ...options };
-		this.container = document.createElement('div');
+		super();
+		this.options = { ...options };
 	}
 
 	styleChangeListener = () => {
-		if (!this.map) throw Error('map is undefined');
 		this.map.off('styledata', this.styleChangeListener);
 		this.setLanguage(this.options.language);
 	};
 
 	setLanguage(lang?: string) {
-		if (!this.map) throw Error('map is undefined');
 		let language = lang || this.browserLanguage();
-		if (this.options.supportedLanguages.indexOf(language) < 0) {
+		if (this.getSupportedLanguages().indexOf(language) < 0) {
 			language = 'mul';
 		}
 		const style = this.map.getStyle();
 		if (!style) return;
-		const languageKey = this.options.getLanguageKey(language);
-		const layers = style.layers.map((layer) => {
-			if (layer.type !== 'symbol') return layer;
-			if (!layer.layout || !layer.layout['text-field']) return layer;
-			if (this.options.excludedLayerIds.indexOf(layer.id) !== -1) return layer;
-
+		const languageKey = this.getLanguageKey(language);
+		style.layers.forEach((layer) => {
+			if (layer.type !== 'symbol') return;
+			if (!layer.layout || !layer.layout['text-field']) return;
+			if (this.options.excludedLayerIds?.includes(layer.id)) return;
 			const textField = layer.layout['text-field'];
 			const textFieldLocalized = this.localizeTextField(textField, languageKey);
-
-			return {
-				...layer,
-				layout: {
-					...layer.layout,
-					'text-field': textFieldLocalized,
-				},
-			};
+			this.map.setLayoutProperty(layer.id, 'text-field', textFieldLocalized);
 		});
+	}
 
-		this.map.setStyle({ ...style, layers });
+	getSupportedLanguages() {
+		return this.options.supportedLanguages ?? languages;
+	}
+
+	getLanguageKey(language: string) {
+		const defaultLanguageKey = (language: string) => {
+			if (language === 'mul') return 'name';
+			return isMapLibre(this.map) ? `name:${language}` : `name_${language}`;
+		};
+		return (this.options.getLanguageKey ?? defaultLanguageKey)(language);
 	}
 
 	browserLanguage() {
 		const language = navigator?.languages[0] ?? navigator.language;
 		const parts = language.split('-');
 		const languageCode = parts.length > 1 ? parts[0] : language;
-		if (this.options.supportedLanguages.indexOf(languageCode) > -1) return languageCode;
-
+		if (this.getSupportedLanguages().indexOf(languageCode) > -1) return languageCode;
 		return 'mul';
 	}
 
@@ -78,14 +72,11 @@ export default class LanguageControl implements IControl {
 		return JSON.parse(str.replace(/{name.*?}/g, `{${languageKey}}`));
 	}
 
-	onAdd(map: unknown): HTMLElement {
-		this.map = map as Map;
+	protected mount() {
 		this.map.on('styledata', this.styleChangeListener);
-		return this.container;
 	}
 
-	onRemove() {
-		this.map?.off('styledata', this.styleChangeListener);
-		this.container.parentNode?.removeChild(this.container);
+	protected unmount() {
+		this.map.off('styledata', this.styleChangeListener);
 	}
 }

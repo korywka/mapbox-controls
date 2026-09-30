@@ -35,7 +35,6 @@ export const layers: Layers = {
 		source: sources.points,
 		layout: {
 			'text-field': '{distance}',
-			'text-font': ['Roboto Medium'],
 			'text-anchor': 'top',
 			'text-size': 12,
 			'text-offset': [0, 0.8],

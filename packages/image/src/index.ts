@@ -1,5 +1,5 @@
-import type { GeoJSONSource, IControl, ImageSource, Map, MapMouseEvent } from 'mapbox-gl';
-import { controlButton, controlContainer } from '@mapbox-controls/helpers';
+import type { GeoJSONSource, ImageSource, Map, MapMouseEvent } from 'mapbox-gl';
+import { Control, controlButton } from '@mapbox-controls/helpers';
 import { icons } from './icons.js';
 import { Raster } from './raster.js';
 import { Move } from './modes/move.js';
@@ -9,8 +9,7 @@ import { centerPosition } from './center-position.js';
 import { createFileInput, readFile, readUrl } from './file.js';
 import type { ControlOptions, RasterCoordinates } from './types.js';
 
-class ImageControl implements IControl {
-	container: HTMLDivElement;
+class ImageControl extends Control<Map> {
 	fileInput: HTMLInputElement;
 	buttonAdd: HTMLButtonElement;
 	buttonMove: HTMLButtonElement;
@@ -20,15 +19,14 @@ class ImageControl implements IControl {
 	rasters: Record<string, Raster>;
 	currentRaster: Raster | null;
 	currentMode: Move | Scale | Rotate | null;
-	map: Map | undefined;
 
 	constructor(options: ControlOptions = {}) {
-		this.container = controlContainer('mapbox-ctrl-image');
+		super('mapgl-image');
 		this.fileInput = createFileInput();
 		this.buttonAdd = controlButton({
 			title: 'Add image',
 			icon: icons.image(),
-			className: 'mapbox-ctrl-image-add',
+			className: 'mapgl-image-add',
 			onClick: () => this.fileInput.click(),
 		});
 		this.buttonMove = controlButton({
@@ -75,7 +73,6 @@ class ImageControl implements IControl {
 	}
 
 	async addImage(image: HTMLImageElement, coordinates?: RasterCoordinates) {
-		if (!this.map) throw Error('map is undefined');
 		const position = coordinates ?? centerPosition(image, this.map);
 		const raster = new Raster(image, position);
 		this.addRaster(raster);
@@ -83,7 +80,6 @@ class ImageControl implements IControl {
 	}
 
 	addRaster(raster: Raster) {
-		if (!this.map) throw Error('map is undefined');
 		this.rasters[raster.id] = raster;
 		this.map.addSource(raster.rasterSource.id, raster.rasterSource.source);
 		this.map.addSource(raster.polygonSource.id, raster.polygonSource.source);
@@ -94,7 +90,6 @@ class ImageControl implements IControl {
 	}
 
 	removeRaster() {
-		if (!this.map) throw Error('map is undefined');
 		if (!this.currentRaster) throw Error('no raster is selected');
 		const rasterId = this.currentRaster.id;
 		const raster = this.rasters[rasterId];
@@ -109,7 +104,6 @@ class ImageControl implements IControl {
 	}
 
 	selectRaster(id: string) {
-		if (!this.map) throw Error('map is undefined');
 		this.deselectRaster();
 		const raster = this.rasters[id];
 		if (raster.locked) return;
@@ -126,7 +120,6 @@ class ImageControl implements IControl {
 	}
 
 	deselectRaster() {
-		if (!this.map) throw Error('map is undefined');
 		if (!this.currentRaster) return;
 		this.map.removeLayer(this.currentRaster.contourLayer.id);
 		this.map.fire('image.deselect', { id: this.currentRaster.id });
@@ -142,7 +135,6 @@ class ImageControl implements IControl {
 	}
 
 	setMode(mode: 'move' | 'scale' | 'rotate' | null) {
-		if (!this.map) throw Error('map is undefined');
 		if (!this.currentRaster) throw Error('no raster is selected');
 		if (this.currentMode) {
 			const currentId = this.currentMode.id;
@@ -179,7 +171,6 @@ class ImageControl implements IControl {
 	}
 
 	updateCoordinates(coordinates: RasterCoordinates) {
-		if (!this.map) throw Error('map is undefined');
 		if (!this.currentRaster) throw Error('no raster is selected');
 		const raster = this.currentRaster;
 		raster.coordinates = coordinates;
@@ -193,11 +184,10 @@ class ImageControl implements IControl {
 	}
 
 	onMapClick = (event: MapMouseEvent) => {
-		if (!this.map) throw Error('map is undefined');
 		const layersId = Object.values(this.rasters).map((i) => i.fillLayer.id);
 		// sometimes layers are removed from the map without destroying the control, e.g. style was changed
 		const errorLayerId = layersId.find((id) => {
-			return !this.map?.getLayer(id);
+			return !this.map.getLayer(id);
 		});
 		if (errorLayerId) {
 			return;
@@ -234,8 +224,7 @@ class ImageControl implements IControl {
 		}
 	};
 
-	onAdd(map: unknown): HTMLElement {
-		this.map = map as Map;
+	protected mount() {
 		this.container.appendChild(this.fileInput);
 		this.container.appendChild(this.buttonAdd);
 		if (this.buttonRemove) {
@@ -250,12 +239,10 @@ class ImageControl implements IControl {
 			await this.addFile(file);
 		});
 		this.map.on('click', this.onMapClick);
-		return this.container;
 	}
 
-	onRemove() {
-		this.map?.off('click', this.onMapClick);
-		this.container.parentNode?.removeChild(this.container);
+	protected unmount() {
+		this.map.off('click', this.onMapClick);
 	}
 }
 

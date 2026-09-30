@@ -1,5 +1,3 @@
-export type { IControl } from "mapbox-gl";
-
 export interface Style {
 	label: string;
 	styleName: string;

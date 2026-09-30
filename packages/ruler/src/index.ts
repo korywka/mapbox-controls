@@ -1,25 +1,25 @@
+import type { GeoJSONSource, IControl, Map, MapMouseEvent, MapTouchEvent } from 'mapbox-gl';
 import { controlContainer, controlButton } from '@mapbox-controls/helpers';
 import { icons } from './icons.js';
 import { layers } from './layers.js';
 import { sources, toGeoJSONLine, toGeoJSONPoints } from './sources.js';
+import type { ControlOptions } from './types.js';
 
-/**
- * @import { IControl } from './types'
- * @implements {IControl}
- */
-export default class RulerControl {
-	/**
-	 * @param {import('./types').ControlOptions} options
-	 */
-	constructor(options = {}) {
+export default class RulerControl implements IControl {
+	options: ControlOptions;
+	container: HTMLDivElement;
+	isActive: boolean;
+	coordinates: [number, number][];
+	button: HTMLButtonElement | null;
+	removeDragEvents: (() => void) | null;
+	map: Map | undefined;
+
+	constructor(options: ControlOptions = {}) {
 		this.options = options;
 		this.container = controlContainer('mapbox-ctrl-ruler');
 		this.isActive = false;
-		/** @type {[number, number][]} */
 		this.coordinates = [];
-		/** @type {HTMLButtonElement | null} */
 		this.button = null;
-		/** @type {(() => void) | null} */
 		this.removeDragEvents = null;
 		if (!this.options.invisible) {
 			this.button = controlButton({
@@ -100,7 +100,6 @@ export default class RulerControl {
 		this.draw();
 		map.on('click', this.mapClickListener);
 		map.on('style.load', this.draw);
-		// @ts-ignore
 		map.fire('ruler.on');
 		if (this.button) {
 			this.button.classList.add('-active');
@@ -119,25 +118,21 @@ export default class RulerControl {
 		this.map.removeSource(sources.points);
 		this.map.off('click', this.mapClickListener);
 		this.map.off('style.load', this.draw);
-		// @ts-ignore
 		this.map.fire('ruler.off');
 		if (this.button) {
 			this.button.classList.remove('-active');
 		}
 	}
 
-	/**
-	 * @param {import('mapbox-gl').MapMouseEvent} event
-	 */
-	mapClickListener = (event) => {
+	mapClickListener = (event: MapMouseEvent) => {
 		if (!this.map) throw Error('map is undefined');
 		this.addCoordinate([event.lngLat.lng, event.lngLat.lat]);
 	};
 
 	/**
-	 * @param {[number, number]} coordinate - [lng, lat] of new point
+	 * @param coordinate - [lng, lat] of new point
 	 */
-	addCoordinate(coordinate) {
+	addCoordinate(coordinate: [number, number]) {
 		if (!this.map) throw Error('map is undefined');
 		if (!this.isActive) throw Error('ruler is not active');
 		this.coordinates.push(coordinate);
@@ -146,10 +141,9 @@ export default class RulerControl {
 
 	updateSource() {
 		if (!this.map) throw Error('map is undefined');
-		// @ts-ignore
 		this.map.fire('ruler.change', { coordinates: this.coordinates });
-		const lineSource = /** @type {import('mapbox-gl').GeoJSONSource} */(this.map.getSource(sources.line));
-		const pointsSource = /** @type {import('mapbox-gl').GeoJSONSource} */(this.map.getSource(sources.points));
+		const lineSource = this.map.getSource(sources.line) as GeoJSONSource;
+		const pointsSource = this.map.getSource(sources.points) as GeoJSONSource;
 		const geoJSONLine = toGeoJSONLine(this.coordinates);
 		const geoJSONPoints = toGeoJSONPoints(this.coordinates, {
 			units: this.options.units,
@@ -160,16 +154,10 @@ export default class RulerControl {
 	}
 
 	addDragEvents() {
-		/** @typedef {import('mapbox-gl').MapMouseEvent} MapMouseEvent */
-		/** @typedef {import('mapbox-gl').MapTouchEvent} MapTouchEvent */
-		/** @typedef {import('mapbox-gl').MapMouseEvent} MapLayerMouseEvent */
-		/** @typedef {import('mapbox-gl').MapTouchEvent} MapLayerTouchEvent */
 		if (!this.map) throw Error('map is undefined');
-		const self = this;
 		const map = this.map;
 		const canvas = map.getCanvas();
-		/** @type {number} */
-		let markerIndex;
+		let markerIndex: number;
 
 		function onMouseEnter() {
 			canvas.style.cursor = 'move';
@@ -179,8 +167,7 @@ export default class RulerControl {
 			canvas.style.cursor = '';
 		}
 
-		/** @param {MapLayerMouseEvent | MapLayerTouchEvent} event */
-		function onStart(event) {
+		function onStart(event: MapMouseEvent | MapTouchEvent) {
 			// do not block multi-touch actions
 			if (event.type === 'touchstart' && event.points.length !== 1) {
 				return;
@@ -198,13 +185,12 @@ export default class RulerControl {
 			map.on('touchend', onEnd);
 		}
 
-		/** @param {MapMouseEvent | MapTouchEvent} event */
-		function onMove(event) {
+		const onMove = (event: MapMouseEvent | MapTouchEvent) => {
 			const coords = event.lngLat;
 			canvas.style.cursor = 'grabbing';
-			self.coordinates[markerIndex] = [coords.lng, coords.lat];
-			self.updateSource();
-		}
+			this.coordinates[markerIndex] = [coords.lng, coords.lat];
+			this.updateSource();
+		};
 
 		function onEnd() {
 			// mouse events
@@ -236,12 +222,8 @@ export default class RulerControl {
 		};
 	}
 
-	/**
-	 * @param {any} map
-	 * @returns {HTMLElement}
-	 */
-	onAdd(map) {
-		this.map = /** @type {import('mapbox-gl').Map} */ (map);
+	onAdd(map: unknown): HTMLElement {
+		this.map = map as Map;
 		if (this.button) {
 			this.container.appendChild(this.button);
 		}

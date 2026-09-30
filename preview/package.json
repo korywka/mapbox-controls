@@ -1,12 +1,10 @@
 {
 	"name": "preview",
-	"private": "true",
+	"private": true,
 	"type": "module",
 	"scripts": {
-		"start": "concurrently \"npm:serve\" \"npm:watch\"",
-		"serve": "serve .",
-		"build": "rollup -c",
-		"watch": "rollup -c -w"
+		"start": "esbuild preview.ts --bundle --format=iife --outfile=preview.bundle.js --main-fields=source,browser,module,main --servedir=. --serve=localhost:8000 --watch",
+		"build": "esbuild preview.ts --bundle --format=iife --outfile=preview.bundle.js --main-fields=source,browser,module,main"
 	},
 	"dependencies": {
 		"@mapbox-controls/compass": "workspace:*",
@@ -20,12 +18,7 @@
 		"mapbox-gl": "catalog:"
 	},
 	"devDependencies": {
-		"@rollup/plugin-commonjs": "29.0.3",
-		"@rollup/plugin-node-resolve": "16.0.3",
-		"concurrently": "10.0.3",
-		"rollup": "4.62.2",
-		"rollup-plugin-import-css": "4.2.1",
-		"rollup-plugin-polyfill-node": "0.13.0",
-		"serve": "14.2.6"
+		"@types/geojson": "catalog:",
+		"esbuild": "0.28.2"
 	}
 }

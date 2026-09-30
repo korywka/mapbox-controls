@@ -6,11 +6,7 @@ export function createFileInput() {
 	return node;
 }
 
-/**
- * @param {File} file
- * @returns {Promise<HTMLImageElement>}
- */
-export function readFile(file) {
+export function readFile(file: File): Promise<HTMLImageElement> {
 	return new Promise((resolve, reject) => {
 		const url = URL.createObjectURL(file);
 		const node = document.createElement('img');
@@ -22,17 +18,13 @@ export function readFile(file) {
 	});
 }
 
-/**
- * @param {string} url
- * @return {Promise<HTMLImageElement>}
- */
-export function readUrl(url) {
-	return new Promise(((resolve, reject) => {
+export function readUrl(url: string): Promise<HTMLImageElement> {
+	return new Promise((resolve, reject) => {
 		const node = document.createElement('img');
 		node.onload = () => {
 			resolve(node);
 		};
 		node.onerror = reject;
 		node.src = url;
-	}));
+	});
 }

@@ -1,32 +1,33 @@
+import type { IControl, Map } from 'mapbox-gl';
 import { controlButton, controlContainer } from '@mapbox-controls/helpers';
 import { icons } from './icons.js';
+import type { ControlOptions, Style } from './types.js';
 
-const defaults = [
+const defaults: Style[] = [
 	{
 		label: 'Standard',
 		styleName: 'Mapbox Standard',
 		styleUrl: 'mapbox://styles/mapbox/standard',
-	}, {
+	},
+	{
 		label: 'Satellite',
 		styleName: 'Mapbox Satellite Streets',
 		styleUrl: 'mapbox://styles/mapbox/satellite-streets-v12',
 	},
 ];
 
-/**
- * @import { IControl } from './types'
- * @implements {IControl}
- */
-export default class StylesControl {
-	/** @param {import('./types').ControlOptions} options */
-	constructor(options = {}) {
+export default class StylesControl implements IControl {
+	options: ControlOptions & { styles: Style[] };
+	container: HTMLDivElement;
+	map: Map | undefined;
+
+	constructor(options: ControlOptions = {}) {
 		this.options = { styles: defaults, ...options };
 		this.container = controlContainer('mapbox-ctrl-styles');
 		this.container.classList.add(options.compact ? 'mapbox-ctrl-styles-compact' : 'mapbox-ctrl-styles-expanded');
 	}
 
-	/** @param {string} name */
-	findStyle(name) {
+	findStyle(name: string) {
 		const style = this.options.styles.find((s) => s.styleName === name);
 		if (!style) throw Error(`can't find style with name ${name}`);
 		return style;
@@ -34,13 +35,11 @@ export default class StylesControl {
 
 	getCurrentStyleName() {
 		if (!this.map) throw Error('map is undefined');
-		/** @type {string} */
-		let name;
-		/** @type {any} mapbox standard style doesn't return JSON Style object */
+		let name: string | undefined;
 		const style = this.map.getStyle();
 		if (Array.isArray(style.imports) && style.imports.length) {
 			// mapbox standard style
-			name = style.imports[0].data.name;
+			name = style.imports[0].data?.name;
 		} else {
 			// classic style
 			name = style.name;
@@ -51,8 +50,7 @@ export default class StylesControl {
 
 	expanded() {
 		if (!this.map) throw Error('map is undefined');
-		/** @type HTMLButtonElement[] */
-		const buttons = [];
+		const buttons: HTMLButtonElement[] = [];
 		this.options.styles.forEach((style) => {
 			const button = controlButton({
 				title: style.label,
@@ -109,12 +107,8 @@ export default class StylesControl {
 		});
 	}
 
-	/**
-	 * @param {any} map
-	 * @returns {HTMLElement}
-	 */
-	onAdd(map) {
-		this.map = /** @type {import('mapbox-gl').Map} */ (map);
+	onAdd(map: unknown): HTMLElement {
+		this.map = map as Map;
 		if (this.options.compact) {
 			this.compact();
 		} else {

@@ -1,3 +1,14 @@
 {
-	"words": ["mapbox"]
+	"words": [
+		"mapbox",
+		"oxlint",
+		"tsgolint",
+		"oxfmt",
+		"unproject",
+		"bbox",
+		"styledata",
+		"servedir",
+		"esbuild",
+		"nodenext"
+	]
 }

@@ -1,18 +1,23 @@
-/**
- * @import { IControl } from './types'
- * @implements {IControl}
- */
-class TooltipControl {
-	/** @param {import('./types').ControlOptions} options */
-	constructor(options) {
+import type { IControl, LngLat, Map, MapEventType, MapMouseEvent } from 'mapbox-gl';
+import type { ControlOptions } from './types.js';
+
+class TooltipControl implements IControl {
+	options: ControlOptions;
+	container: HTMLDivElement;
+	eventShow: MapEventType;
+	eventHide: MapEventType;
+	node: HTMLDivElement;
+	lngLat: LngLat | undefined;
+	cursorStyle: string;
+	map: Map | undefined;
+
+	constructor(options: ControlOptions) {
 		if (typeof options.getContent !== 'function') {
 			throw Error('getContent function must be defined');
 		}
 		this.options = { ...options };
 		this.container = document.createElement('div');
-		/** @type {import('mapbox-gl').MapEventType} */
 		this.eventShow = this.options.layer ? 'mouseenter' : 'mouseover';
-		/** @type {import('mapbox-gl').MapEventType} */
 		this.eventHide = this.options.layer ? 'mouseleave' : 'mouseout';
 		this.node = document.createElement('div');
 		this.node.classList.add('mapbox-ctrl-tooltip');
@@ -36,8 +41,7 @@ class TooltipControl {
 		this.map.off('move', this.updatePosition);
 	};
 
-	/** @param {import('mapbox-gl').MapMouseEvent} event */
-	move = (event) => {
+	move = (event: MapMouseEvent) => {
 		this.node.innerHTML = this.options.getContent(event);
 		this.lngLat = event.lngLat;
 		this.updatePosition();
@@ -51,12 +55,8 @@ class TooltipControl {
 		this.node.style.top = `${pos.y}px`;
 	};
 
-	/**
-	 * @param {any} map
-	 * @returns {HTMLElement}
-	 */
-	onAdd(map) {
-		this.map = /** @type {import('mapbox-gl').Map} */ (map);
+	onAdd(map: unknown): HTMLElement {
+		this.map = map as Map;
 		if (this.options.layer) {
 			this.map.on(this.eventShow, this.options.layer, this.show);
 			this.map.on('mousemove', this.options.layer, this.move);

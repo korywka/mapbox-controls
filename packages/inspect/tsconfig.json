@@ -1,3 +1,11 @@
 {
 	"extends": "../../tsconfig.shared.json",
+	"compilerOptions": {
+		"types": ["geojson"],
+	},
+	"references": [
+		{
+			"path": "../helpers",
+		},
+	],
 }

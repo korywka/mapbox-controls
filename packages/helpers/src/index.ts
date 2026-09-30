@@ -1,25 +1,26 @@
 /**
- * Create mapbox control container
- * @param {string} className
+ * Create control container
  */
-export function controlContainer(className) {
+export function controlContainer(className: string) {
 	const container = document.createElement('div');
 	container.classList.add('mapboxgl-ctrl', 'mapboxgl-ctrl-group', className);
 	return container;
 }
 
+export interface ControlButtonOptions {
+	title?: string;
+	icon?: Node;
+	textContent?: string;
+	disabled?: boolean;
+	hidden?: boolean;
+	className?: string;
+	onClick?: () => void;
+}
+
 /**
- * Create mapbox control button
- * @param {Object} options
- * @param {string=} options.title
- * @param {Node=} options.icon
- * @param {string=} options.textContent
- * @param {boolean=} options.disabled
- * @param {boolean=} options.hidden
- * @param {string=} options.className
- * @param {() => void=} options.onClick
+ * Create control button
  */
-export function controlButton(options = {}) {
+export function controlButton(options: ControlButtonOptions = {}) {
 	const button = document.createElement('button');
 	button.type = 'button';
 	if (options.title) {
@@ -51,8 +52,7 @@ export function controlButton(options = {}) {
 
 /**
  * Create SVG element from string code
- * @param {string} string
  */
-export function parseSVG(string) {
-	return /** @type SVGElement */ ((new DOMParser().parseFromString(string, 'image/svg+xml')).firstChild);
+export function parseSVG(string: string) {
+	return new DOMParser().parseFromString(string, 'image/svg+xml').firstChild as SVGElement;
 }

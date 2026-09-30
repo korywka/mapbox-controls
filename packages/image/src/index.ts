@@ -1,3 +1,4 @@
+import type { GeoJSONSource, IControl, ImageSource, Map, MapMouseEvent } from 'mapbox-gl';
 import { controlButton, controlContainer } from '@mapbox-controls/helpers';
 import { icons } from './icons.js';
 import { Raster } from './raster.js';
@@ -6,14 +7,22 @@ import { Scale } from './modes/scale.js';
 import { Rotate } from './modes/rotate.js';
 import { centerPosition } from './center-position.js';
 import { createFileInput, readFile, readUrl } from './file.js';
+import type { ControlOptions, RasterCoordinates } from './types.js';
 
-/**
- * @import { IControl } from './types'
- * @implements {IControl}
- */
-class ImageControl {
-	/** @param {import('./types').ControlOptions} options */
-	constructor(options = {}) {
+class ImageControl implements IControl {
+	container: HTMLDivElement;
+	fileInput: HTMLInputElement;
+	buttonAdd: HTMLButtonElement;
+	buttonMove: HTMLButtonElement;
+	buttonScale: HTMLButtonElement;
+	buttonRotate: HTMLButtonElement;
+	buttonRemove: HTMLButtonElement | undefined;
+	rasters: Record<string, Raster>;
+	currentRaster: Raster | null;
+	currentMode: Move | Scale | Rotate | null;
+	map: Map | undefined;
+
+	constructor(options: ControlOptions = {}) {
 		this.container = controlContainer('mapbox-ctrl-image');
 		this.fileInput = createFileInput();
 		this.buttonAdd = controlButton({
@@ -48,39 +57,24 @@ class ImageControl {
 				onClick: () => this.removeRaster(),
 			});
 		}
-		/** @type {Record<string, Raster>} */
 		this.rasters = {};
-		/** @type {Raster | null} */
 		this.currentRaster = null;
-		/** @type {Move | Scale | Rotate | null} */
 		this.currentMode = null;
 	}
 
-	/**
-	 * @param {File} file
-	 * @param {import('./types').RasterCoordinates=} coordinates
-	 */
-	async addFile(file, coordinates) {
+	async addFile(file: File, coordinates?: RasterCoordinates) {
 		const image = await readFile(file);
 		const id = this.addImage(image, coordinates);
 		return id;
 	}
 
-	/**
-	 * @param {string} url
-	 * @param {import('./types').RasterCoordinates=} coordinates
-	 */
-	async addUrl(url, coordinates) {
+	async addUrl(url: string, coordinates?: RasterCoordinates) {
 		const image = await readUrl(url);
 		const id = this.addImage(image, coordinates);
 		return id;
 	}
 
-	/**
-	 * @param {HTMLImageElement} image
-	 * @param {import('./types').RasterCoordinates=} coordinates
-	 */
-	async addImage(image, coordinates) {
+	async addImage(image: HTMLImageElement, coordinates?: RasterCoordinates) {
 		if (!this.map) throw Error('map is undefined');
 		const position = coordinates ?? centerPosition(image, this.map);
 		const raster = new Raster(image, position);
@@ -88,10 +82,7 @@ class ImageControl {
 		return raster.id;
 	}
 
-	/**
-	 * @param {Raster} raster
-	 */
-	addRaster(raster) {
+	addRaster(raster: Raster) {
 		if (!this.map) throw Error('map is undefined');
 		this.rasters[raster.id] = raster;
 		this.map.addSource(raster.rasterSource.id, raster.rasterSource.source);
@@ -99,7 +90,6 @@ class ImageControl {
 		this.map.addSource(raster.pointsSource.id, raster.pointsSource.source);
 		this.map.addLayer(raster.rasterLayer);
 		this.map.addLayer(raster.fillLayer);
-		// @ts-ignore
 		this.map.fire('image.add', { id: raster.id });
 	}
 
@@ -115,14 +105,10 @@ class ImageControl {
 		this.map.removeSource(raster.rasterSource.id);
 		this.map.removeSource(raster.polygonSource.id);
 		this.map.removeSource(raster.pointsSource.id);
-		// @ts-ignore
 		this.map.fire('image.remove', { id: raster.id });
 	}
 
-	/**
-	 * @param {string} id
-	 */
-	selectRaster(id) {
+	selectRaster(id: string) {
 		if (!this.map) throw Error('map is undefined');
 		this.deselectRaster();
 		const raster = this.rasters[id];
@@ -136,7 +122,6 @@ class ImageControl {
 			this.buttonAdd.hidden = true;
 			this.buttonRemove.hidden = false;
 		}
-		// @ts-ignore
 		this.map.fire('image.select', { id: this.currentRaster.id });
 	}
 
@@ -144,7 +129,6 @@ class ImageControl {
 		if (!this.map) throw Error('map is undefined');
 		if (!this.currentRaster) return;
 		this.map.removeLayer(this.currentRaster.contourLayer.id);
-		// @ts-ignore
 		this.map.fire('image.deselect', { id: this.currentRaster.id });
 		this.setMode(null);
 		this.currentRaster = null;
@@ -157,10 +141,7 @@ class ImageControl {
 		}
 	}
 
-	/**
-	 * @param {'move' | 'scale' | 'rotate' | null} mode
-	 */
-	setMode(mode) {
+	setMode(mode: 'move' | 'scale' | 'rotate' | null) {
 		if (!this.map) throw Error('map is undefined');
 		if (!this.currentRaster) throw Error('no raster is selected');
 		if (this.currentMode) {
@@ -170,7 +151,6 @@ class ImageControl {
 			this.buttonRotate.classList.remove('-active');
 			this.currentMode.destroy();
 			this.currentMode = null;
-			// @ts-ignore
 			this.map.fire('image.mode', { mode: this.currentMode });
 			// click on active button just deactivates current mode
 			if (currentId === mode) return;
@@ -194,35 +174,25 @@ class ImageControl {
 			});
 		}
 		if (this.currentMode) {
-			// @ts-ignore
 			this.map.fire('image.mode', { mode: this.currentMode.id });
 		}
 	}
 
-	/**
-	 * @typedef {import('mapbox-gl').ImageSource} ImageSource
-	 * @typedef {import('mapbox-gl').GeoJSONSource} GeoJSONSource
-	 * @param {import('./types').RasterCoordinates} coordinates
-	 */
-	updateCoordinates(coordinates) {
+	updateCoordinates(coordinates: RasterCoordinates) {
 		if (!this.map) throw Error('map is undefined');
 		if (!this.currentRaster) throw Error('no raster is selected');
 		const raster = this.currentRaster;
 		raster.coordinates = coordinates;
-		const rasterSource = /** @type {ImageSource} */ (this.map.getSource(raster.rasterSource.id));
-		const polygonSource = /** @type {GeoJSONSource} */ (this.map.getSource(raster.polygonSource.id));
-		const pointsSource = /** @type {GeoJSONSource} */ (this.map.getSource(raster.pointsSource.id));
+		const rasterSource = this.map.getSource(raster.rasterSource.id) as ImageSource;
+		const polygonSource = this.map.getSource(raster.polygonSource.id) as GeoJSONSource;
+		const pointsSource = this.map.getSource(raster.pointsSource.id) as GeoJSONSource;
 		rasterSource.setCoordinates(raster.coordinates);
 		polygonSource.setData(raster.polygonSource.source.data);
 		pointsSource.setData(raster.pointsSource.source.data);
-		// @ts-ignore
 		this.map.fire('image.update', { coordinates });
 	}
 
-	/**
-	 * @param {import('mapbox-gl').MapMouseEvent} event
-	 */
-	onMapClick = (event) => {
+	onMapClick = (event: MapMouseEvent) => {
 		if (!this.map) throw Error('map is undefined');
 		const layersId = Object.values(this.rasters).map((i) => i.fillLayer.id);
 		// sometimes layers are removed from the map without destroying the control, e.g. style was changed
@@ -234,8 +204,7 @@ class ImageControl {
 		}
 		const features = this.map.queryRenderedFeatures(event.point, { layers: layersId });
 		if (features[0]) {
-			/** @type {string} */
-			const id = features[0].properties?.id;
+			const id: string = features[0].properties?.id;
 			if (!id) throw Error('id property is undefined');
 			this.selectRaster(id);
 			return;
@@ -247,8 +216,10 @@ class ImageControl {
 				padding = this.currentRaster.knobsLayer.paint['circle-radius'] * 2;
 			}
 			const { x, y } = event.point;
-			/** @type {[[number, number], [number, number]]} */
-			const bbox = [[x - padding, y - padding], [x + padding, y + padding]];
+			const bbox: [[number, number], [number, number]] = [
+				[x - padding, y - padding],
+				[x + padding, y + padding],
+			];
 			const features = this.map.queryRenderedFeatures(bbox, { layers: layersId });
 			if (!features.length) {
 				this.deselectRaster();
@@ -256,23 +227,15 @@ class ImageControl {
 		}
 	};
 
-	/**
-	 * @param {string} id
-	 * @param {boolean} isLocked
-	 */
-	setLock = (id, isLocked) => {
+	setLock = (id: string, isLocked: boolean) => {
 		this.rasters[id].locked = isLocked;
 		if (this.currentRaster?.id === id && isLocked) {
 			this.deselectRaster();
 		}
 	};
 
-	/**
-	 * @param {any} map
-	 * @returns {HTMLElement}
-	 */
-	onAdd(map) {
-		this.map = /** @type {import('mapbox-gl').Map} */ (map);
+	onAdd(map: unknown): HTMLElement {
+		this.map = map as Map;
 		this.container.appendChild(this.fileInput);
 		this.container.appendChild(this.buttonAdd);
 		if (this.buttonRemove) {

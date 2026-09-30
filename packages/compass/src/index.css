@@ -1,14 +1,14 @@
 .mapbox-ctrl-compass {
-	transition: .2s opacity;
-}
+	transition: 0.2s opacity;
 
-.mapbox-ctrl-compass[hidden] {
-	display: block;
-	opacity: 0;
-}
+	&[hidden] {
+		display: block;
+		opacity: 0;
+	}
 
-.mapbox-ctrl-compass button {
-	display: flex;
-	align-items: center;
-	justify-content: center;
+	button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
 }

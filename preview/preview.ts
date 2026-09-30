@@ -1,3 +1,4 @@
+import type { Feature, Polygon } from 'geojson';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 /** CompassControl */
@@ -24,7 +25,7 @@ import '@mapbox-controls/tooltip/src/index.css';
 import ZoomControl from '@mapbox-controls/zoom';
 import '@mapbox-controls/zoom/src/index.css';
 
-const polygon = {
+const polygon: Feature<Polygon> = {
 	id: 1234567890,
 	type: 'Feature',
 	properties: {},
@@ -87,22 +88,10 @@ map.addControl(new CompassControl({ instant: true }), 'bottom-right');
 (async function () {
 	await map.once('style.load');
 	await image.addUrl('https://korywka.github.io/mapbox-controls/preview/plan.jpg', [
-		[
-			30.622053488641882,
-			50.43926060648866,
-		],
-		[
-			30.627144888757584,
-			50.43197654403531,
-		],
-		[
-			30.617797873099676,
-			50.429326551923964,
-		],
-		[
-			30.612705668630156,
-			50.436610940291615,
-		],
+		[30.622053488641882, 50.43926060648866],
+		[30.627144888757584, 50.43197654403531],
+		[30.617797873099676, 50.429326551923964],
+		[30.612705668630156, 50.436610940291615],
 	]);
 
 	map.on('image.select', ({ id }) => {
@@ -113,10 +102,10 @@ map.addControl(new CompassControl({ instant: true }), 'bottom-right');
 		range.style.transform = 'translateX(-50%)';
 		range.style.bottom = '16px';
 		range.type = 'range';
-		range.min = 0;
-		range.step = 0.05;
-		range.max = 1;
-		range.value = map.getPaintProperty(rasterLayerId, 'raster-opacity');
+		range.min = '0';
+		range.step = '0.05';
+		range.max = '1';
+		range.value = String(map.getPaintProperty(rasterLayerId, 'raster-opacity'));
 		range.addEventListener('input', () => {
 			map.setPaintProperty(rasterLayerId, 'raster-opacity', Number(range.value));
 		});
@@ -127,18 +116,21 @@ map.addControl(new CompassControl({ instant: true }), 'bottom-right');
 	});
 })();
 
-map.addControl(new TooltipControl({
-	layer: 'polygon-fill',
-	getContent: (event) => {
-		console.log('Tooltip for feature id:', event.features?.at(0).id);
-		return `TooltipControl example ${event.lngLat.lng.toFixed(6)}, ${event.lngLat.lat.toFixed(6)}`;
-	},
-}));
+map.addControl(
+	new TooltipControl({
+		layer: 'polygon-fill',
+		getContent: (event) => {
+			console.log('Tooltip for feature id:', event.features?.at(0)?.id);
+			return `TooltipControl example ${event.lngLat.lng.toFixed(6)}, ${event.lngLat.lat.toFixed(6)}`;
+		},
+	}),
+);
 
 const languageControl = new LanguageControl();
 map.addControl(languageControl);
-document.getElementById('languages').addEventListener('change', (event) => {
-	languageControl.setLanguage(event.target.value);
+const languages = document.getElementById('languages') as HTMLSelectElement;
+languages.addEventListener('change', () => {
+	languageControl.setLanguage(languages.value);
 });
 
 map.addControl(new StylesControl(), 'top-left');

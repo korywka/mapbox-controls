@@ -1,16 +1,18 @@
+import type { IControl, Map } from 'mapbox-gl';
+import type { ControlOptions, TextField } from './types.js';
+
 const defaults = {
 	supportedLanguages: ['ar', 'de', 'en', 'es', 'fr', 'it', 'ja', 'ko', 'mul', 'pt', 'ru', 'vi', 'zh-Hans', 'zh-Hant'],
-	getLanguageKey: (/** @type {string} */ language) => (language === 'mul' ? 'name' : `name_${language}`),
-	excludedLayerIds: [],
+	getLanguageKey: (language: string) => (language === 'mul' ? 'name' : `name_${language}`),
+	excludedLayerIds: [] as string[],
 };
 
-/**
- * @import { IControl } from './types'
- * @implements {IControl}
- */
-export default class LanguageControl {
-	/** @param {import('./types').ControlOptions} options */
-	constructor(options = {}) {
+export default class LanguageControl implements IControl {
+	options: typeof defaults & ControlOptions;
+	container: HTMLDivElement;
+	map: Map | undefined;
+
+	constructor(options: ControlOptions = {}) {
 		this.options = { ...defaults, ...options };
 		this.container = document.createElement('div');
 	}
@@ -21,8 +23,7 @@ export default class LanguageControl {
 		this.setLanguage(this.options.language);
 	};
 
-	/** @param {string=} lang */
-	setLanguage(lang) {
+	setLanguage(lang?: string) {
 		if (!this.map) throw Error('map is undefined');
 		let language = lang || this.browserLanguage();
 		if (this.options.supportedLanguages.indexOf(language) < 0) {
@@ -60,12 +61,7 @@ export default class LanguageControl {
 		return 'mul';
 	}
 
-	/**
-	 * @param {import('./types').TextField} field
-	 * @param {string} languageKey
-	 * @returns {import('./types').TextField}
-	 */
-	localizeTextField(field, languageKey) {
+	localizeTextField(field: TextField, languageKey: string): TextField {
 		// string
 		if (typeof field === 'string') {
 			return field.replace(/{name.*?}/, `{${languageKey}}`);
@@ -75,22 +71,15 @@ export default class LanguageControl {
 
 		// expression
 		if (Array.isArray(field)) {
-			return JSON.parse(str.replace(
-				/"coalesce",\["get","name.*?"]/g,
-				`"coalesce",["get","${languageKey}"]`,
-			));
+			return JSON.parse(str.replace(/"coalesce",\["get","name.*?"]/g, `"coalesce",["get","${languageKey}"]`));
 		}
 
 		// style function
 		return JSON.parse(str.replace(/{name.*?}/g, `{${languageKey}}`));
 	}
 
-	/**
-	 * @param {any} map
-	 * @returns {HTMLElement}
-	 */
-	onAdd(map) {
-		this.map = /** @type {import('mapbox-gl').Map} */ (map);
+	onAdd(map: unknown): HTMLElement {
+		this.map = map as Map;
 		this.map.on('styledata', this.styleChangeListener);
 		return this.container;
 	}

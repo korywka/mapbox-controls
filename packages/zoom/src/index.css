@@ -1,6 +1,8 @@
-.mapbox-ctrl-zoom button {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	color: #333;
+.mapbox-ctrl-zoom {
+	button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: #333;
+	}
 }

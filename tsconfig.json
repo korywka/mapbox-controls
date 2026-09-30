@@ -1,0 +1,14 @@
+{
+  "files": [],
+  "references": [
+    { "path": "packages/helpers" },
+    { "path": "packages/compass" },
+    { "path": "packages/image" },
+    { "path": "packages/inspect" },
+    { "path": "packages/language" },
+    { "path": "packages/ruler" },
+    { "path": "packages/styles" },
+    { "path": "packages/tooltip" },
+    { "path": "packages/zoom" },
+  ],
+}

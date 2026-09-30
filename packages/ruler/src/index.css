@@ -1,10 +1,12 @@
-.mapbox-ctrl-ruler button {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	color: #333;
-}
+.mapbox-ctrl-ruler {
+	button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: #333;
 
-.mapbox-ctrl-ruler button.-active {
-	color: #4264fb;
+		&.-active {
+			color: #4264fb;
+		}
+	}
 }

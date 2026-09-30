@@ -9,8 +9,8 @@
 	white-space: nowrap;
 	/* show tooltip over control buttons which z-index is 2 */
 	z-index: 3;
-}
 
-.mapbox-ctrl-tooltip:empty {
-	display: none;
+	&:empty {
+		display: none;
+	}
 }

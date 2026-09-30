@@ -24,3 +24,6 @@ jobs:
 
       - name: Run linter
         run: pnpm lint
+
+      - name: Build
+        run: pnpm build

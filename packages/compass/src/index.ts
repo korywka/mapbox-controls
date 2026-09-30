@@ -1,15 +1,16 @@
+import type { IControl, Map } from 'mapbox-gl';
+import type { ControlOptions } from './types.js';
 import { controlContainer, controlButton } from '@mapbox-controls/helpers';
 import { icons } from './icons.js';
 
-/**
- * @import { IControl } from './types'
- * @implements {IControl}
- */
-class CompassControl {
-	/**
-	 * @param {import('./types').ControlOptions} options
-	 */
-	constructor(options = {}) {
+class CompassControl implements IControl {
+	options: ControlOptions;
+	container: HTMLDivElement;
+	icon: SVGElement;
+	button: HTMLButtonElement;
+	map: Map | undefined;
+
+	constructor(options: ControlOptions = {}) {
 		this.options = { ...options };
 		this.container = controlContainer('mapbox-ctrl-compass');
 		this.icon = icons.compass();
@@ -34,12 +35,8 @@ class CompassControl {
 		this.icon.style.rotate = `${angle}deg`;
 	}
 
-	/**
-	 * @param {any} map
-	 * @returns {HTMLElement}
-	 */
-	onAdd(map) {
-		this.map = /** @type {import('mapbox-gl').Map} */ (map);
+	onAdd(map: unknown): HTMLElement {
+		this.map = map as Map;
 		if (!this.options.instant) {
 			this.container.hidden = true;
 		}

@@ -1,11 +1,22 @@
+import type { Feature, FeatureCollection, Point, Polygon } from 'geojson';
+import type {
+	CircleLayerSpecification,
+	FillLayerSpecification,
+	ImageSourceSpecification,
+	LineLayerSpecification,
+	RasterLayerSpecification,
+} from 'mapbox-gl';
+import type { RasterCoordinates } from './types.js';
 import { featureCollection, polygon, point } from '@turf/helpers';
 
 export class Raster {
-	/**
-	 * @param {HTMLImageElement} image
-	 * @param {import('./types').RasterCoordinates} coordinates
-	 */
-	constructor(image, coordinates) {
+	src: string;
+	width: number;
+	height: number;
+	coordinates: RasterCoordinates;
+	locked: boolean;
+
+	constructor(image: HTMLImageElement, coordinates: RasterCoordinates) {
 		this.src = image.src;
 		this.width = image.width;
 		this.height = image.height;
@@ -19,13 +30,7 @@ export class Raster {
 		return id;
 	}
 
-	/**
-	 * @type {{
-	 * 	id: string,
-	 * 	source: import('mapbox-gl').ImageSourceSpecification
-	 * }}
-	 */
-	get rasterSource() {
+	get rasterSource(): { id: string; source: ImageSourceSpecification } {
 		return {
 			id: `$raster:${this.id}`,
 			source: {
@@ -36,16 +41,7 @@ export class Raster {
 		};
 	}
 
-	/**
-	 * @type {{
-	 * 	id: string,
-	 * 	source: {
-	 * 		type: 'geojson',
-	 * 		data: import('geojson').Feature<import('geojson').Polygon>
-	 * 	}
-	 * }}
-	 */
-	get polygonSource() {
+	get polygonSource(): { id: string; source: { type: 'geojson'; data: Feature<Polygon> } } {
 		const feature = polygon([[...this.coordinates, this.coordinates[0]]], { id: this.id });
 		return {
 			id: `$polygon:${this.id}`,
@@ -56,16 +52,7 @@ export class Raster {
 		};
 	}
 
-	/**
-	 * @type {{
-	 * 	id: string,
-	 * 	source: {
-	 * 		type: 'geojson',
-	 * 		data: import('geojson').FeatureCollection<import('geojson').Point>
-	 * 	}
-	 * }}
-	 */
-	get pointsSource() {
+	get pointsSource(): { id: string; source: { type: 'geojson'; data: FeatureCollection<Point> } } {
 		const features = this.coordinates.map((coordinate, index) => point(coordinate, { index }));
 		return {
 			id: `$points:${this.id}`,
@@ -76,8 +63,7 @@ export class Raster {
 		};
 	}
 
-	/** @type {import('mapbox-gl').RasterLayerSpecification} */
-	get rasterLayer() {
+	get rasterLayer(): RasterLayerSpecification {
 		return {
 			id: `$raster:${this.id}`,
 			type: 'raster',
@@ -89,8 +75,7 @@ export class Raster {
 		};
 	}
 
-	/** @type {import('mapbox-gl').FillLayerSpecification} */
-	get fillLayer() {
+	get fillLayer(): FillLayerSpecification {
 		return {
 			id: `$fill:${this.id}`,
 			type: 'fill',
@@ -101,8 +86,7 @@ export class Raster {
 		};
 	}
 
-	/** @type {import('mapbox-gl').LineLayerSpecification} */
-	get contourLayer() {
+	get contourLayer(): LineLayerSpecification {
 		return {
 			id: `$contour:${this.id}`,
 			type: 'line',
@@ -114,17 +98,12 @@ export class Raster {
 			paint: {
 				'line-dasharray': [0.2, 2],
 				'line-color': 'rgb(61, 90, 254)',
-				'line-width': [
-					'interpolate', ['linear'], ['zoom'],
-					12, 1,
-					14, 2,
-				],
+				'line-width': ['interpolate', ['linear'], ['zoom'], 12, 1, 14, 2],
 			},
 		};
 	}
 
-	/** @type {import('mapbox-gl').CircleLayerSpecification} */
-	get knobsLayer() {
+	get knobsLayer(): CircleLayerSpecification {
 		return {
 			id: `$knobs:${this.id}`,
 			type: 'circle',

@@ -1,5 +1,4 @@
 node_modules/
 .DS_Store
-
-# build output generated and published from CI
-packages/*/types/
+packages/*/dist/
+*.tsbuildinfo

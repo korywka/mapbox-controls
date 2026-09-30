@@ -1,15 +1,13 @@
+import type { CircleLayerSpecification, LineLayerSpecification, SymbolLayerSpecification } from 'mapbox-gl';
 import { sources } from './sources.js';
 
-/**
- * @typedef {{
- *  line: import('mapbox-gl').LineLayerSpecification
- *  markers: import('mapbox-gl').CircleLayerSpecification
- *  labels: import('mapbox-gl').SymbolLayerSpecification
- * }} Layers
- */
+export interface Layers {
+	line: LineLayerSpecification;
+	markers: CircleLayerSpecification;
+	labels: SymbolLayerSpecification;
+}
 
-/** @type {Layers} */
-export const layers = {
+export const layers: Layers = {
 	line: {
 		id: 'mapbox-control-ruler-line',
 		type: 'line',

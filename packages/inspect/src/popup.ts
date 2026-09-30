@@ -1,15 +1,12 @@
-/**
- * @param {import('mapbox-gl').GeoJSONFeature[]} features
- * @param {number} current
- * @returns {string}
- */
-function html(features, current) {
+import type { GeoJSONFeature, LayerSpecification } from 'mapbox-gl';
+
+function html(features: GeoJSONFeature[], current: number): string {
 	const feature = features[current];
 	const withProperties = feature.properties && Object.keys(feature.properties).length;
 	const properties = feature.properties || {};
-	const layer = /** @type {import('mapbox-gl').LayerSpecification} */ (feature.layer);
+	const layer = feature.layer as LayerSpecification;
 
-	return (`
+	return `
     <header>
       ${features.length > 1 ? '<button data-prev>←</button>' : ''}
       <nav>
@@ -18,12 +15,7 @@ function html(features, current) {
       ${features.length > 1 ? '<button data-next>→</button>' : ''}
     </header>
     <table>
-      ${feature.id ? (`
-        <tr>
-          <th>$id</th>
-          <td>${feature.id}</td>
-        </tr>  
-      `) : ''}
+      ${feature.id ? `<tr><th>$id</th><td>${feature.id}</td></tr>` : ''}
       <tr>
         <td colspan="2">layer</td>
       </tr>
@@ -43,26 +35,19 @@ function html(features, current) {
         <th>source-layer</th>
         <td>${layer['source-layer'] ?? '-'}</td>
       </tr>
-      ${withProperties ? (`
-        <tr>
-          <td colspan="2">properties</td>
-        </tr>
-      `) : ''}
-      ${withProperties ? Object.entries(properties).map(([key, value]) => (`
-        <tr>
-          <th>${key}</th>
-          <td>${value}</td>
-        </tr>  
-      `)).join('') : ''}
+      ${withProperties ? '<tr><td colspan="2">properties</td></tr>' : ''}
+      ${
+				withProperties
+					? Object.entries(properties)
+							.map(([key, value]) => `<tr><th>${key}</th><td>${value}</td></tr>`)
+							.join('')
+					: ''
+			}
     </table>
-  `);
+  `;
 }
 
-/**
- * @param {import('mapbox-gl').GeoJSONFeature[]} features
- * @returns {HTMLDivElement}
- */
-export function popup(features) {
+export function popup(features: GeoJSONFeature[]): HTMLDivElement {
 	const node = document.createElement('div');
 	let current = 0;
 	node.classList.add('mapbox-ctrl-inspect-popup');
@@ -75,7 +60,7 @@ export function popup(features) {
 	node.innerHTML = html(features, current);
 
 	node.addEventListener('click', (event) => {
-		const target = /** @type {HTMLElement} */(event.target);
+		const target = event.target as HTMLElement;
 		if (target.matches('[data-prev]')) {
 			const isFirst = current === 0;
 			current = isFirst ? features.length - 1 : current - 1;

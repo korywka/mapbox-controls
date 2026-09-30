@@ -3,20 +3,25 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"lint": "eslint packages",
+		"build": "tsc -b",
 		"publish": "pnpm --recursive publish",
-		"build": "pnpm --recursive build"
+		"lint": "oxlint --deny-warnings packages && prettier --check 'packages/*/src/**/*.ts'",
+		"format": "prettier --write 'packages/*/src/**/*.ts'"
 	},
 	"devDependencies": {
-		"@eslint/js": "10.0.1",
-		"eslint": "10.6.0",
-		"globals": "17.7.0",
-		"typescript": "6.0.3"
+		"oxlint": "1.86.0",
+		"prettier": "3.9.9",
+		"typescript": "7.0.2"
 	},
 	"devEngines": {
 		"packageManager": {
 			"name": "pnpm",
-			"version": ">=11.0.0"
+			"version": "12.8.1"
 		}
+	},
+	"prettier": {
+		"printWidth": 120,
+		"useTabs": true,
+		"singleQuote": true
 	}
 }

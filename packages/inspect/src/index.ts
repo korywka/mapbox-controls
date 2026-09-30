@@ -1,14 +1,19 @@
+import type { GeoJSONFeature, IControl, LngLat, Map, MapMouseEvent, Point } from 'mapbox-gl';
+import type { ControlOptions } from './types.js';
 import { controlButton, controlContainer } from '@mapbox-controls/helpers';
 import { icons } from './icons.js';
 import { popup } from './popup.js';
 
-/**
- * @import { IControl } from './types'
- * @implements {IControl}
- */
-export default class InspectControl {
-	/** @param {import('./types').ControlOptions} options */
-	constructor(options = {}) {
+export default class InspectControl implements IControl {
+	options: ControlOptions;
+	container: HTMLDivElement;
+	button: HTMLButtonElement;
+	isActive: boolean;
+	detailsNode: HTMLDivElement | undefined;
+	lngLat: LngLat | undefined;
+	map: Map | undefined;
+
+	constructor(options: ControlOptions = {}) {
 		this.options = { ...options };
 		this.container = controlContainer('mapbox-ctrl-inspect');
 		this.button = controlButton({
@@ -46,13 +51,11 @@ export default class InspectControl {
 		this.hideDetails();
 	}
 
-	/** @param {import('mapbox-gl').Point} point */
-	getPointFeatures(point) {
+	getPointFeatures(point: Point) {
 		if (!this.map) throw Error('map is undefined');
 		const selectThreshold = 3;
 
-		/** @type {[[number, number], [number, number]]} */
-		const queryBox = [
+		const queryBox: [[number, number], [number, number]] = [
 			[point.x - selectThreshold, point.y + selectThreshold], // bottom left (SW)
 			[point.x + selectThreshold, point.y - selectThreshold], // top right (NE)
 		];
@@ -60,8 +63,7 @@ export default class InspectControl {
 		return this.map.queryRenderedFeatures(queryBox);
 	}
 
-	/** @param {import('mapbox-gl').GeoJSONFeature[]} features */
-	showDetails(features) {
+	showDetails(features: GeoJSONFeature[]) {
 		if (!this.map) throw Error('map is undefined');
 		this.detailsNode = popup(features);
 		this.map.getContainer().appendChild(this.detailsNode);
@@ -88,20 +90,15 @@ export default class InspectControl {
 		this.detailsNode.style.top = `${pos.y - canvasRect.top}px`;
 	};
 
-	/** @param {import('mapbox-gl').MapMouseEvent} event */
-	mapClickListener = (event) => {
+	mapClickListener = (event: MapMouseEvent) => {
 		this.lngLat = event.lngLat;
 		const features = this.getPointFeatures(event.point);
 		this.hideDetails();
 		this.showDetails(features);
 	};
 
-	/**
-	 * @param {any} map
-	 * @returns {HTMLElement}
-	 */
-	onAdd(map) {
-		this.map = /** @type {import('mapbox-gl').Map} */ (map);
+	onAdd(map: unknown): HTMLElement {
+		this.map = map as Map;
 		this.container.appendChild(this.button);
 		return this.container;
 	}

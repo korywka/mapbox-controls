@@ -1,10 +1,9 @@
 import distance from '@turf/distance';
+import type { Units } from '@turf/helpers';
+import type { Feature, FeatureCollection, LineString, Point } from 'geojson';
 
-/** @param {number} value */
-function defaultLabelFormat(value) {
-	return value < 1
-		? `${(value * 1000).toFixed()} m`
-		: `${value.toFixed(2)} km`;
+function defaultLabelFormat(value: number) {
+	return value < 1 ? `${(value * 1000).toFixed()} m` : `${value.toFixed(2)} km`;
 }
 
 export const sources = {
@@ -12,11 +11,7 @@ export const sources = {
 	points: 'mapbox-control-ruler-points',
 };
 
-/**
- * @param {[number, number][]} coordinates
- * @returns {import('geojson').Feature<import('geojson').LineString>}
- */
-export function toGeoJSONLine(coordinates) {
+export function toGeoJSONLine(coordinates: [number, number][]): Feature<LineString> {
 	return {
 		type: 'Feature',
 		properties: {},
@@ -27,15 +22,10 @@ export function toGeoJSONLine(coordinates) {
 	};
 }
 
-/**
- * @param {[number, number][]} coordinates
- * @param {{
- *  units?: import('@turf/helpers').Units,
- *  labelFormat?: (v: number) => string
- * }} options
- * @returns {import('geojson').FeatureCollection<import('geojson').Point>}
- */
-export function toGeoJSONPoints(coordinates, options = {}) {
+export function toGeoJSONPoints(
+	coordinates: [number, number][],
+	options: { units?: Units; labelFormat?: (v: number) => string } = {},
+): FeatureCollection<Point> {
 	const labelFormat = options.labelFormat ?? defaultLabelFormat;
 	const units = options.units ?? 'kilometers';
 	let sum = 0;

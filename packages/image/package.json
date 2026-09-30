@@ -3,20 +3,18 @@
 	"version": "4.1.0",
 	"description": "Move, scale and rotate image on a map",
 	"type": "module",
-	"main": "./src/index.js",
-	"scripts": {
-		"build": "tsc && cp src/*.d.ts types/"
-	},
+	"main": "./dist/index.js",
+	"source": "./src/index.ts",
 	"dependencies": {
 		"@mapbox-controls/helpers": "workspace:*",
-		"@turf/bearing": "7.1.0",
-		"@turf/centroid": "7.1.0",
-		"@turf/helpers": "7.1.0",
-		"@turf/rhumb-bearing": "7.1.0",
-		"@turf/rhumb-distance": "7.1.0",
-		"@turf/transform-rotate": "7.1.0",
-		"@turf/transform-scale": "7.1.0",
-		"@turf/transform-translate": "7.1.0"
+		"@turf/bearing": "catalog:",
+		"@turf/centroid": "catalog:",
+		"@turf/helpers": "catalog:",
+		"@turf/rhumb-bearing": "catalog:",
+		"@turf/rhumb-distance": "catalog:",
+		"@turf/transform-rotate": "catalog:",
+		"@turf/transform-scale": "catalog:",
+		"@turf/transform-translate": "catalog:"
 	},
 	"devDependencies": {
 		"@types/geojson": "catalog:",
@@ -25,10 +23,10 @@
 	"peerDependencies": {
 		"mapbox-gl": ">=1.0.0 <4.0.0"
 	},
-	"types": "./types/index.d.ts",
+	"types": "./dist/index.d.ts",
 	"files": [
-		"src",
-		"types"
+		"dist",
+		"src"
 	],
 	"publishConfig": {
 		"access": "public",

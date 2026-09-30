@@ -3,14 +3,12 @@
 	"version": "4.1.0",
 	"description": "Measure distance between points on a map",
 	"type": "module",
-	"main": "./src/index.js",
-	"scripts": {
-		"build": "tsc && cp src/*.d.ts types/"
-	},
+	"main": "./dist/index.js",
+	"source": "./src/index.ts",
 	"dependencies": {
 		"@mapbox-controls/helpers": "workspace:*",
-		"@turf/distance": "7.1.0",
-		"@turf/helpers": "7.1.0"
+		"@turf/distance": "catalog:",
+		"@turf/helpers": "catalog:"
 	},
 	"devDependencies": {
 		"@types/geojson": "catalog:",
@@ -19,10 +17,10 @@
 	"peerDependencies": {
 		"mapbox-gl": ">=1.0.0 <4.0.0"
 	},
-	"types": "./types/index.d.ts",
+	"types": "./dist/index.d.ts",
 	"files": [
-		"src",
-		"types"
+		"dist",
+		"src"
 	],
 	"publishConfig": {
 		"access": "public",

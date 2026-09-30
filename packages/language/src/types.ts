@@ -1,6 +1,4 @@
-import type { DataDrivenPropertyValueSpecification, ExpressionSpecification } from "mapbox-gl";
-
-export type { IControl } from "mapbox-gl";
+import type { DataDrivenPropertyValueSpecification, ExpressionSpecification } from 'mapbox-gl';
 
 export interface ControlOptions {
 	supportedLanguages?: string[];

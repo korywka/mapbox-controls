@@ -1,9 +1,7 @@
-/**
- * @param {HTMLImageElement} image
- * @param {import('mapbox-gl').Map} map
- * @param {number} padding
- */
-export function centerPosition(image, map, padding = 20) {
+import type { Map } from 'mapbox-gl';
+import type { RasterCoordinates } from './types.js';
+
+export function centerPosition(image: HTMLImageElement, map: Map, padding = 20): RasterCoordinates {
 	const canvas = map.getCanvas();
 	const canvasWidth = canvas.offsetWidth;
 	const canvasHeight = canvas.offsetHeight;
@@ -12,8 +10,7 @@ export function centerPosition(image, map, padding = 20) {
 	const ratio = Math.min(maxWidth / image.width, maxHeight / image.height);
 	const scaleWidth = image.width * ratio;
 	const scaleHeight = image.height * ratio;
-	/** @type {import('./types').RasterCoordinates} */
-	const position = [
+	const position: RasterCoordinates = [
 		[(canvasWidth - scaleWidth) / 2, (canvasHeight - scaleHeight) / 2], // left top
 		[(canvasWidth + scaleWidth) / 2, (canvasHeight - scaleHeight) / 2], // right top
 		[(canvasWidth + scaleWidth) / 2, (canvasHeight + scaleHeight) / 2], // right bottom
@@ -25,11 +22,10 @@ export function centerPosition(image, map, padding = 20) {
 	 */
 	map.setPitch(0);
 
-	return /** @type {import('./types').RasterCoordinates} */ ([
+	return [
 		map.unproject(position[0]).toArray(),
 		map.unproject(position[1]).toArray(),
 		map.unproject(position[2]).toArray(),
 		map.unproject(position[3]).toArray(),
-	]);
+	];
 }
-

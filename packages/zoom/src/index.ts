@@ -1,11 +1,13 @@
+import type { IControl, Map } from 'mapbox-gl';
 import { controlButton, controlContainer } from '@mapbox-controls/helpers';
 import { icons } from './icons.js';
 
-/**
- * @import { IControl } from './types'
- * @implements {IControl}
- */
-class ZoomControl {
+class ZoomControl implements IControl {
+	container: HTMLDivElement;
+	buttonIn: HTMLButtonElement;
+	buttonOut: HTMLButtonElement;
+	map: Map | undefined;
+
 	constructor() {
 		this.container = controlContainer('mapbox-ctrl-zoom');
 		this.buttonIn = controlButton({
@@ -20,12 +22,8 @@ class ZoomControl {
 		});
 	}
 
-	/**
-	 * @param {any} map
-	 * @returns {HTMLElement}
-	 */
-	onAdd(map) {
-		this.map = /** @type {import('mapbox-gl').Map} */ (map);
+	onAdd(map: unknown): HTMLElement {
+		this.map = map as Map;
 		this.container.appendChild(this.buttonIn);
 		this.container.appendChild(this.buttonOut);
 		return this.container;

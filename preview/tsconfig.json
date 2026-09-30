@@ -1,0 +1,13 @@
+{
+	"compilerOptions": {
+		"target": "es2022",
+		"module": "preserve",
+		"strict": true,
+		"noEmit": true,
+		"skipLibCheck": true,
+		"paths": {
+			"@mapbox-controls/*": ["../packages/*/src/index.ts"],
+		},
+	},
+	"include": ["*.ts"],
+}

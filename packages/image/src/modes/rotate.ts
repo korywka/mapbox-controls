@@ -1,21 +1,23 @@
+import type { Map, MapMouseEvent } from 'mapbox-gl';
+import type { Raster } from '../raster.js';
+import type { RasterCoordinates } from '../types.js';
 import bearing from '@turf/bearing';
 import centroid from '@turf/centroid';
 import { bearingToAzimuth } from '@turf/helpers';
 import transformRotate from '@turf/transform-rotate';
 
 export class Rotate {
-	/**
-   * @param {import('mapbox-gl').Map} map
-   * @param {import('../raster').Raster} raster
-   * @param {(coordinates: import('../types').RasterCoordinates) => void} onUpdate
-   */
-	constructor(map, raster, onUpdate) {
+	map: Map;
+	raster: Raster;
+	onUpdate: (coordinates: RasterCoordinates) => void;
+	centroid: [number, number] | null;
+	startPoint: [number, number] | null;
+
+	constructor(map: Map, raster: Raster, onUpdate: (coordinates: RasterCoordinates) => void) {
 		this.map = map;
 		this.raster = raster;
 		this.onUpdate = onUpdate;
-		/** @type { [number, number] | null } */
 		this.centroid = null;
-		/** @type { [number, number] | null } */
 		this.startPoint = null;
 		this.map.addLayer(this.raster.knobsLayer);
 		this.map.on('mouseenter', this.raster.knobsLayer.id, this.onPointerEnter);
@@ -35,26 +37,19 @@ export class Rotate {
 		this.map.getCanvas().style.cursor = '';
 	};
 
-	/**
-   * @param {import('mapbox-gl').MapMouseEvent} event
-   */
-	onPointerDown = (event) => {
+	onPointerDown = (event: MapMouseEvent) => {
 		event.preventDefault();
 		const geojson = this.raster.polygonSource.source.data;
-		this.centroid = /** @type {[number, number]} */ (centroid(geojson).geometry.coordinates);
+		this.centroid = centroid(geojson).geometry.coordinates as [number, number];
 		this.startPoint = [event.lngLat.lng, event.lngLat.lat];
 		this.map.on('mousemove', this.onPointerMove);
 		document.addEventListener('pointerup', this.onPointerUp, { once: true });
 	};
 
-	/**
-	 * @param {import('mapbox-gl').MapMouseEvent} event
-	 */
-	onPointerMove = (event) => {
+	onPointerMove = (event: MapMouseEvent) => {
 		if (!this.centroid) throw Error('centroid is undefined');
 		if (!this.startPoint) throw Error('previous position is undefined');
-		/** @type {[number, number]} */
-		const currentPosition = [event.lngLat.lng, event.lngLat.lat];
+		const currentPosition: [number, number] = [event.lngLat.lng, event.lngLat.lat];
 		const azimuthA = bearingToAzimuth(bearing(this.startPoint, this.centroid));
 		const azimuthB = bearingToAzimuth(bearing(currentPosition, this.centroid));
 		const delta = azimuthB - azimuthA;
@@ -62,7 +57,7 @@ export class Rotate {
 		const transformed = transformRotate(geojson, delta);
 		const transformedCoordinates = transformed.geometry.coordinates[0];
 		// remove closing 5th coordinate from polygon
-		const position = /** @type {import('../types').RasterCoordinates} */ (transformedCoordinates.slice(0, 4));
+		const position = transformedCoordinates.slice(0, 4) as RasterCoordinates;
 		this.onUpdate(position);
 		this.startPoint = currentPosition;
 	};

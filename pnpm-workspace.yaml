@@ -1,7 +1,35 @@
 packages:
-  - "packages/*"
-  - "preview"
+  - 'packages/*'
+  - 'preview'
+
+allowBuilds:
+  esbuild: true
 
 catalog:
-  "mapbox-gl": 3.25.0
-  "@types/geojson": 7946.0.14
+  'mapbox-gl': 3.32.0
+  '@types/geojson': 7946.0.14
+  '@turf/bearing': &turf 7.4.0
+  '@turf/centroid': *turf
+  '@turf/distance': *turf
+  '@turf/helpers': *turf
+  '@turf/rhumb-bearing': *turf
+  '@turf/rhumb-distance': *turf
+  '@turf/transform-rotate': *turf
+  '@turf/transform-scale': *turf
+  '@turf/transform-translate': *turf
+
+versioning:
+  ignore:
+    - preview
+  fixed:
+    - [
+        '@mapbox-controls/compass',
+        '@mapbox-controls/helpers',
+        '@mapbox-controls/image',
+        '@mapbox-controls/inspect',
+        '@mapbox-controls/language',
+        '@mapbox-controls/ruler',
+        '@mapbox-controls/styles',
+        '@mapbox-controls/tooltip',
+        '@mapbox-controls/zoom',
+      ]

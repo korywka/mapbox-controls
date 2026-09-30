@@ -1,17 +1,19 @@
+import type { Map, MapMouseEvent } from 'mapbox-gl';
+import type { Raster } from '../raster.js';
+import type { RasterCoordinates } from '../types.js';
 import rhumbDistance from '@turf/rhumb-distance';
 import transformScale from '@turf/transform-scale';
 
 export class Scale {
-	/**
-	 * @param {import('mapbox-gl').Map} map
-	 * @param {import('../raster').Raster} raster
-	 * @param {(coordinates: import('../types').RasterCoordinates) => void} onUpdate
-	 */
-	constructor(map, raster, onUpdate) {
+	map: Map;
+	raster: Raster;
+	onUpdate: (coordinates: RasterCoordinates) => void;
+	knobIndex: number | null;
+
+	constructor(map: Map, raster: Raster, onUpdate: (coordinates: RasterCoordinates) => void) {
 		this.map = map;
 		this.raster = raster;
 		this.onUpdate = onUpdate;
-		/** @type { number | null } */
 		this.knobIndex = null;
 		this.map.addLayer(this.raster.knobsLayer);
 		this.map.on('mouseenter', this.raster.knobsLayer.id, this.onPointerEnter);
@@ -23,10 +25,7 @@ export class Scale {
 		return 'scale';
 	}
 
-	/**
-   * @param {import('mapbox-gl').MapMouseEvent} event
-   */
-	onPointerEnter = (event) => {
+	onPointerEnter = (event: MapMouseEvent) => {
 		if (!event.features) return;
 		this.map.getCanvas().style.cursor = 'pointer';
 	};
@@ -35,10 +34,7 @@ export class Scale {
 		this.map.getCanvas().style.cursor = '';
 	};
 
-	/**
-   * @param {import('mapbox-gl').MapMouseEvent} event
-   */
-	onPointerDown = (event) => {
+	onPointerDown = (event: MapMouseEvent) => {
 		event.preventDefault();
 		if (!event.features) return;
 		this.map.getCanvas().style.cursor = 'grabbing';
@@ -47,10 +43,7 @@ export class Scale {
 		document.addEventListener('pointerup', this.onPointerUp, { once: true });
 	};
 
-	/**
-   * @param {import('mapbox-gl').MapMouseEvent} event
-   */
-	onPointerMove = (event) => {
+	onPointerMove = (event: MapMouseEvent) => {
 		if (typeof this.knobIndex !== 'number') throw Error('knob index is undefined');
 		const index0 = (this.knobIndex + 2) % 4;
 		const point0 = this.raster.coordinates[index0];
@@ -63,7 +56,7 @@ export class Scale {
 		const transformed = transformScale(geojson, scale, { origin: point0 });
 		const transformedCoordinates = transformed.geometry.coordinates[0];
 		// remove closing 5th coordinate from polygon
-		const position = /** @type {import('../types').RasterCoordinates} */ (transformedCoordinates.slice(0, 4));
+		const position = transformedCoordinates.slice(0, 4) as RasterCoordinates;
 		this.onUpdate(position);
 	};
 
@@ -81,4 +74,3 @@ export class Scale {
 		document.removeEventListener('pointerup', this.onPointerUp);
 	}
 }
-

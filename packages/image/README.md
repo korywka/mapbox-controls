@@ -40,21 +40,21 @@ export type ControlOptions = {
 
 ## Methods
 
-Methods are useful for programmatic control (when option `invisible` is `true`):
+Methods are useful for programmatic control:
 
 - `addFile(file: File, coordinates?: [number, number][] | undefined): Promise<string>;` - add new image by file. raster id is returned
 - `addUrl(url: string, coordinates?: [number, number][] | undefined): Promise<string>;` - add new image by url. raster id is returned
 - `setLock: (id: string, isLocked: boolean) => void;` - lock or unlock image. locked image can't be selected
 - `removeRaster: () => void;` - removes selected raster from the map
 
-If image was added without `coordinates` parameter, the image is scaled down to be fully visible and placed at the center of the viewport.
+If image was added without `RasterCoordinates` parameter, the image is scaled down to be fully visible and placed at the center of the viewport.
 
 Other methods may help to use this control without buttons, these methods are described in type definitions `.d.ts`.
 
 ## Change paint properties
 
 Paint properties can be changed dynamically.
-Below is an example how to control image opacity by slider (full implementation is available in [preview](/preview/preview.js)).
+Below is an example how to control image opacity by slider (full implementation is available in [preview](/preview/preview.ts)).
 
 ```js
 map.on('image.select', ({ id }) => {

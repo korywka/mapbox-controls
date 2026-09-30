@@ -38,10 +38,11 @@ export type ControlOptions = {
 
 ## Events
 
-| event     | description       |
-| --------- | ----------------- |
-| ruler.on  | ruler activated   |
-| ruler.off | ruler deactivated |
+| event         | description       |
+| ------------- | ----------------- |
+| ruler.on      | ruler activated   |
+| ruler.off     | ruler deactivated |
+| ruler.changed | ruler changed     |
 
 ## Methods
 

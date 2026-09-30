@@ -14,18 +14,23 @@ npm i @mapbox-controls/styles
 import StylesControl from '@mapbox-controls/styles';
 import '@mapbox-controls/styles/src/index.css';
 
-map.addControl(new StylesControl(styles: [
-  {
-    label: 'Streets',
-    styleName: 'Mapbox Streets',
-    styleUrl: 'mapbox://styles/mapbox/streets-v12',
-  },
-  {
-    label: 'Satellite',
-    styleName: 'Mapbox Satellite Streets',
-    styleUrl: 'mapbox://styles/mapbox/satellite-streets-v12',
-  },
-]), 'top-left');
+map.addControl(
+	new StylesControl({
+		styles: [
+			{
+				label: 'Streets',
+				styleName: 'Mapbox Streets',
+				styleUrl: 'mapbox://styles/mapbox/streets-v12',
+			},
+			{
+				label: 'Satellite',
+				styleName: 'Mapbox Satellite Streets',
+				styleUrl: 'mapbox://styles/mapbox/satellite-streets-v12',
+			},
+		],
+	}),
+	'top-left',
+);
 
 // or with compact view and default styles (streets and satellite)
 map.addControl(new StylesControl({ compact: true }), 'top-left');

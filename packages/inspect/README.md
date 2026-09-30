@@ -23,6 +23,6 @@ map.addControl(new InspectControl(), 'bottom-right');
 
 ```ts
 export type ControlOptions = {
-    console?: boolean;
+	console?: boolean;
 };
 ```

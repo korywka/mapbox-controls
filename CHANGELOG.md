@@ -1,3 +1,10 @@
+## 5.0.0
+
+- ⚠️ Rewrite from JSDoc to TypeScript
+- ⚠️ CSS classes renamed from `mapbox-ctrl-*` to `mapgl-*` (e.g. `.mapbox-ctrl-ruler` → `.mapgl-ruler`)
+- Add MapLibre GL JS support
+- Update `@turf` package
+
 ## 4.0.0
 
 - Update package for new `mapbox-gl/esm` imports

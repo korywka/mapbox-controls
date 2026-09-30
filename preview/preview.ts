@@ -1,29 +1,20 @@
 import type { Feature, Polygon } from 'geojson';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-/** CompassControl */
-import CompassControl from '@mapbox-controls/compass';
-import '@mapbox-controls/compass/src/index.css';
-/** ImageControl */
-import ImageControl from '@mapbox-controls/image';
-import '@mapbox-controls/image/src/index.css';
-/** InspectControl */
-import InspectControl from '@mapbox-controls/inspect';
-import '@mapbox-controls/inspect/src/index.css';
-/** LanguageControl */
-import LanguageControl from '@mapbox-controls/language';
-/** RulerControl */
-import RulerControl from '@mapbox-controls/ruler';
-import '@mapbox-controls/ruler/src/index.css';
-/** StylesControl */
-import StylesControl from '@mapbox-controls/styles';
-import '@mapbox-controls/styles/src/index.css';
-/** TooltipControl */
-import TooltipControl from '@mapbox-controls/tooltip';
-import '@mapbox-controls/tooltip/src/index.css';
-/** ZoomControl */
-import ZoomControl from '@mapbox-controls/zoom';
-import '@mapbox-controls/zoom/src/index.css';
+import * as maplibregl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
+import {
+	CompassControl,
+	ImageControl,
+	InspectControl,
+	LanguageControl,
+	RulerControl,
+	StylesControl,
+	TooltipControl,
+	ZoomControl,
+} from './controls.js';
+
+const library = new URLSearchParams(location.search).get('lib') === 'maplibre' ? 'maplibre' : 'mapbox';
 
 const polygon: Feature<Polygon> = {
 	id: 1234567890,
@@ -43,13 +34,35 @@ const polygon: Feature<Polygon> = {
 	},
 };
 
-const map = new mapboxgl.Map({
-	accessToken: 'pk.eyJ1Ijoia29yeXdrYSIsImEiOiJjbTJreGo1bHkwNWx1MmtxdGJtN2phdmEwIn0.Rct4IUBzwzsKF90Riz81dA',
-	container: 'map',
-	style: 'mapbox://styles/mapbox/standard',
-	zoom: 14,
-	center: [30.5234, 50.4501],
-});
+function mapLibrary() {
+	const center: [number, number] = [30.5234, 50.4501];
+	const select = document.getElementById('library') as HTMLSelectElement;
+	select.value = library;
+	select.addEventListener('change', () => {
+		const url = new URL(location.href);
+		url.search = select.value === 'maplibre' ? '?lib=maplibre' : '';
+		location.href = url.href;
+	});
+
+	if (library === 'maplibre') {
+		return new maplibregl.Map({
+			container: 'map',
+			style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+			zoom: 14,
+			center,
+		}) as unknown as mapboxgl.Map;
+	}
+
+	return new mapboxgl.Map({
+		accessToken: 'pk.eyJ1Ijoia29yeXdrYSIsImEiOiJjbTJreGo1bHkwNWx1MmtxdGJtN2phdmEwIn0.Rct4IUBzwzsKF90Riz81dA',
+		container: 'map',
+		style: 'mapbox://styles/mapbox/standard',
+		zoom: 14,
+		center,
+	});
+}
+
+const map = mapLibrary();
 
 map.on('style.load', () => {
 	map.addLayer({
@@ -133,5 +146,22 @@ languages.addEventListener('change', () => {
 	languageControl.setLanguage(languages.value);
 });
 
-map.addControl(new StylesControl(), 'top-left');
-map.addControl(new StylesControl({ compact: true }), 'top-left');
+if (library === 'maplibre') {
+	const styles = [
+		{
+			label: 'Voyager',
+			styleName: 'Voyager',
+			styleUrl: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+		},
+		{
+			label: 'Positron',
+			styleName: 'Positron',
+			styleUrl: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+		},
+	];
+	map.addControl(new StylesControl({ styles }), 'top-left');
+	map.addControl(new StylesControl({ styles, compact: true }), 'top-left');
+} else {
+	map.addControl(new StylesControl(), 'top-left');
+	map.addControl(new StylesControl({ compact: true }), 'top-left');
+}

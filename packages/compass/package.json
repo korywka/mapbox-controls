@@ -5,16 +5,13 @@
 	"type": "module",
 	"main": "./dist/index.js",
 	"source": "./src/index.ts",
+	"types": "./dist/index.d.ts",
 	"dependencies": {
 		"@mapbox-controls/helpers": "workspace:*"
 	},
 	"devDependencies": {
 		"mapbox-gl": "catalog:"
 	},
-	"peerDependencies": {
-		"mapbox-gl": ">=1.0.0 <4.0.0"
-	},
-	"types": "./dist/index.d.ts",
 	"files": [
 		"dist",
 		"src"

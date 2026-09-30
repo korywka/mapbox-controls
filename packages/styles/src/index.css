@@ -1,4 +1,4 @@
-.mapbox-ctrl-styles-expanded {
+.mapgl-styles-expanded {
 	display: flex;
 	button {
 		width: auto;
@@ -20,7 +20,7 @@
 	}
 }
 
-.mapbox-ctrl-styles-compact {
+.mapgl-styles-compact {
 	button {
 		position: relative;
 		display: flex;

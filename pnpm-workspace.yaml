@@ -7,6 +7,7 @@ allowBuilds:
 
 catalog:
   'mapbox-gl': 3.32.0
+  'maplibre-gl': 6.11.2
   '@types/geojson': 7946.0.14
   '@turf/bearing': &turf 7.4.0
   '@turf/centroid': *turf

@@ -1,4 +1,4 @@
-.mapbox-ctrl-inspect {
+.mapgl-inspect {
 	button {
 		display: flex;
 		align-items: center;
@@ -10,7 +10,7 @@
 	}
 }
 
-.mapbox-ctrl-inspect-popup {
+.mapgl-inspect-popup {
 	position: absolute;
 	padding: 8px;
 	border-radius: 4px;

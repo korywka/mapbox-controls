@@ -18,7 +18,7 @@ map.addControl(new LanguageControl());
 
 // set custom language while initialization
 const languageControl = new LanguageControl({
-  language: 'ru',
+	language: 'ru',
 });
 map.addControl(languageControl);
 
@@ -30,10 +30,10 @@ languageControl.setLanguage(event.target.value);
 
 ```ts
 export type ControlOptions = {
-    supportedLanguages?: string[];
-    language?: string;
-    getLanguageKey?: (language: string) => string;
-    excludedLayerIds?: string[];
+	supportedLanguages?: string[];
+	language?: string;
+	getLanguageKey?: (language: string) => string;
+	excludedLayerIds?: string[];
 };
 ```
 

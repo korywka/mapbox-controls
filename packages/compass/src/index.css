@@ -1,4 +1,4 @@
-.mapbox-ctrl-compass {
+.mapgl-compass {
 	transition: 0.2s opacity;
 
 	&[hidden] {

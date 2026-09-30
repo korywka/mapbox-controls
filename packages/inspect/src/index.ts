@@ -1,21 +1,19 @@
-import type { GeoJSONFeature, IControl, LngLat, Map, MapMouseEvent, Point } from 'mapbox-gl';
+import type { GeoJSONFeature, LngLat, Map, MapMouseEvent, Point } from 'mapbox-gl';
 import type { ControlOptions } from './types.js';
-import { controlButton, controlContainer } from '@mapbox-controls/helpers';
+import { Control, controlButton } from '@mapbox-controls/helpers';
 import { icons } from './icons.js';
 import { popup } from './popup.js';
 
-export default class InspectControl implements IControl {
+export default class InspectControl extends Control<Map> {
 	options: ControlOptions;
-	container: HTMLDivElement;
 	button: HTMLButtonElement;
 	isActive: boolean;
 	detailsNode: HTMLDivElement | undefined;
 	lngLat: LngLat | undefined;
-	map: Map | undefined;
 
 	constructor(options: ControlOptions = {}) {
+		super('mapgl-inspect');
 		this.options = { ...options };
-		this.container = controlContainer('mapbox-ctrl-inspect');
 		this.button = controlButton({
 			title: 'Inspect',
 			icon: icons.inspect(),
@@ -33,7 +31,6 @@ export default class InspectControl implements IControl {
 	}
 
 	activate() {
-		if (!this.map) throw Error('map is undefined');
 		this.isActive = true;
 		this.button.classList.add('-active');
 		this.map.on('click', this.mapClickListener);
@@ -42,7 +39,6 @@ export default class InspectControl implements IControl {
 	}
 
 	deactivate() {
-		if (!this.map) throw Error('map is undefined');
 		this.isActive = false;
 		this.button.classList.remove('-active');
 		this.map.off('click', this.mapClickListener);
@@ -52,7 +48,6 @@ export default class InspectControl implements IControl {
 	}
 
 	getPointFeatures(point: Point) {
-		if (!this.map) throw Error('map is undefined');
 		const selectThreshold = 3;
 
 		const queryBox: [[number, number], [number, number]] = [
@@ -64,7 +59,6 @@ export default class InspectControl implements IControl {
 	}
 
 	showDetails(features: GeoJSONFeature[]) {
-		if (!this.map) throw Error('map is undefined');
 		this.detailsNode = popup(features);
 		this.map.getContainer().appendChild(this.detailsNode);
 		this.updatePosition();
@@ -74,14 +68,12 @@ export default class InspectControl implements IControl {
 	}
 
 	hideDetails() {
-		if (!this.map) throw Error('map is undefined');
 		if (!this.detailsNode) return;
 		this.map.getContainer().removeChild(this.detailsNode);
 		this.detailsNode = undefined;
 	}
 
 	updatePosition = () => {
-		if (!this.map) throw Error('map is undefined');
 		if (!this.lngLat) return;
 		if (!this.detailsNode) return;
 		const canvasRect = this.map.getCanvas().getBoundingClientRect();
@@ -97,14 +89,11 @@ export default class InspectControl implements IControl {
 		this.showDetails(features);
 	};
 
-	onAdd(map: unknown): HTMLElement {
-		this.map = map as Map;
+	protected mount() {
 		this.container.appendChild(this.button);
-		return this.container;
 	}
 
-	onRemove() {
+	protected unmount() {
 		this.deactivate();
-		this.container.parentNode?.removeChild(this.container);
 	}
 }

@@ -17,21 +17,22 @@ import '@mapbox-controls/ruler/src/index.css';
 map.addControl(new RulerControl(), 'bottom-right');
 map.on('ruler.on', () => console.log('Ruler activated'));
 map.on('ruler.off', () => console.log('Ruler deactivated'));
+map.on('ruler.change', ({ coordinates }) => console.log('Ruler changed'));
 ```
 
 ## Options
 
 ```ts
 export type ControlOptions = {
-    units?: import("@turf/helpers").Units;
-    labelFormat?: (n: number) => string;
-    lineLayout?: import("mapbox-gl").LineLayerSpecification["layout"];
-    linePaint?: import("mapbox-gl").LineLayerSpecification["paint"];
-    markerLayout?: import("mapbox-gl").CircleLayerSpecification["layout"];
-    markerPaint?: import("mapbox-gl").CircleLayerSpecification["paint"];
-    labelLayout?: import("mapbox-gl").SymbolLayerSpecification["layout"];
-    labelPaint?: import("mapbox-gl").SymbolLayerSpecification["paint"];
-    invisible?: boolean;
+	units?: import('@turf/helpers').Units;
+	labelFormat?: (n: number) => string;
+	lineLayout?: LineLayerSpecification['layout'];
+	linePaint?: LineLayerSpecification['paint'];
+	markerLayout?: CircleLayerSpecification['layout'];
+	markerPaint?: CircleLayerSpecification['paint'];
+	labelLayout?: SymbolLayerSpecification['layout'];
+	labelPaint?: SymbolLayerSpecification['paint'];
+	invisible?: boolean;
 };
 ```
 

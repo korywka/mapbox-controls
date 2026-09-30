@@ -1,22 +1,20 @@
-import type { GeoJSONSource, IControl, Map, MapMouseEvent, MapTouchEvent } from 'mapbox-gl';
-import { controlContainer, controlButton } from '@mapbox-controls/helpers';
+import type { GeoJSONSource, Map, MapMouseEvent, MapTouchEvent } from 'mapbox-gl';
+import { Control, controlButton } from '@mapbox-controls/helpers';
 import { icons } from './icons.js';
 import { layers } from './layers.js';
 import { sources, toGeoJSONLine, toGeoJSONPoints } from './sources.js';
 import type { ControlOptions } from './types.js';
 
-export default class RulerControl implements IControl {
+export default class RulerControl extends Control<Map> {
 	options: ControlOptions;
-	container: HTMLDivElement;
 	isActive: boolean;
 	coordinates: [number, number][];
 	button: HTMLButtonElement | null;
 	removeDragEvents: (() => void) | null;
-	map: Map | undefined;
 
 	constructor(options: ControlOptions = {}) {
+		super('mapgl-ruler');
 		this.options = options;
-		this.container = controlContainer('mapbox-ctrl-ruler');
 		this.isActive = false;
 		this.coordinates = [];
 		this.button = null;
@@ -39,8 +37,6 @@ export default class RulerControl implements IControl {
 	}
 
 	draw = () => {
-		if (!this.map) throw Error('map is undefined');
-
 		this.map.addSource(sources.line, {
 			type: 'geojson',
 			data: toGeoJSONLine(this.coordinates),
@@ -92,7 +88,6 @@ export default class RulerControl implements IControl {
 	};
 
 	activate() {
-		if (!this.map) throw Error('map is undefined');
 		const map = this.map;
 		this.isActive = true;
 		this.coordinates = [];
@@ -107,7 +102,6 @@ export default class RulerControl implements IControl {
 	}
 
 	deactivate() {
-		if (!this.map) throw Error('map is undefined');
 		this.isActive = false;
 		this.map.getCanvas().style.cursor = '';
 		// remove layers, sources and event listeners
@@ -125,7 +119,6 @@ export default class RulerControl implements IControl {
 	}
 
 	mapClickListener = (event: MapMouseEvent) => {
-		if (!this.map) throw Error('map is undefined');
 		this.addCoordinate([event.lngLat.lng, event.lngLat.lat]);
 	};
 
@@ -133,14 +126,12 @@ export default class RulerControl implements IControl {
 	 * @param coordinate - [lng, lat] of new point
 	 */
 	addCoordinate(coordinate: [number, number]) {
-		if (!this.map) throw Error('map is undefined');
 		if (!this.isActive) throw Error('ruler is not active');
 		this.coordinates.push(coordinate);
 		this.updateSource();
 	}
 
 	updateSource() {
-		if (!this.map) throw Error('map is undefined');
 		this.map.fire('ruler.change', { coordinates: this.coordinates });
 		const lineSource = this.map.getSource(sources.line) as GeoJSONSource;
 		const pointsSource = this.map.getSource(sources.points) as GeoJSONSource;
@@ -154,7 +145,6 @@ export default class RulerControl implements IControl {
 	}
 
 	addDragEvents() {
-		if (!this.map) throw Error('map is undefined');
 		const map = this.map;
 		const canvas = map.getCanvas();
 		let markerIndex: number;
@@ -222,22 +212,19 @@ export default class RulerControl implements IControl {
 		};
 	}
 
-	onAdd(map: unknown): HTMLElement {
-		this.map = map as Map;
+	protected mount() {
 		if (this.button) {
 			this.container.appendChild(this.button);
 		}
 		this.addDragEvents();
-		return this.container;
 	}
 
-	onRemove() {
+	protected unmount() {
 		if (this.isActive) {
 			this.deactivate();
 		}
 		if (this.removeDragEvents) {
 			this.removeDragEvents();
 		}
-		this.container.parentNode?.removeChild(this.container);
 	}
 }

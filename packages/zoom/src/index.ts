@@ -1,36 +1,28 @@
-import type { IControl, Map } from 'mapbox-gl';
-import { controlButton, controlContainer } from '@mapbox-controls/helpers';
+import type { Map } from 'mapbox-gl';
+import { Control, controlButton } from '@mapbox-controls/helpers';
 import { icons } from './icons.js';
 
-class ZoomControl implements IControl {
-	container: HTMLDivElement;
+class ZoomControl extends Control<Map> {
 	buttonIn: HTMLButtonElement;
 	buttonOut: HTMLButtonElement;
-	map: Map | undefined;
 
 	constructor() {
-		this.container = controlContainer('mapbox-ctrl-zoom');
+		super('mapgl-zoom');
 		this.buttonIn = controlButton({
 			title: 'Zoom In',
 			icon: icons.plus(),
-			onClick: () => this.map?.zoomIn(),
+			onClick: () => this.map.zoomIn(),
 		});
 		this.buttonOut = controlButton({
 			title: 'Zoom Out',
 			icon: icons.minus(),
-			onClick: () => this.map?.zoomOut(),
+			onClick: () => this.map.zoomOut(),
 		});
 	}
 
-	onAdd(map: unknown): HTMLElement {
-		this.map = map as Map;
+	protected mount() {
 		this.container.appendChild(this.buttonIn);
 		this.container.appendChild(this.buttonOut);
-		return this.container;
-	}
-
-	onRemove() {
-		this.container.parentNode?.removeChild(this.container);
 	}
 }
 

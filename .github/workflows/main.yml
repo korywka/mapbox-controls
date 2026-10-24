@@ -27,3 +27,45 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+  preview:
+    if: github.event_name == 'push'
+    needs: build
+    runs-on: ubuntu-latest
+    concurrency: pages
+    permissions:
+      pages: write
+      id-token: write
+      contents: read
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}preview/
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Install Node.js
+        uses: actions/setup-node@v6
+        with:
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build preview
+        run: pnpm --filter preview build
+
+      - name: Collect site
+        run: rsync -a --exclude node_modules preview site/
+
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

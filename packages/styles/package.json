@@ -1,25 +1,26 @@
 {
-	"name": "@mapbox-controls/styles",
-	"version": "5.0.0",
-	"description": "Change map style",
-	"type": "module",
-	"main": "./dist/index.js",
-	"source": "./src/index.ts",
-	"types": "./dist/index.d.ts",
-	"dependencies": {
-		"@mapbox-controls/helpers": "workspace:*"
-	},
-	"devDependencies": {
-		"mapbox-gl": "catalog:"
-	},
-	"files": [
-		"dist",
-		"src"
-	],
-	"publishConfig": {
-		"access": "public",
-		"registry": "https://registry.npmjs.org/"
-	},
-	"repository": "korywka/mapbox-controls",
-	"license": "MIT"
+  "name": "@mapbox-controls/styles",
+  "version": "5.0.0",
+  "description": "Change map style",
+  "type": "module",
+  "main": "./dist/index.js",
+  "source": "./src/index.ts",
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@mapbox-controls/helpers": "workspace:*"
+  },
+  "devDependencies": {
+    "mapbox-gl": "catalog:",
+    "maplibre-gl": "catalog:"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": "korywka/mapbox-controls",
+  "license": "MIT"
 }

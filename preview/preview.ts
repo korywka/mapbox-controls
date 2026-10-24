@@ -146,22 +146,14 @@ languages.addEventListener('change', () => {
 	languageControl.setLanguage(languages.value);
 });
 
-if (library === 'maplibre') {
-	const styles = [
-		{
-			label: 'Voyager',
-			styleName: 'Voyager',
-			styleUrl: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-		},
-		{
-			label: 'Positron',
-			styleName: 'Positron',
-			styleUrl: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
-		},
-	];
-	map.addControl(new StylesControl({ styles }), 'top-left');
-	map.addControl(new StylesControl({ styles, compact: true }), 'top-left');
-} else {
-	map.addControl(new StylesControl(), 'top-left');
-	map.addControl(new StylesControl({ compact: true }), 'top-left');
-}
+const maplibreStyles = [
+	{ label: 'Voyager', style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json' },
+	{ label: 'Positron', style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json' },
+];
+const mapboxStyles = [
+	{ label: 'Standard', style: 'mapbox://styles/mapbox/standard' },
+	{ label: 'Satellite', style: 'mapbox://styles/mapbox/satellite-streets-v12' },
+];
+const styles = library === 'maplibre' ? maplibreStyles : mapboxStyles;
+map.addControl(new StylesControl({ styles }), 'top-left');
+map.addControl(new StylesControl({ styles, compact: true }), 'top-left');

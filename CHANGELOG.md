@@ -1,3 +1,8 @@
+## 6.0.0
+
+- ⚠️ **StylesControl**: `styles` option is required, default Mapbox styles are removed
+- ⚠️ **StylesControl**: `styleName` and `styleUrl` are replaced by `style`: a style URL or a style object with `name`
+
 ## 5.0.0
 
 - ⚠️ Rewrite from JSDoc to TypeScript

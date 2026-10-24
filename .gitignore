@@ -1,4 +1,8 @@
 node_modules/
 .DS_Store
-packages/*/dist/
 *.tsbuildinfo
+packages/*/dist/
+preview/preview.bundle.js
+preview/preview.bundle.css
+preview/maplibre-gl-shared.mjs
+preview/maplibre-gl-worker.mjs

@@ -1,6 +1,6 @@
 {
 	"name": "@mapbox-controls/helpers",
-	"version": "5.0.0",
+	"version": "6.0.0",
 	"description": "Helpers for mapbox controls",
 	"type": "module",
 	"main": "./dist/index.js",

@@ -1,6 +1,6 @@
 {
 	"name": "@mapbox-controls/ruler",
-	"version": "5.0.0",
+	"version": "6.0.0",
 	"description": "Measure distance between points on a map",
 	"type": "module",
 	"main": "./dist/index.js",

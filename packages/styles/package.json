@@ -1,6 +1,6 @@
 {
   "name": "@mapbox-controls/styles",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "description": "Change map style",
   "type": "module",
   "main": "./dist/index.js",
